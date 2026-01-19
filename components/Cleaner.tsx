@@ -8,7 +8,7 @@ import {
     CheckCircle,
     Loader2,
 } from 'lucide-react';
-import useCleaner from '../hooks/useCleaner';
+import useCleaner from '../hooks/usecleaner';
 export default function FolderCleanerUI() {
     const {
         isDragging,

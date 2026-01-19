@@ -12,30 +12,27 @@ export interface TidyStats {
  * @param folderPath string
  */
 export async function tidyFolder(folderPath: string): Promise<TidyStats> {
-    const seenHashes = new Set<string>();
+    const seenHashes = new Map<string, string>();
     const files = await fs.readdir(folderPath);
     let duplicatesRemoved = 0;
     let spaceSaved = 0;
     const finalFiles: string[] = [];
-    await Promise.all(
-        files.map(async (fileName) => {
-            const filePath = path.join(folderPath, fileName);
-            const stats = await fs.stat(filePath);
-
-            // Only process files
-            if (stats.isFile()) {
-                const hash = await hashFile(filePath);
-                if (seenHashes.has(hash)) {
-                    await fs.remove(filePath);
-                    duplicatesRemoved++;
-                    spaceSaved += stats.size;
-                } else {
-                    seenHashes.add(hash);
-                    finalFiles.push(filePath);
-                }
+    for (const fileName of files) {
+        const filePath = path.join(folderPath, fileName);
+        const stats = await fs.stat(filePath);
+        if (stats.isFile()) {
+            const hash = await hashFile(filePath);
+            if (seenHashes.has(hash)) {
+                await fs.remove(filePath);
+                duplicatesRemoved++;
+                spaceSaved += stats.size;
+                console.log(`Removed duplicate: ${fileName}`);
+            } else {
+                seenHashes.set(hash, filePath);
+                finalFiles.push(filePath);
             }
-        })
-    );
+        }
+    }
 
     return {
         finalFiles,

@@ -65,6 +65,7 @@ export default function useCleaner() {
                 }
             }
             const formData = new FormData();
+            formData.append('folderName', uploadedFolder?.name || 'folder');
             files.forEach((file) => formData.append('files', file, file.name));
             setStatus('processing');
             const start = Date.now();
@@ -77,7 +78,7 @@ export default function useCleaner() {
                 }
             );
             console.log(
-                `[FRONTEND] backedn responded in ${Date.now() - start}ms`
+                `[FRONTEND] backend responded in ${Date.now() - start}ms`
             );
             setCleaningStats(response.data.stats);
             setDownloadURL(response.data.downloadURL);
@@ -87,10 +88,16 @@ export default function useCleaner() {
             setStatus('error');
         }
     };
+    console.log(`[FRONTEND] download url ${downloadURL}`);
 
     const handleDownload = () => {
         if (!downloadURL) return;
-        window.location.href = downloadURL;
+        const link = document.createElement('a');
+        link.href = downloadURL;
+        link.download = downloadURL.split('/').pop() || 'cleaned.zip';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     };
 
     const handleReset = () => {

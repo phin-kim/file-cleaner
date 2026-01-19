@@ -1,0 +1,2601 @@
+[{
+  "_id": {
+    "$oid": "68fa5454acd8ce8ef7b9336a"
+  },
+  "userId": "TIjvR0nNHnR2fXPveDOKT370Zz72",
+  "month": "January",
+  "monthNumber": 1,
+  "year": 2025,
+  "income": [
+    {
+      "source": "Salary",
+      "category": "Freelance",
+      "amount": 1375,
+      "date": "2024-12-31T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Salary",
+      "category": "Rental",
+      "amount": 146,
+      "date": "2025-01-03T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Rental",
+      "category": "Rental",
+      "amount": 1267,
+      "date": "2025-01-03T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Rental",
+      "category": "Bonus",
+      "amount": 629,
+      "date": "2025-01-04T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Salary",
+      "category": "Other",
+      "amount": 1064,
+      "date": "2025-01-07T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Rental",
+      "category": "Salary",
+      "amount": 727,
+      "date": "2025-01-08T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Other",
+      "category": "Freelance",
+      "amount": 673,
+      "date": "2025-01-08T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Gift",
+      "category": "Rental",
+      "amount": 1579,
+      "date": "2025-01-09T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Salary",
+      "category": "Salary",
+      "amount": 789,
+      "date": "2025-01-09T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Bonus",
+      "category": "Gift",
+      "amount": 182,
+      "date": "2025-01-11T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Investments",
+      "category": "Rental",
+      "amount": 1287,
+      "date": "2025-01-13T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Salary",
+      "category": "Bonus",
+      "amount": 1609,
+      "date": "2025-01-14T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Bonus",
+      "category": "Other",
+      "amount": 1074,
+      "date": "2025-01-14T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Investments",
+      "category": "Investments",
+      "amount": 1735,
+      "date": "2025-01-15T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Gift",
+      "category": "Rental",
+      "amount": 644,
+      "date": "2025-01-17T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Gift",
+      "category": "Other",
+      "amount": 1097,
+      "date": "2025-01-17T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Rental",
+      "category": "Other",
+      "amount": 1484,
+      "date": "2025-01-18T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Rental",
+      "category": "Other",
+      "amount": 1581,
+      "date": "2025-01-18T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Rental",
+      "category": "Salary",
+      "amount": 1200,
+      "date": "2025-01-19T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Gift",
+      "category": "Freelance",
+      "amount": 211,
+      "date": "2025-01-22T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Freelance",
+      "category": "Investments",
+      "amount": 522,
+      "date": "2025-01-24T21:00:00.000Z",
+      "notes": "Income from Freelance"
+    },
+    {
+      "source": "Other",
+      "category": "Investments",
+      "amount": 706,
+      "date": "2025-01-24T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Other",
+      "category": "Bonus",
+      "amount": 865,
+      "date": "2025-01-25T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Investments",
+      "category": "Bonus",
+      "amount": 946,
+      "date": "2025-01-26T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Bonus",
+      "category": "Rental",
+      "amount": 1108,
+      "date": "2025-01-29T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Other",
+      "category": "Salary",
+      "amount": 740,
+      "date": "2025-01-30T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Investments",
+      "category": "Rental",
+      "amount": 380,
+      "date": "2025-01-30T21:00:00.000Z",
+      "notes": "Income from Investments"
+    }
+  ],
+  "totalIncome": 176620
+},
+{
+  "_id": {
+    "$oid": "68fa5454acd8ce8ef7b9336b"
+  },
+  "userId": "TIjvR0nNHnR2fXPveDOKT370Zz72",
+  "month": "February",
+  "monthNumber": 2,
+  "year": 2025,
+  "income": [
+    {
+      "source": "Salary",
+      "category": "Rental",
+      "amount": 1477,
+      "date": "2025-02-02T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Bonus",
+      "category": "Salary",
+      "amount": 1310,
+      "date": "2025-02-03T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Bonus",
+      "category": "Salary",
+      "amount": 1215,
+      "date": "2025-02-04T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Freelance",
+      "category": "Salary",
+      "amount": 471,
+      "date": "2025-02-05T21:00:00.000Z",
+      "notes": "Income from Freelance"
+    },
+    {
+      "source": "Rental",
+      "category": "Gift",
+      "amount": 575,
+      "date": "2025-02-09T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Freelance",
+      "category": "Freelance",
+      "amount": 1167,
+      "date": "2025-02-09T21:00:00.000Z",
+      "notes": "Income from Freelance"
+    },
+    {
+      "source": "Bonus",
+      "category": "Bonus",
+      "amount": 1664,
+      "date": "2025-02-10T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Bonus",
+      "category": "Investments",
+      "amount": 313,
+      "date": "2025-02-10T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Gift",
+      "category": "Freelance",
+      "amount": 146,
+      "date": "2025-02-11T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Bonus",
+      "category": "Rental",
+      "amount": 1891,
+      "date": "2025-02-11T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Freelance",
+      "category": "Rental",
+      "amount": 1778,
+      "date": "2025-02-12T21:00:00.000Z",
+      "notes": "Income from Freelance"
+    },
+    {
+      "source": "Freelance",
+      "category": "Rental",
+      "amount": 382,
+      "date": "2025-02-15T21:00:00.000Z",
+      "notes": "Income from Freelance"
+    },
+    {
+      "source": "Investments",
+      "category": "Other",
+      "amount": 1502,
+      "date": "2025-02-16T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Bonus",
+      "category": "Freelance",
+      "amount": 1735,
+      "date": "2025-02-17T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Gift",
+      "category": "Bonus",
+      "amount": 1402,
+      "date": "2025-02-18T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Salary",
+      "category": "Gift",
+      "amount": 649,
+      "date": "2025-02-18T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Freelance",
+      "category": "Salary",
+      "amount": 421,
+      "date": "2025-02-20T21:00:00.000Z",
+      "notes": "Income from Freelance"
+    },
+    {
+      "source": "Rental",
+      "category": "Investments",
+      "amount": 957,
+      "date": "2025-02-21T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Rental",
+      "category": "Other",
+      "amount": 1806,
+      "date": "2025-02-21T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Rental",
+      "category": "Salary",
+      "amount": 732,
+      "date": "2025-02-24T21:00:00.000Z",
+      "notes": "Income from Rental"
+    }
+  ],
+  "totalIncome": 161593
+},
+{
+  "_id": {
+    "$oid": "68fa5454acd8ce8ef7b9336c"
+  },
+  "userId": "TIjvR0nNHnR2fXPveDOKT370Zz72",
+  "month": "March",
+  "monthNumber": 3,
+  "year": 2025,
+  "income": [
+    {
+      "source": "Gift",
+      "category": "Freelance",
+      "amount": 1051,
+      "date": "2025-02-28T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Salary",
+      "category": "Bonus",
+      "amount": 555,
+      "date": "2025-02-28T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Bonus",
+      "category": "Freelance",
+      "amount": 1952,
+      "date": "2025-03-04T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Gift",
+      "category": "Freelance",
+      "amount": 881,
+      "date": "2025-03-04T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Freelance",
+      "category": "Gift",
+      "amount": 559,
+      "date": "2025-03-05T21:00:00.000Z",
+      "notes": "Income from Freelance"
+    },
+    {
+      "source": "Investments",
+      "category": "Investments",
+      "amount": 1181,
+      "date": "2025-03-05T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Freelance",
+      "category": "Investments",
+      "amount": 136,
+      "date": "2025-03-06T21:00:00.000Z",
+      "notes": "Income from Freelance"
+    },
+    {
+      "source": "Other",
+      "category": "Rental",
+      "amount": 1414,
+      "date": "2025-03-06T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Gift",
+      "category": "Freelance",
+      "amount": 1464,
+      "date": "2025-03-07T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Investments",
+      "category": "Bonus",
+      "amount": 990,
+      "date": "2025-03-09T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Bonus",
+      "category": "Gift",
+      "amount": 976,
+      "date": "2025-03-10T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Salary",
+      "category": "Rental",
+      "amount": 708,
+      "date": "2025-03-11T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Gift",
+      "category": "Gift",
+      "amount": 1643,
+      "date": "2025-03-12T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Salary",
+      "category": "Other",
+      "amount": 882,
+      "date": "2025-03-12T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Bonus",
+      "category": "Salary",
+      "amount": 1577,
+      "date": "2025-03-13T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Freelance",
+      "category": "Other",
+      "amount": 1533,
+      "date": "2025-03-14T21:00:00.000Z",
+      "notes": "Income from Freelance"
+    },
+    {
+      "source": "Gift",
+      "category": "Bonus",
+      "amount": 1705,
+      "date": "2025-03-14T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Investments",
+      "category": "Salary",
+      "amount": 1330,
+      "date": "2025-03-15T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Bonus",
+      "category": "Freelance",
+      "amount": 530,
+      "date": "2025-03-18T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Gift",
+      "category": "Bonus",
+      "amount": 1790,
+      "date": "2025-03-18T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Gift",
+      "category": "Other",
+      "amount": 1291,
+      "date": "2025-03-19T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Investments",
+      "category": "Rental",
+      "amount": 511,
+      "date": "2025-03-20T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Rental",
+      "category": "Gift",
+      "amount": 1533,
+      "date": "2025-03-20T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Bonus",
+      "category": "Rental",
+      "amount": 750,
+      "date": "2025-03-21T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Salary",
+      "category": "Bonus",
+      "amount": 745,
+      "date": "2025-03-22T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Freelance",
+      "category": "Bonus",
+      "amount": 1114,
+      "date": "2025-03-25T21:00:00.000Z",
+      "notes": "Income from Freelance"
+    },
+    {
+      "source": "Freelance",
+      "category": "Investments",
+      "amount": 1166,
+      "date": "2025-03-25T21:00:00.000Z",
+      "notes": "Income from Freelance"
+    },
+    {
+      "source": "Salary",
+      "category": "Other",
+      "amount": 669,
+      "date": "2025-03-26T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Salary",
+      "category": "Investments",
+      "amount": 506,
+      "date": "2025-03-26T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Investments",
+      "category": "Freelance",
+      "amount": 636,
+      "date": "2025-03-27T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Rental",
+      "category": "Bonus",
+      "amount": 1587,
+      "date": "2025-03-29T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Investments",
+      "category": "Salary",
+      "amount": 1608,
+      "date": "2025-03-30T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Freelance",
+      "category": "Gift",
+      "amount": 378,
+      "date": "2025-03-30T21:00:00.000Z",
+      "notes": "Income from Freelance"
+    }
+  ],
+  "totalIncome": 158351
+},
+{
+  "_id": {
+    "$oid": "68fa5454acd8ce8ef7b9336d"
+  },
+  "userId": "TIjvR0nNHnR2fXPveDOKT370Zz72",
+  "month": "April",
+  "monthNumber": 4,
+  "year": 2025,
+  "income": [
+    {
+      "source": "Rental",
+      "category": "Rental",
+      "amount": 526,
+      "date": "2025-03-31T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Rental",
+      "category": "Gift",
+      "amount": 1476,
+      "date": "2025-03-31T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Investments",
+      "category": "Investments",
+      "amount": 658,
+      "date": "2025-04-01T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Other",
+      "category": "Bonus",
+      "amount": 1999,
+      "date": "2025-04-02T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Other",
+      "category": "Investments",
+      "amount": 1447,
+      "date": "2025-04-03T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Bonus",
+      "category": "Freelance",
+      "amount": 1779,
+      "date": "2025-04-03T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Gift",
+      "category": "Bonus",
+      "amount": 1428,
+      "date": "2025-04-04T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Investments",
+      "category": "Rental",
+      "amount": 1333,
+      "date": "2025-04-06T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Other",
+      "category": "Bonus",
+      "amount": 916,
+      "date": "2025-04-06T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Investments",
+      "category": "Other",
+      "amount": 1009,
+      "date": "2025-04-07T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Rental",
+      "category": "Investments",
+      "amount": 1956,
+      "date": "2025-04-07T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Rental",
+      "category": "Freelance",
+      "amount": 1016,
+      "date": "2025-04-08T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Freelance",
+      "category": "Investments",
+      "amount": 1180,
+      "date": "2025-04-10T21:00:00.000Z",
+      "notes": "Income from Freelance"
+    },
+    {
+      "source": "Gift",
+      "category": "Gift",
+      "amount": 1912,
+      "date": "2025-04-10T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Salary",
+      "category": "Investments",
+      "amount": 248,
+      "date": "2025-04-12T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Bonus",
+      "category": "Salary",
+      "amount": 1411,
+      "date": "2025-04-12T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Gift",
+      "category": "Rental",
+      "amount": 1470,
+      "date": "2025-04-13T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Salary",
+      "category": "Rental",
+      "amount": 589,
+      "date": "2025-04-14T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Rental",
+      "category": "Investments",
+      "amount": 329,
+      "date": "2025-04-15T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Bonus",
+      "category": "Investments",
+      "amount": 551,
+      "date": "2025-04-16T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Rental",
+      "category": "Rental",
+      "amount": 426,
+      "date": "2025-04-16T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Freelance",
+      "category": "Freelance",
+      "amount": 1119,
+      "date": "2025-04-17T21:00:00.000Z",
+      "notes": "Income from Freelance"
+    },
+    {
+      "source": "Gift",
+      "category": "Other",
+      "amount": 1029,
+      "date": "2025-04-20T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Other",
+      "category": "Bonus",
+      "amount": 825,
+      "date": "2025-04-24T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Bonus",
+      "category": "Other",
+      "amount": 1778,
+      "date": "2025-04-25T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Salary",
+      "category": "Rental",
+      "amount": 1185,
+      "date": "2025-04-26T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Investments",
+      "category": "Gift",
+      "amount": 1847,
+      "date": "2025-04-26T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Investments",
+      "category": "Freelance",
+      "amount": 1892,
+      "date": "2025-04-29T21:00:00.000Z",
+      "notes": "Income from Investments"
+    }
+  ],
+  "totalIncome": 178404
+},
+{
+  "_id": {
+    "$oid": "68fa5454acd8ce8ef7b9336e"
+  },
+  "userId": "TIjvR0nNHnR2fXPveDOKT370Zz72",
+  "month": "May",
+  "monthNumber": 5,
+  "year": 2025,
+  "income": [
+    {
+      "source": "Bonus",
+      "category": "Rental",
+      "amount": 1974,
+      "date": "2025-04-30T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Salary",
+      "category": "Rental",
+      "amount": 1944,
+      "date": "2025-04-30T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Gift",
+      "category": "Other",
+      "amount": 783,
+      "date": "2025-05-03T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Gift",
+      "category": "Salary",
+      "amount": 174,
+      "date": "2025-05-03T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Other",
+      "category": "Salary",
+      "amount": 1392,
+      "date": "2025-05-04T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Investments",
+      "category": "Freelance",
+      "amount": 1749,
+      "date": "2025-05-04T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Rental",
+      "category": "Rental",
+      "amount": 1445,
+      "date": "2025-05-05T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Other",
+      "category": "Other",
+      "amount": 761,
+      "date": "2025-05-05T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Salary",
+      "category": "Other",
+      "amount": 1440,
+      "date": "2025-05-06T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Freelance",
+      "category": "Salary",
+      "amount": 1165,
+      "date": "2025-05-07T21:00:00.000Z",
+      "notes": "Income from Freelance"
+    },
+    {
+      "source": "Freelance",
+      "category": "Investments",
+      "amount": 871,
+      "date": "2025-05-07T21:00:00.000Z",
+      "notes": "Income from Freelance"
+    },
+    {
+      "source": "Bonus",
+      "category": "Investments",
+      "amount": 118,
+      "date": "2025-05-09T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Investments",
+      "category": "Rental",
+      "amount": 480,
+      "date": "2025-05-10T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Salary",
+      "category": "Salary",
+      "amount": 129,
+      "date": "2025-05-10T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Bonus",
+      "category": "Salary",
+      "amount": 1965,
+      "date": "2025-05-12T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Salary",
+      "category": "Investments",
+      "amount": 774,
+      "date": "2025-05-12T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Freelance",
+      "category": "Bonus",
+      "amount": 1754,
+      "date": "2025-05-13T21:00:00.000Z",
+      "notes": "Income from Freelance"
+    },
+    {
+      "source": "Other",
+      "category": "Salary",
+      "amount": 865,
+      "date": "2025-05-13T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Other",
+      "category": "Other",
+      "amount": 1089,
+      "date": "2025-05-15T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Freelance",
+      "category": "Investments",
+      "amount": 518,
+      "date": "2025-05-15T21:00:00.000Z",
+      "notes": "Income from Freelance"
+    },
+    {
+      "source": "Other",
+      "category": "Rental",
+      "amount": 501,
+      "date": "2025-05-17T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Rental",
+      "category": "Freelance",
+      "amount": 1663,
+      "date": "2025-05-18T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Investments",
+      "category": "Investments",
+      "amount": 1864,
+      "date": "2025-05-19T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Salary",
+      "category": "Rental",
+      "amount": 159,
+      "date": "2025-05-21T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Bonus",
+      "category": "Gift",
+      "amount": 1414,
+      "date": "2025-05-22T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Other",
+      "category": "Gift",
+      "amount": 1189,
+      "date": "2025-05-22T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Other",
+      "category": "Rental",
+      "amount": 856,
+      "date": "2025-05-25T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Investments",
+      "category": "Bonus",
+      "amount": 1985,
+      "date": "2025-05-25T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Freelance",
+      "category": "Other",
+      "amount": 1072,
+      "date": "2025-05-27T21:00:00.000Z",
+      "notes": "Income from Freelance"
+    },
+    {
+      "source": "Gift",
+      "category": "Rental",
+      "amount": 1575,
+      "date": "2025-05-27T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Salary",
+      "category": "Gift",
+      "amount": 1907,
+      "date": "2025-05-28T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Investments",
+      "category": "Bonus",
+      "amount": 412,
+      "date": "2025-05-28T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Salary",
+      "category": "Gift",
+      "amount": 814,
+      "date": "2025-05-29T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Other",
+      "category": "Bonus",
+      "amount": 890,
+      "date": "2025-05-29T21:00:00.000Z",
+      "notes": "Income from Other"
+    }
+  ],
+  "totalIncome": 189691
+},
+{
+  "_id": {
+    "$oid": "68fa5454acd8ce8ef7b9336f"
+  },
+  "userId": "TIjvR0nNHnR2fXPveDOKT370Zz72",
+  "month": "June",
+  "monthNumber": 6,
+  "year": 2025,
+  "income": [
+    {
+      "source": "Investments",
+      "category": "Salary",
+      "amount": 463,
+      "date": "2025-06-02T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Investments",
+      "category": "Freelance",
+      "amount": 666,
+      "date": "2025-06-02T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Freelance",
+      "category": "Salary",
+      "amount": 1033,
+      "date": "2025-06-04T21:00:00.000Z",
+      "notes": "Income from Freelance"
+    },
+    {
+      "source": "Salary",
+      "category": "Investments",
+      "amount": 425,
+      "date": "2025-06-04T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Other",
+      "category": "Other",
+      "amount": 1343,
+      "date": "2025-06-06T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Gift",
+      "category": "Bonus",
+      "amount": 919,
+      "date": "2025-06-07T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Investments",
+      "category": "Freelance",
+      "amount": 1886,
+      "date": "2025-06-07T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Rental",
+      "category": "Rental",
+      "amount": 1898,
+      "date": "2025-06-08T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Other",
+      "category": "Bonus",
+      "amount": 184,
+      "date": "2025-06-08T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Freelance",
+      "category": "Gift",
+      "amount": 1964,
+      "date": "2025-06-10T21:00:00.000Z",
+      "notes": "Income from Freelance"
+    },
+    {
+      "source": "Salary",
+      "category": "Rental",
+      "amount": 1724,
+      "date": "2025-06-10T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Salary",
+      "category": "Rental",
+      "amount": 1745,
+      "date": "2025-06-11T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Gift",
+      "category": "Bonus",
+      "amount": 1369,
+      "date": "2025-06-12T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Investments",
+      "category": "Other",
+      "amount": 1318,
+      "date": "2025-06-14T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Other",
+      "category": "Freelance",
+      "amount": 1461,
+      "date": "2025-06-16T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Bonus",
+      "category": "Bonus",
+      "amount": 1451,
+      "date": "2025-06-16T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Gift",
+      "category": "Gift",
+      "amount": 591,
+      "date": "2025-06-17T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Freelance",
+      "category": "Bonus",
+      "amount": 1245,
+      "date": "2025-06-17T21:00:00.000Z",
+      "notes": "Income from Freelance"
+    },
+    {
+      "source": "Salary",
+      "category": "Other",
+      "amount": 1634,
+      "date": "2025-06-18T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Bonus",
+      "category": "Salary",
+      "amount": 1331,
+      "date": "2025-06-18T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Rental",
+      "category": "Freelance",
+      "amount": 1036,
+      "date": "2025-06-19T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Other",
+      "category": "Rental",
+      "amount": 1783,
+      "date": "2025-06-19T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Other",
+      "category": "Other",
+      "amount": 880,
+      "date": "2025-06-20T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Salary",
+      "category": "Investments",
+      "amount": 1326,
+      "date": "2025-06-22T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Salary",
+      "category": "Bonus",
+      "amount": 1840,
+      "date": "2025-06-23T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Salary",
+      "category": "Bonus",
+      "amount": 1960,
+      "date": "2025-06-26T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Other",
+      "category": "Bonus",
+      "amount": 534,
+      "date": "2025-06-28T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Rental",
+      "category": "Bonus",
+      "amount": 1634,
+      "date": "2025-06-29T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Freelance",
+      "category": "Freelance",
+      "amount": 1754,
+      "date": "2025-06-29T21:00:00.000Z",
+      "notes": "Income from Freelance"
+    }
+  ],
+  "totalIncome": 156397
+},
+{
+  "_id": {
+    "$oid": "68fa5454acd8ce8ef7b93370"
+  },
+  "userId": "TIjvR0nNHnR2fXPveDOKT370Zz72",
+  "month": "July",
+  "monthNumber": 7,
+  "year": 2025,
+  "income": [
+    {
+      "source": "Gift",
+      "category": "Investments",
+      "amount": 1477,
+      "date": "2025-06-30T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Rental",
+      "category": "Investments",
+      "amount": 937,
+      "date": "2025-06-30T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Other",
+      "category": "Other",
+      "amount": 903,
+      "date": "2025-07-01T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Other",
+      "category": "Rental",
+      "amount": 861,
+      "date": "2025-07-01T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Other",
+      "category": "Other",
+      "amount": 1181,
+      "date": "2025-07-02T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Investments",
+      "category": "Salary",
+      "amount": 104,
+      "date": "2025-07-04T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Other",
+      "category": "Investments",
+      "amount": 1204,
+      "date": "2025-07-04T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Salary",
+      "category": "Salary",
+      "amount": 316,
+      "date": "2025-07-06T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Bonus",
+      "category": "Freelance",
+      "amount": 1057,
+      "date": "2025-07-07T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Freelance",
+      "category": "Investments",
+      "amount": 1745,
+      "date": "2025-07-07T21:00:00.000Z",
+      "notes": "Income from Freelance"
+    },
+    {
+      "source": "Investments",
+      "category": "Salary",
+      "amount": 641,
+      "date": "2025-07-08T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Investments",
+      "category": "Freelance",
+      "amount": 851,
+      "date": "2025-07-08T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Rental",
+      "category": "Bonus",
+      "amount": 1810,
+      "date": "2025-07-09T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Rental",
+      "category": "Rental",
+      "amount": 1217,
+      "date": "2025-07-09T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Other",
+      "category": "Salary",
+      "amount": 1916,
+      "date": "2025-07-10T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Gift",
+      "category": "Other",
+      "amount": 1038,
+      "date": "2025-07-10T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Rental",
+      "category": "Rental",
+      "amount": 1747,
+      "date": "2025-07-11T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Other",
+      "category": "Gift",
+      "amount": 796,
+      "date": "2025-07-11T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Salary",
+      "category": "Gift",
+      "amount": 1849,
+      "date": "2025-07-12T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Gift",
+      "category": "Rental",
+      "amount": 801,
+      "date": "2025-07-13T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Bonus",
+      "category": "Salary",
+      "amount": 1451,
+      "date": "2025-07-15T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Investments",
+      "category": "Other",
+      "amount": 728,
+      "date": "2025-07-15T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Other",
+      "category": "Salary",
+      "amount": 160,
+      "date": "2025-07-16T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Salary",
+      "category": "Gift",
+      "amount": 486,
+      "date": "2025-07-17T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Salary",
+      "category": "Freelance",
+      "amount": 2000,
+      "date": "2025-07-17T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Gift",
+      "category": "Freelance",
+      "amount": 413,
+      "date": "2025-07-18T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Gift",
+      "category": "Salary",
+      "amount": 1901,
+      "date": "2025-07-18T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Salary",
+      "category": "Other",
+      "amount": 1375,
+      "date": "2025-07-20T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Other",
+      "category": "Rental",
+      "amount": 1225,
+      "date": "2025-07-20T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Investments",
+      "category": "Other",
+      "amount": 1000,
+      "date": "2025-07-21T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Salary",
+      "category": "Salary",
+      "amount": 311,
+      "date": "2025-07-21T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Salary",
+      "category": "Other",
+      "amount": 1255,
+      "date": "2025-07-22T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Rental",
+      "category": "Freelance",
+      "amount": 1218,
+      "date": "2025-07-22T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Gift",
+      "category": "Rental",
+      "amount": 337,
+      "date": "2025-07-23T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Salary",
+      "category": "Gift",
+      "amount": 1438,
+      "date": "2025-07-25T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Bonus",
+      "category": "Bonus",
+      "amount": 1619,
+      "date": "2025-07-26T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Gift",
+      "category": "Salary",
+      "amount": 1413,
+      "date": "2025-07-28T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Salary",
+      "category": "Gift",
+      "amount": 1493,
+      "date": "2025-07-30T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Gift",
+      "category": "Salary",
+      "amount": 249,
+      "date": "2025-07-30T21:00:00.000Z",
+      "notes": "Income from Gift"
+    }
+  ],
+  "totalIncome": 167093
+},
+{
+  "_id": {
+    "$oid": "68fa5454acd8ce8ef7b93371"
+  },
+  "userId": "TIjvR0nNHnR2fXPveDOKT370Zz72",
+  "month": "August",
+  "monthNumber": 8,
+  "year": 2025,
+  "income": [
+    {
+      "source": "Freelance",
+      "category": "Investments",
+      "amount": 1901,
+      "date": "2025-08-01T21:00:00.000Z",
+      "notes": "Income from Freelance"
+    },
+    {
+      "source": "Salary",
+      "category": "Rental",
+      "amount": 1765,
+      "date": "2025-08-01T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Bonus",
+      "category": "Salary",
+      "amount": 1714,
+      "date": "2025-08-02T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Other",
+      "category": "Other",
+      "amount": 1702,
+      "date": "2025-08-02T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Freelance",
+      "category": "Other",
+      "amount": 452,
+      "date": "2025-08-03T21:00:00.000Z",
+      "notes": "Income from Freelance"
+    },
+    {
+      "source": "Salary",
+      "category": "Freelance",
+      "amount": 502,
+      "date": "2025-08-03T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Salary",
+      "category": "Gift",
+      "amount": 1661,
+      "date": "2025-08-05T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Other",
+      "category": "Bonus",
+      "amount": 680,
+      "date": "2025-08-05T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Gift",
+      "category": "Bonus",
+      "amount": 193,
+      "date": "2025-08-07T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Other",
+      "category": "Gift",
+      "amount": 438,
+      "date": "2025-08-07T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Freelance",
+      "category": "Gift",
+      "amount": 291,
+      "date": "2025-08-08T21:00:00.000Z",
+      "notes": "Income from Freelance"
+    },
+    {
+      "source": "Investments",
+      "category": "Freelance",
+      "amount": 1882,
+      "date": "2025-08-08T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Investments",
+      "category": "Freelance",
+      "amount": 1268,
+      "date": "2025-08-09T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Investments",
+      "category": "Other",
+      "amount": 1836,
+      "date": "2025-08-09T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Investments",
+      "category": "Gift",
+      "amount": 1300,
+      "date": "2025-08-11T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Gift",
+      "category": "Gift",
+      "amount": 726,
+      "date": "2025-08-11T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Salary",
+      "category": "Other",
+      "amount": 1140,
+      "date": "2025-08-12T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Investments",
+      "category": "Rental",
+      "amount": 1708,
+      "date": "2025-08-13T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Gift",
+      "category": "Salary",
+      "amount": 336,
+      "date": "2025-08-14T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Other",
+      "category": "Other",
+      "amount": 1032,
+      "date": "2025-08-14T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Freelance",
+      "category": "Freelance",
+      "amount": 392,
+      "date": "2025-08-17T21:00:00.000Z",
+      "notes": "Income from Freelance"
+    },
+    {
+      "source": "Gift",
+      "category": "Rental",
+      "amount": 1232,
+      "date": "2025-08-17T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Bonus",
+      "category": "Salary",
+      "amount": 587,
+      "date": "2025-08-20T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Other",
+      "category": "Salary",
+      "amount": 342,
+      "date": "2025-08-21T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Other",
+      "category": "Investments",
+      "amount": 1662,
+      "date": "2025-08-23T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Rental",
+      "category": "Bonus",
+      "amount": 917,
+      "date": "2025-08-23T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Bonus",
+      "category": "Investments",
+      "amount": 1033,
+      "date": "2025-08-25T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Freelance",
+      "category": "Other",
+      "amount": 1362,
+      "date": "2025-08-26T21:00:00.000Z",
+      "notes": "Income from Freelance"
+    },
+    {
+      "source": "Bonus",
+      "category": "Rental",
+      "amount": 1047,
+      "date": "2025-08-26T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    }
+  ],
+  "totalIncome": 164599
+},
+{
+  "_id": {
+    "$oid": "68fa5454acd8ce8ef7b93372"
+  },
+  "userId": "TIjvR0nNHnR2fXPveDOKT370Zz72",
+  "month": "September",
+  "monthNumber": 9,
+  "year": 2025,
+  "income": [
+    {
+      "source": "Other",
+      "category": "Freelance",
+      "amount": 1926,
+      "date": "2025-08-31T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Investments",
+      "category": "Salary",
+      "amount": 1051,
+      "date": "2025-08-31T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Salary",
+      "category": "Gift",
+      "amount": 1390,
+      "date": "2025-09-05T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Freelance",
+      "category": "Freelance",
+      "amount": 295,
+      "date": "2025-09-05T21:00:00.000Z",
+      "notes": "Income from Freelance"
+    },
+    {
+      "source": "Freelance",
+      "category": "Other",
+      "amount": 1193,
+      "date": "2025-09-06T21:00:00.000Z",
+      "notes": "Income from Freelance"
+    },
+    {
+      "source": "Gift",
+      "category": "Other",
+      "amount": 1890,
+      "date": "2025-09-07T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Bonus",
+      "category": "Bonus",
+      "amount": 1805,
+      "date": "2025-09-07T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Other",
+      "category": "Salary",
+      "amount": 739,
+      "date": "2025-09-09T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Bonus",
+      "category": "Bonus",
+      "amount": 1104,
+      "date": "2025-09-09T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Rental",
+      "category": "Freelance",
+      "amount": 1514,
+      "date": "2025-09-11T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Other",
+      "category": "Rental",
+      "amount": 1710,
+      "date": "2025-09-12T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Gift",
+      "category": "Freelance",
+      "amount": 592,
+      "date": "2025-09-13T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Freelance",
+      "category": "Freelance",
+      "amount": 1192,
+      "date": "2025-09-13T21:00:00.000Z",
+      "notes": "Income from Freelance"
+    },
+    {
+      "source": "Freelance",
+      "category": "Gift",
+      "amount": 282,
+      "date": "2025-09-14T21:00:00.000Z",
+      "notes": "Income from Freelance"
+    },
+    {
+      "source": "Investments",
+      "category": "Salary",
+      "amount": 1476,
+      "date": "2025-09-14T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Bonus",
+      "category": "Bonus",
+      "amount": 1726,
+      "date": "2025-09-15T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Other",
+      "category": "Rental",
+      "amount": 1577,
+      "date": "2025-09-15T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Other",
+      "category": "Investments",
+      "amount": 1894,
+      "date": "2025-09-16T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Rental",
+      "category": "Gift",
+      "amount": 659,
+      "date": "2025-09-16T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Investments",
+      "category": "Other",
+      "amount": 1716,
+      "date": "2025-09-17T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Freelance",
+      "category": "Rental",
+      "amount": 619,
+      "date": "2025-09-20T21:00:00.000Z",
+      "notes": "Income from Freelance"
+    },
+    {
+      "source": "Salary",
+      "category": "Other",
+      "amount": 1479,
+      "date": "2025-09-20T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Bonus",
+      "category": "Rental",
+      "amount": 1865,
+      "date": "2025-09-21T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Other",
+      "category": "Salary",
+      "amount": 1900,
+      "date": "2025-09-21T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Other",
+      "category": "Freelance",
+      "amount": 260,
+      "date": "2025-09-22T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Investments",
+      "category": "Other",
+      "amount": 1807,
+      "date": "2025-09-22T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Rental",
+      "category": "Salary",
+      "amount": 1958,
+      "date": "2025-09-23T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Bonus",
+      "category": "Freelance",
+      "amount": 708,
+      "date": "2025-09-24T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Investments",
+      "category": "Salary",
+      "amount": 506,
+      "date": "2025-09-24T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Rental",
+      "category": "Other",
+      "amount": 709,
+      "date": "2025-09-25T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Investments",
+      "category": "Other",
+      "amount": 251,
+      "date": "2025-09-25T21:00:00.000Z",
+      "notes": "Income from Investments"
+    }
+  ],
+  "totalIncome": 163993
+},
+{
+  "_id": {
+    "$oid": "68fa5b69acd8ce8ef7b93391"
+  },
+  "userId": "TIjvR0nNHnR2fXPveDOKT370Zz72",
+  "month": "October",
+  "monthNumber": 1,
+  "year": 2025,
+  "income": [
+    {
+      "source": "Salary",
+      "category": "Freelance",
+      "amount": 1375,
+      "date": "2024-12-31T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Salary",
+      "category": "Rental",
+      "amount": 146,
+      "date": "2025-01-03T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Rental",
+      "category": "Rental",
+      "amount": 1267,
+      "date": "2025-01-03T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Rental",
+      "category": "Bonus",
+      "amount": 629,
+      "date": "2025-01-04T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Salary",
+      "category": "Other",
+      "amount": 1064,
+      "date": "2025-01-07T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Rental",
+      "category": "Salary",
+      "amount": 727,
+      "date": "2025-01-08T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Other",
+      "category": "Freelance",
+      "amount": 673,
+      "date": "2025-01-08T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Gift",
+      "category": "Rental",
+      "amount": 1579,
+      "date": "2025-01-09T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Salary",
+      "category": "Salary",
+      "amount": 789,
+      "date": "2025-01-09T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Bonus",
+      "category": "Gift",
+      "amount": 182,
+      "date": "2025-01-11T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Investments",
+      "category": "Rental",
+      "amount": 1287,
+      "date": "2025-01-13T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Salary",
+      "category": "Bonus",
+      "amount": 1609,
+      "date": "2025-01-14T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Bonus",
+      "category": "Other",
+      "amount": 1074,
+      "date": "2025-01-14T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Investments",
+      "category": "Investments",
+      "amount": 1735,
+      "date": "2025-01-15T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Gift",
+      "category": "Rental",
+      "amount": 644,
+      "date": "2025-01-17T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Gift",
+      "category": "Other",
+      "amount": 1097,
+      "date": "2025-01-17T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Rental",
+      "category": "Other",
+      "amount": 1484,
+      "date": "2025-01-18T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Rental",
+      "category": "Other",
+      "amount": 1581,
+      "date": "2025-01-18T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Rental",
+      "category": "Salary",
+      "amount": 1200,
+      "date": "2025-01-19T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Gift",
+      "category": "Freelance",
+      "amount": 211,
+      "date": "2025-01-22T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Freelance",
+      "category": "Investments",
+      "amount": 522,
+      "date": "2025-01-24T21:00:00.000Z",
+      "notes": "Income from Freelance"
+    },
+    {
+      "source": "Other",
+      "category": "Investments",
+      "amount": 706,
+      "date": "2025-01-24T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Other",
+      "category": "Bonus",
+      "amount": 865,
+      "date": "2025-01-25T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Investments",
+      "category": "Bonus",
+      "amount": 946,
+      "date": "2025-01-26T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Bonus",
+      "category": "Rental",
+      "amount": 1108,
+      "date": "2025-01-29T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Other",
+      "category": "Salary",
+      "amount": 740,
+      "date": "2025-01-30T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Investments",
+      "category": "Rental",
+      "amount": 380,
+      "date": "2025-01-30T21:00:00.000Z",
+      "notes": "Income from Investments"
+    }
+  ],
+  "totalIncome": 176620
+},
+{
+  "_id": {
+    "$oid": "68fa5cd1acd8ce8ef7b93392"
+  },
+  "userId": "TIjvR0nNHnR2fXPveDOKT370Zz72",
+  "month": "November",
+  "monthNumber": 1,
+  "year": 2025,
+  "income": [
+    {
+      "source": "Salary",
+      "category": "Freelance",
+      "amount": 1375,
+      "date": "2024-12-31T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Salary",
+      "category": "Rental",
+      "amount": 146,
+      "date": "2025-01-03T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Rental",
+      "category": "Rental",
+      "amount": 1267,
+      "date": "2025-01-03T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Rental",
+      "category": "Bonus",
+      "amount": 629,
+      "date": "2025-01-04T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Salary",
+      "category": "Other",
+      "amount": 1064,
+      "date": "2025-01-07T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Rental",
+      "category": "Salary",
+      "amount": 727,
+      "date": "2025-01-08T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Other",
+      "category": "Freelance",
+      "amount": 673,
+      "date": "2025-01-08T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Gift",
+      "category": "Rental",
+      "amount": 1579,
+      "date": "2025-01-09T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Salary",
+      "category": "Salary",
+      "amount": 789,
+      "date": "2025-01-09T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Bonus",
+      "category": "Gift",
+      "amount": 182,
+      "date": "2025-01-11T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Investments",
+      "category": "Rental",
+      "amount": 1287,
+      "date": "2025-01-13T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Salary",
+      "category": "Bonus",
+      "amount": 1609,
+      "date": "2025-01-14T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Bonus",
+      "category": "Other",
+      "amount": 1074,
+      "date": "2025-01-14T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Investments",
+      "category": "Investments",
+      "amount": 1735,
+      "date": "2025-01-15T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Gift",
+      "category": "Rental",
+      "amount": 644,
+      "date": "2025-01-17T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Gift",
+      "category": "Other",
+      "amount": 1097,
+      "date": "2025-01-17T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Rental",
+      "category": "Other",
+      "amount": 1484,
+      "date": "2025-01-18T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Rental",
+      "category": "Other",
+      "amount": 1581,
+      "date": "2025-01-18T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Rental",
+      "category": "Salary",
+      "amount": 1200,
+      "date": "2025-01-19T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Gift",
+      "category": "Freelance",
+      "amount": 211,
+      "date": "2025-01-22T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Freelance",
+      "category": "Investments",
+      "amount": 522,
+      "date": "2025-01-24T21:00:00.000Z",
+      "notes": "Income from Freelance"
+    },
+    {
+      "source": "Other",
+      "category": "Investments",
+      "amount": 706,
+      "date": "2025-01-24T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Other",
+      "category": "Bonus",
+      "amount": 865,
+      "date": "2025-01-25T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Investments",
+      "category": "Bonus",
+      "amount": 946,
+      "date": "2025-01-26T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Bonus",
+      "category": "Rental",
+      "amount": 1108,
+      "date": "2025-01-29T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Other",
+      "category": "Salary",
+      "amount": 740,
+      "date": "2025-01-30T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Investments",
+      "category": "Rental",
+      "amount": 380,
+      "date": "2025-01-30T21:00:00.000Z",
+      "notes": "Income from Investments"
+    }
+  ],
+  "totalIncome": 166620
+},
+{
+  "_id": {
+    "$oid": "68fa5d7cacd8ce8ef7b93394"
+  },
+  "userId": "TIjvR0nNHnR2fXPveDOKT370Zz72",
+  "month": "December",
+  "monthNumber": 1,
+  "year": 2025,
+  "income": [
+    {
+      "source": "Salary",
+      "category": "Freelance",
+      "amount": 1375,
+      "date": "2024-12-31T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Salary",
+      "category": "Rental",
+      "amount": 146,
+      "date": "2025-01-03T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Rental",
+      "category": "Rental",
+      "amount": 1267,
+      "date": "2025-01-03T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Rental",
+      "category": "Bonus",
+      "amount": 629,
+      "date": "2025-01-04T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Salary",
+      "category": "Other",
+      "amount": 1064,
+      "date": "2025-01-07T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Rental",
+      "category": "Salary",
+      "amount": 727,
+      "date": "2025-01-08T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Other",
+      "category": "Freelance",
+      "amount": 673,
+      "date": "2025-01-08T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Gift",
+      "category": "Rental",
+      "amount": 1579,
+      "date": "2025-01-09T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Salary",
+      "category": "Salary",
+      "amount": 789,
+      "date": "2025-01-09T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Bonus",
+      "category": "Gift",
+      "amount": 182,
+      "date": "2025-01-11T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Investments",
+      "category": "Rental",
+      "amount": 1287,
+      "date": "2025-01-13T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Salary",
+      "category": "Bonus",
+      "amount": 1609,
+      "date": "2025-01-14T21:00:00.000Z",
+      "notes": "Income from Salary"
+    },
+    {
+      "source": "Bonus",
+      "category": "Other",
+      "amount": 1074,
+      "date": "2025-01-14T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Investments",
+      "category": "Investments",
+      "amount": 1735,
+      "date": "2025-01-15T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Gift",
+      "category": "Rental",
+      "amount": 644,
+      "date": "2025-01-17T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Gift",
+      "category": "Other",
+      "amount": 1097,
+      "date": "2025-01-17T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Rental",
+      "category": "Other",
+      "amount": 1484,
+      "date": "2025-01-18T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Rental",
+      "category": "Other",
+      "amount": 1581,
+      "date": "2025-01-18T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Rental",
+      "category": "Salary",
+      "amount": 1200,
+      "date": "2025-01-19T21:00:00.000Z",
+      "notes": "Income from Rental"
+    },
+    {
+      "source": "Gift",
+      "category": "Freelance",
+      "amount": 211,
+      "date": "2025-01-22T21:00:00.000Z",
+      "notes": "Income from Gift"
+    },
+    {
+      "source": "Freelance",
+      "category": "Investments",
+      "amount": 522,
+      "date": "2025-01-24T21:00:00.000Z",
+      "notes": "Income from Freelance"
+    },
+    {
+      "source": "Other",
+      "category": "Investments",
+      "amount": 706,
+      "date": "2025-01-24T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Other",
+      "category": "Bonus",
+      "amount": 865,
+      "date": "2025-01-25T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Investments",
+      "category": "Bonus",
+      "amount": 946,
+      "date": "2025-01-26T21:00:00.000Z",
+      "notes": "Income from Investments"
+    },
+    {
+      "source": "Bonus",
+      "category": "Rental",
+      "amount": 1108,
+      "date": "2025-01-29T21:00:00.000Z",
+      "notes": "Income from Bonus"
+    },
+    {
+      "source": "Other",
+      "category": "Salary",
+      "amount": 740,
+      "date": "2025-01-30T21:00:00.000Z",
+      "notes": "Income from Other"
+    },
+    {
+      "source": "Investments",
+      "category": "Rental",
+      "amount": 380,
+      "date": "2025-01-30T21:00:00.000Z",
+      "notes": "Income from Investments"
+    }
+  ],
+  "totalIncome": 163620
+}]

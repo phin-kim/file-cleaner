@@ -1,0 +1,5892 @@
+[{
+  "_id": {
+    "$oid": "68fa41cc4237485db16f4d78"
+  },
+  "userId": "TIjvR0nNHnR2fXPveDOKT370Zz72",
+  "month": "January",
+  "year": 2025,
+  "weeks": [
+    {
+      "weekNumber": 1,
+      "startDate": "2024-12-31T21:00:00.000Z",
+      "endDate": "2025-01-06T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2024-12-31T21:00:00.000Z",
+          "categories": {
+            "Shopping": 163,
+            "Transport": 388,
+            "Food and Drinks": 253,
+            "Entertainment": 859,
+            "Bills": 117,
+            "Subscriptions": 380,
+            "Education": 311,
+            "Healthcare": 489,
+            "Transfers": 362,
+            "Loans": 977
+          },
+          "total": 4299
+        },
+        {
+          "date": "2025-01-01T21:00:00.000Z",
+          "categories": {
+            "Shopping": 182,
+            "Transport": 845,
+            "Food and Drinks": 672,
+            "Entertainment": 276,
+            "Bills": 411,
+            "Subscriptions": 210,
+            "Education": 907,
+            "Healthcare": 316,
+            "Transfers": 721,
+            "Loans": 799
+          },
+          "total": 5339
+        },
+        {
+          "date": "2025-01-02T21:00:00.000Z",
+          "categories": {
+            "Shopping": 790,
+            "Transport": 837,
+            "Food and Drinks": 737,
+            "Entertainment": 654,
+            "Bills": 599,
+            "Subscriptions": 251,
+            "Education": 188,
+            "Healthcare": 710,
+            "Transfers": 835,
+            "Loans": 747
+          },
+          "total": 6348
+        },
+        {
+          "date": "2025-01-03T21:00:00.000Z",
+          "categories": {
+            "Shopping": 698,
+            "Transport": 555,
+            "Food and Drinks": 333,
+            "Entertainment": 949,
+            "Bills": 458,
+            "Subscriptions": 842,
+            "Education": 740,
+            "Healthcare": 283,
+            "Transfers": 229,
+            "Loans": 586
+          },
+          "total": 5673
+        },
+        {
+          "date": "2025-01-04T21:00:00.000Z",
+          "categories": {
+            "Shopping": 839,
+            "Transport": 324,
+            "Food and Drinks": 783,
+            "Entertainment": 653,
+            "Bills": 837,
+            "Subscriptions": 316,
+            "Education": 970,
+            "Healthcare": 988,
+            "Transfers": 361,
+            "Loans": 183
+          },
+          "total": 6254
+        },
+        {
+          "date": "2025-01-05T21:00:00.000Z",
+          "categories": {
+            "Shopping": 350,
+            "Transport": 749,
+            "Food and Drinks": 918,
+            "Entertainment": 914,
+            "Bills": 326,
+            "Subscriptions": 656,
+            "Education": 525,
+            "Healthcare": 615,
+            "Transfers": 682,
+            "Loans": 527
+          },
+          "total": 6262
+        },
+        {
+          "date": "2025-01-06T21:00:00.000Z",
+          "categories": {
+            "Shopping": 398,
+            "Transport": 106,
+            "Food and Drinks": 271,
+            "Entertainment": 188,
+            "Bills": 845,
+            "Subscriptions": 667,
+            "Education": 156,
+            "Healthcare": 693,
+            "Transfers": 820,
+            "Loans": 158
+          },
+          "total": 4302
+        }
+      ],
+      "weeklyTotal": 38477
+    },
+    {
+      "weekNumber": 2,
+      "startDate": "2025-01-07T21:00:00.000Z",
+      "endDate": "2025-01-13T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-01-07T21:00:00.000Z",
+          "categories": {
+            "Shopping": 456,
+            "Transport": 742,
+            "Food and Drinks": 884,
+            "Entertainment": 464,
+            "Bills": 374,
+            "Subscriptions": 930,
+            "Education": 638,
+            "Healthcare": 172,
+            "Transfers": 287,
+            "Loans": 796
+          },
+          "total": 5743
+        },
+        {
+          "date": "2025-01-08T21:00:00.000Z",
+          "categories": {
+            "Shopping": 222,
+            "Transport": 883,
+            "Food and Drinks": 694,
+            "Entertainment": 917,
+            "Bills": 362,
+            "Subscriptions": 977,
+            "Education": 521,
+            "Healthcare": 520,
+            "Transfers": 469,
+            "Loans": 544
+          },
+          "total": 6109
+        },
+        {
+          "date": "2025-01-09T21:00:00.000Z",
+          "categories": {
+            "Shopping": 671,
+            "Transport": 694,
+            "Food and Drinks": 750,
+            "Entertainment": 509,
+            "Bills": 104,
+            "Subscriptions": 476,
+            "Education": 753,
+            "Healthcare": 808,
+            "Transfers": 905,
+            "Loans": 405
+          },
+          "total": 6075
+        },
+        {
+          "date": "2025-01-10T21:00:00.000Z",
+          "categories": {
+            "Shopping": 686,
+            "Transport": 558,
+            "Food and Drinks": 407,
+            "Entertainment": 355,
+            "Bills": 172,
+            "Subscriptions": 257,
+            "Education": 614,
+            "Healthcare": 302,
+            "Transfers": 682,
+            "Loans": 612
+          },
+          "total": 4645
+        },
+        {
+          "date": "2025-01-11T21:00:00.000Z",
+          "categories": {
+            "Shopping": 178,
+            "Transport": 303,
+            "Food and Drinks": 301,
+            "Entertainment": 978,
+            "Bills": 146,
+            "Subscriptions": 449,
+            "Education": 645,
+            "Healthcare": 428,
+            "Transfers": 370,
+            "Loans": 623
+          },
+          "total": 4421
+        },
+        {
+          "date": "2025-01-12T21:00:00.000Z",
+          "categories": {
+            "Shopping": 219,
+            "Transport": 435,
+            "Food and Drinks": 913,
+            "Entertainment": 107,
+            "Bills": 584,
+            "Subscriptions": 110,
+            "Education": 579,
+            "Healthcare": 933,
+            "Transfers": 345,
+            "Loans": 598
+          },
+          "total": 4823
+        },
+        {
+          "date": "2025-01-13T21:00:00.000Z",
+          "categories": {
+            "Shopping": 917,
+            "Transport": 920,
+            "Food and Drinks": 133,
+            "Entertainment": 862,
+            "Bills": 433,
+            "Subscriptions": 387,
+            "Education": 640,
+            "Healthcare": 289,
+            "Transfers": 406,
+            "Loans": 995
+          },
+          "total": 5982
+        }
+      ],
+      "weeklyTotal": 37798
+    },
+    {
+      "weekNumber": 3,
+      "startDate": "2025-01-14T21:00:00.000Z",
+      "endDate": "2025-01-20T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-01-14T21:00:00.000Z",
+          "categories": {
+            "Shopping": 672,
+            "Transport": 902,
+            "Food and Drinks": 854,
+            "Entertainment": 145,
+            "Bills": 461,
+            "Subscriptions": 127,
+            "Education": 518,
+            "Healthcare": 277,
+            "Transfers": 887,
+            "Loans": 501
+          },
+          "total": 5344
+        },
+        {
+          "date": "2025-01-15T21:00:00.000Z",
+          "categories": {
+            "Shopping": 385,
+            "Transport": 947,
+            "Food and Drinks": 687,
+            "Entertainment": 512,
+            "Bills": 778,
+            "Subscriptions": 665,
+            "Education": 549,
+            "Healthcare": 643,
+            "Transfers": 997,
+            "Loans": 908
+          },
+          "total": 7071
+        },
+        {
+          "date": "2025-01-16T21:00:00.000Z",
+          "categories": {
+            "Shopping": 450,
+            "Transport": 788,
+            "Food and Drinks": 978,
+            "Entertainment": 188,
+            "Bills": 697,
+            "Subscriptions": 736,
+            "Education": 939,
+            "Healthcare": 916,
+            "Transfers": 487,
+            "Loans": 296
+          },
+          "total": 6475
+        },
+        {
+          "date": "2025-01-17T21:00:00.000Z",
+          "categories": {
+            "Shopping": 207,
+            "Transport": 345,
+            "Food and Drinks": 611,
+            "Entertainment": 807,
+            "Bills": 436,
+            "Subscriptions": 444,
+            "Education": 657,
+            "Healthcare": 506,
+            "Transfers": 913,
+            "Loans": 933
+          },
+          "total": 5859
+        },
+        {
+          "date": "2025-01-18T21:00:00.000Z",
+          "categories": {
+            "Shopping": 879,
+            "Transport": 205,
+            "Food and Drinks": 585,
+            "Entertainment": 160,
+            "Bills": 313,
+            "Subscriptions": 222,
+            "Education": 698,
+            "Healthcare": 516,
+            "Transfers": 699,
+            "Loans": 424
+          },
+          "total": 4701
+        },
+        {
+          "date": "2025-01-19T21:00:00.000Z",
+          "categories": {
+            "Shopping": 148,
+            "Transport": 458,
+            "Food and Drinks": 668,
+            "Entertainment": 387,
+            "Bills": 680,
+            "Subscriptions": 238,
+            "Education": 583,
+            "Healthcare": 108,
+            "Transfers": 903,
+            "Loans": 965
+          },
+          "total": 5138
+        },
+        {
+          "date": "2025-01-20T21:00:00.000Z",
+          "categories": {
+            "Shopping": 136,
+            "Transport": 499,
+            "Food and Drinks": 571,
+            "Entertainment": 527,
+            "Bills": 284,
+            "Subscriptions": 735,
+            "Education": 623,
+            "Healthcare": 877,
+            "Transfers": 935,
+            "Loans": 825
+          },
+          "total": 6012
+        }
+      ],
+      "weeklyTotal": 40600
+    },
+    {
+      "weekNumber": 4,
+      "startDate": "2025-01-21T21:00:00.000Z",
+      "endDate": "2025-01-27T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-01-21T21:00:00.000Z",
+          "categories": {
+            "Shopping": 982,
+            "Transport": 794,
+            "Food and Drinks": 208,
+            "Entertainment": 170,
+            "Bills": 667,
+            "Subscriptions": 426,
+            "Education": 491,
+            "Healthcare": 508,
+            "Transfers": 101,
+            "Loans": 467
+          },
+          "total": 4814
+        },
+        {
+          "date": "2025-01-22T21:00:00.000Z",
+          "categories": {
+            "Shopping": 885,
+            "Transport": 426,
+            "Food and Drinks": 933,
+            "Entertainment": 213,
+            "Bills": 330,
+            "Subscriptions": 248,
+            "Education": 860,
+            "Healthcare": 311,
+            "Transfers": 823,
+            "Loans": 788
+          },
+          "total": 5817
+        },
+        {
+          "date": "2025-01-23T21:00:00.000Z",
+          "categories": {
+            "Shopping": 809,
+            "Transport": 332,
+            "Food and Drinks": 524,
+            "Entertainment": 506,
+            "Bills": 684,
+            "Subscriptions": 799,
+            "Education": 368,
+            "Healthcare": 963,
+            "Transfers": 368,
+            "Loans": 133
+          },
+          "total": 5486
+        },
+        {
+          "date": "2025-01-24T21:00:00.000Z",
+          "categories": {
+            "Shopping": 576,
+            "Transport": 737,
+            "Food and Drinks": 520,
+            "Entertainment": 521,
+            "Bills": 953,
+            "Subscriptions": 212,
+            "Education": 159,
+            "Healthcare": 516,
+            "Transfers": 256,
+            "Loans": 719
+          },
+          "total": 5169
+        },
+        {
+          "date": "2025-01-25T21:00:00.000Z",
+          "categories": {
+            "Shopping": 690,
+            "Transport": 255,
+            "Food and Drinks": 144,
+            "Entertainment": 828,
+            "Bills": 828,
+            "Subscriptions": 356,
+            "Education": 203,
+            "Healthcare": 272,
+            "Transfers": 916,
+            "Loans": 947
+          },
+          "total": 5439
+        },
+        {
+          "date": "2025-01-26T21:00:00.000Z",
+          "categories": {
+            "Shopping": 805,
+            "Transport": 311,
+            "Food and Drinks": 839,
+            "Entertainment": 382,
+            "Bills": 461,
+            "Subscriptions": 695,
+            "Education": 128,
+            "Healthcare": 323,
+            "Transfers": 215,
+            "Loans": 834
+          },
+          "total": 4993
+        },
+        {
+          "date": "2025-01-27T21:00:00.000Z",
+          "categories": {
+            "Shopping": 632,
+            "Transport": 615,
+            "Food and Drinks": 307,
+            "Entertainment": 454,
+            "Bills": 719,
+            "Subscriptions": 344,
+            "Education": 788,
+            "Healthcare": 547,
+            "Transfers": 909,
+            "Loans": 636
+          },
+          "total": 5951
+        }
+      ],
+      "weeklyTotal": 37669
+    }
+  ],
+  "monthlyTotal": 154544
+},
+{
+  "_id": {
+    "$oid": "68fa41cc4237485db16f4d79"
+  },
+  "userId": "TIjvR0nNHnR2fXPveDOKT370Zz72",
+  "month": "February",
+  "year": 2025,
+  "weeks": [
+    {
+      "weekNumber": 1,
+      "startDate": "2025-01-31T21:00:00.000Z",
+      "endDate": "2025-02-06T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-01-31T21:00:00.000Z",
+          "categories": {
+            "Shopping": 976,
+            "Transport": 739,
+            "Food and Drinks": 909,
+            "Entertainment": 343,
+            "Bills": 309,
+            "Subscriptions": 851,
+            "Education": 262,
+            "Healthcare": 912,
+            "Transfers": 372,
+            "Loans": 681
+          },
+          "total": 6354
+        },
+        {
+          "date": "2025-02-01T21:00:00.000Z",
+          "categories": {
+            "Shopping": 172,
+            "Transport": 868,
+            "Food and Drinks": 659,
+            "Entertainment": 614,
+            "Bills": 670,
+            "Subscriptions": 360,
+            "Education": 614,
+            "Healthcare": 753,
+            "Transfers": 453,
+            "Loans": 291
+          },
+          "total": 5454
+        },
+        {
+          "date": "2025-02-02T21:00:00.000Z",
+          "categories": {
+            "Shopping": 579,
+            "Transport": 229,
+            "Food and Drinks": 584,
+            "Entertainment": 287,
+            "Bills": 683,
+            "Subscriptions": 817,
+            "Education": 257,
+            "Healthcare": 599,
+            "Transfers": 799,
+            "Loans": 322
+          },
+          "total": 5156
+        },
+        {
+          "date": "2025-02-03T21:00:00.000Z",
+          "categories": {
+            "Shopping": 684,
+            "Transport": 885,
+            "Food and Drinks": 168,
+            "Entertainment": 748,
+            "Bills": 920,
+            "Subscriptions": 247,
+            "Education": 282,
+            "Healthcare": 328,
+            "Transfers": 399,
+            "Loans": 555
+          },
+          "total": 5216
+        },
+        {
+          "date": "2025-02-04T21:00:00.000Z",
+          "categories": {
+            "Shopping": 789,
+            "Transport": 676,
+            "Food and Drinks": 928,
+            "Entertainment": 326,
+            "Bills": 319,
+            "Subscriptions": 725,
+            "Education": 896,
+            "Healthcare": 892,
+            "Transfers": 113,
+            "Loans": 332
+          },
+          "total": 5996
+        },
+        {
+          "date": "2025-02-05T21:00:00.000Z",
+          "categories": {
+            "Shopping": 799,
+            "Transport": 546,
+            "Food and Drinks": 589,
+            "Entertainment": 747,
+            "Bills": 253,
+            "Subscriptions": 826,
+            "Education": 816,
+            "Healthcare": 155,
+            "Transfers": 146,
+            "Loans": 409
+          },
+          "total": 5286
+        },
+        {
+          "date": "2025-02-06T21:00:00.000Z",
+          "categories": {
+            "Shopping": 701,
+            "Transport": 566,
+            "Food and Drinks": 530,
+            "Entertainment": 814,
+            "Bills": 764,
+            "Subscriptions": 921,
+            "Education": 274,
+            "Healthcare": 332,
+            "Transfers": 614,
+            "Loans": 523
+          },
+          "total": 6039
+        }
+      ],
+      "weeklyTotal": 39501
+    },
+    {
+      "weekNumber": 2,
+      "startDate": "2025-02-07T21:00:00.000Z",
+      "endDate": "2025-02-13T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-02-07T21:00:00.000Z",
+          "categories": {
+            "Shopping": 166,
+            "Transport": 174,
+            "Food and Drinks": 137,
+            "Entertainment": 214,
+            "Bills": 221,
+            "Subscriptions": 662,
+            "Education": 559,
+            "Healthcare": 633,
+            "Transfers": 578,
+            "Loans": 568
+          },
+          "total": 3912
+        },
+        {
+          "date": "2025-02-08T21:00:00.000Z",
+          "categories": {
+            "Shopping": 477,
+            "Transport": 682,
+            "Food and Drinks": 768,
+            "Entertainment": 250,
+            "Bills": 166,
+            "Subscriptions": 513,
+            "Education": 216,
+            "Healthcare": 391,
+            "Transfers": 833,
+            "Loans": 767
+          },
+          "total": 5063
+        },
+        {
+          "date": "2025-02-09T21:00:00.000Z",
+          "categories": {
+            "Shopping": 209,
+            "Transport": 776,
+            "Food and Drinks": 180,
+            "Entertainment": 285,
+            "Bills": 198,
+            "Subscriptions": 774,
+            "Education": 484,
+            "Healthcare": 998,
+            "Transfers": 190,
+            "Loans": 991
+          },
+          "total": 5085
+        },
+        {
+          "date": "2025-02-10T21:00:00.000Z",
+          "categories": {
+            "Shopping": 977,
+            "Transport": 550,
+            "Food and Drinks": 873,
+            "Entertainment": 123,
+            "Bills": 130,
+            "Subscriptions": 157,
+            "Education": 850,
+            "Healthcare": 320,
+            "Transfers": 370,
+            "Loans": 549
+          },
+          "total": 4899
+        },
+        {
+          "date": "2025-02-11T21:00:00.000Z",
+          "categories": {
+            "Shopping": 193,
+            "Transport": 875,
+            "Food and Drinks": 241,
+            "Entertainment": 182,
+            "Bills": 348,
+            "Subscriptions": 513,
+            "Education": 559,
+            "Healthcare": 975,
+            "Transfers": 523,
+            "Loans": 422
+          },
+          "total": 4831
+        },
+        {
+          "date": "2025-02-12T21:00:00.000Z",
+          "categories": {
+            "Shopping": 689,
+            "Transport": 123,
+            "Food and Drinks": 279,
+            "Entertainment": 523,
+            "Bills": 610,
+            "Subscriptions": 319,
+            "Education": 290,
+            "Healthcare": 819,
+            "Transfers": 948,
+            "Loans": 401
+          },
+          "total": 5001
+        },
+        {
+          "date": "2025-02-13T21:00:00.000Z",
+          "categories": {
+            "Shopping": 569,
+            "Transport": 228,
+            "Food and Drinks": 107,
+            "Entertainment": 435,
+            "Bills": 933,
+            "Subscriptions": 221,
+            "Education": 498,
+            "Healthcare": 932,
+            "Transfers": 780,
+            "Loans": 639
+          },
+          "total": 5342
+        }
+      ],
+      "weeklyTotal": 34133
+    },
+    {
+      "weekNumber": 3,
+      "startDate": "2025-02-14T21:00:00.000Z",
+      "endDate": "2025-02-20T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-02-14T21:00:00.000Z",
+          "categories": {
+            "Shopping": 509,
+            "Transport": 103,
+            "Food and Drinks": 838,
+            "Entertainment": 197,
+            "Bills": 119,
+            "Subscriptions": 445,
+            "Education": 494,
+            "Healthcare": 794,
+            "Transfers": 157,
+            "Loans": 171
+          },
+          "total": 3827
+        },
+        {
+          "date": "2025-02-15T21:00:00.000Z",
+          "categories": {
+            "Shopping": 325,
+            "Transport": 791,
+            "Food and Drinks": 399,
+            "Entertainment": 616,
+            "Bills": 146,
+            "Subscriptions": 541,
+            "Education": 624,
+            "Healthcare": 798,
+            "Transfers": 974,
+            "Loans": 935
+          },
+          "total": 6149
+        },
+        {
+          "date": "2025-02-16T21:00:00.000Z",
+          "categories": {
+            "Shopping": 418,
+            "Transport": 377,
+            "Food and Drinks": 696,
+            "Entertainment": 974,
+            "Bills": 668,
+            "Subscriptions": 900,
+            "Education": 293,
+            "Healthcare": 751,
+            "Transfers": 902,
+            "Loans": 826
+          },
+          "total": 6805
+        },
+        {
+          "date": "2025-02-17T21:00:00.000Z",
+          "categories": {
+            "Shopping": 221,
+            "Transport": 948,
+            "Food and Drinks": 634,
+            "Entertainment": 117,
+            "Bills": 230,
+            "Subscriptions": 620,
+            "Education": 525,
+            "Healthcare": 797,
+            "Transfers": 687,
+            "Loans": 135
+          },
+          "total": 4914
+        },
+        {
+          "date": "2025-02-18T21:00:00.000Z",
+          "categories": {
+            "Shopping": 447,
+            "Transport": 783,
+            "Food and Drinks": 380,
+            "Entertainment": 926,
+            "Bills": 292,
+            "Subscriptions": 473,
+            "Education": 776,
+            "Healthcare": 343,
+            "Transfers": 292,
+            "Loans": 820
+          },
+          "total": 5532
+        },
+        {
+          "date": "2025-02-19T21:00:00.000Z",
+          "categories": {
+            "Shopping": 233,
+            "Transport": 892,
+            "Food and Drinks": 601,
+            "Entertainment": 483,
+            "Bills": 365,
+            "Subscriptions": 660,
+            "Education": 590,
+            "Healthcare": 547,
+            "Transfers": 604,
+            "Loans": 689
+          },
+          "total": 5664
+        },
+        {
+          "date": "2025-02-20T21:00:00.000Z",
+          "categories": {
+            "Shopping": 219,
+            "Transport": 919,
+            "Food and Drinks": 410,
+            "Entertainment": 710,
+            "Bills": 202,
+            "Subscriptions": 568,
+            "Education": 582,
+            "Healthcare": 892,
+            "Transfers": 828,
+            "Loans": 766
+          },
+          "total": 6096
+        }
+      ],
+      "weeklyTotal": 38987
+    },
+    {
+      "weekNumber": 4,
+      "startDate": "2025-02-21T21:00:00.000Z",
+      "endDate": "2025-02-27T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-02-21T21:00:00.000Z",
+          "categories": {
+            "Shopping": 167,
+            "Transport": 478,
+            "Food and Drinks": 1000,
+            "Entertainment": 412,
+            "Bills": 548,
+            "Subscriptions": 310,
+            "Education": 832,
+            "Healthcare": 558,
+            "Transfers": 359,
+            "Loans": 845
+          },
+          "total": 5509
+        },
+        {
+          "date": "2025-02-22T21:00:00.000Z",
+          "categories": {
+            "Shopping": 875,
+            "Transport": 582,
+            "Food and Drinks": 801,
+            "Entertainment": 214,
+            "Bills": 696,
+            "Subscriptions": 913,
+            "Education": 917,
+            "Healthcare": 859,
+            "Transfers": 200,
+            "Loans": 734
+          },
+          "total": 6791
+        },
+        {
+          "date": "2025-02-23T21:00:00.000Z",
+          "categories": {
+            "Shopping": 788,
+            "Transport": 644,
+            "Food and Drinks": 140,
+            "Entertainment": 483,
+            "Bills": 854,
+            "Subscriptions": 581,
+            "Education": 934,
+            "Healthcare": 806,
+            "Transfers": 322,
+            "Loans": 174
+          },
+          "total": 5726
+        },
+        {
+          "date": "2025-02-24T21:00:00.000Z",
+          "categories": {
+            "Shopping": 595,
+            "Transport": 358,
+            "Food and Drinks": 930,
+            "Entertainment": 316,
+            "Bills": 543,
+            "Subscriptions": 916,
+            "Education": 247,
+            "Healthcare": 574,
+            "Transfers": 845,
+            "Loans": 947
+          },
+          "total": 6271
+        },
+        {
+          "date": "2025-02-25T21:00:00.000Z",
+          "categories": {
+            "Shopping": 928,
+            "Transport": 211,
+            "Food and Drinks": 943,
+            "Entertainment": 138,
+            "Bills": 407,
+            "Subscriptions": 274,
+            "Education": 302,
+            "Healthcare": 667,
+            "Transfers": 564,
+            "Loans": 251
+          },
+          "total": 4685
+        },
+        {
+          "date": "2025-02-26T21:00:00.000Z",
+          "categories": {
+            "Shopping": 536,
+            "Transport": 968,
+            "Food and Drinks": 839,
+            "Entertainment": 943,
+            "Bills": 469,
+            "Subscriptions": 943,
+            "Education": 940,
+            "Healthcare": 462,
+            "Transfers": 416,
+            "Loans": 411
+          },
+          "total": 6927
+        },
+        {
+          "date": "2025-02-27T21:00:00.000Z",
+          "categories": {
+            "Shopping": 730,
+            "Transport": 735,
+            "Food and Drinks": 301,
+            "Entertainment": 281,
+            "Bills": 962,
+            "Subscriptions": 444,
+            "Education": 535,
+            "Healthcare": 977,
+            "Transfers": 470,
+            "Loans": 127
+          },
+          "total": 5562
+        }
+      ],
+      "weeklyTotal": 41471
+    }
+  ],
+  "monthlyTotal": 154092
+},
+{
+  "_id": {
+    "$oid": "68fa41cc4237485db16f4d7a"
+  },
+  "userId": "TIjvR0nNHnR2fXPveDOKT370Zz72",
+  "month": "March",
+  "year": 2025,
+  "weeks": [
+    {
+      "weekNumber": 1,
+      "startDate": "2025-02-28T21:00:00.000Z",
+      "endDate": "2025-03-06T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-02-28T21:00:00.000Z",
+          "categories": {
+            "Shopping": 526,
+            "Transport": 666,
+            "Food and Drinks": 172,
+            "Entertainment": 294,
+            "Bills": 368,
+            "Subscriptions": 227,
+            "Education": 451,
+            "Healthcare": 961,
+            "Transfers": 136,
+            "Loans": 981
+          },
+          "total": 4782
+        },
+        {
+          "date": "2025-03-01T21:00:00.000Z",
+          "categories": {
+            "Shopping": 451,
+            "Transport": 440,
+            "Food and Drinks": 990,
+            "Entertainment": 951,
+            "Bills": 596,
+            "Subscriptions": 431,
+            "Education": 501,
+            "Healthcare": 100,
+            "Transfers": 378,
+            "Loans": 977
+          },
+          "total": 5815
+        },
+        {
+          "date": "2025-03-02T21:00:00.000Z",
+          "categories": {
+            "Shopping": 829,
+            "Transport": 884,
+            "Food and Drinks": 624,
+            "Entertainment": 794,
+            "Bills": 801,
+            "Subscriptions": 382,
+            "Education": 100,
+            "Healthcare": 785,
+            "Transfers": 147,
+            "Loans": 204
+          },
+          "total": 5550
+        },
+        {
+          "date": "2025-03-03T21:00:00.000Z",
+          "categories": {
+            "Shopping": 232,
+            "Transport": 432,
+            "Food and Drinks": 963,
+            "Entertainment": 524,
+            "Bills": 111,
+            "Subscriptions": 296,
+            "Education": 617,
+            "Healthcare": 435,
+            "Transfers": 288,
+            "Loans": 202
+          },
+          "total": 4100
+        },
+        {
+          "date": "2025-03-04T21:00:00.000Z",
+          "categories": {
+            "Shopping": 224,
+            "Transport": 144,
+            "Food and Drinks": 917,
+            "Entertainment": 715,
+            "Bills": 417,
+            "Subscriptions": 356,
+            "Education": 810,
+            "Healthcare": 990,
+            "Transfers": 953,
+            "Loans": 141
+          },
+          "total": 5667
+        },
+        {
+          "date": "2025-03-05T21:00:00.000Z",
+          "categories": {
+            "Shopping": 670,
+            "Transport": 304,
+            "Food and Drinks": 329,
+            "Entertainment": 299,
+            "Bills": 600,
+            "Subscriptions": 524,
+            "Education": 547,
+            "Healthcare": 933,
+            "Transfers": 160,
+            "Loans": 953
+          },
+          "total": 5319
+        },
+        {
+          "date": "2025-03-06T21:00:00.000Z",
+          "categories": {
+            "Shopping": 598,
+            "Transport": 844,
+            "Food and Drinks": 426,
+            "Entertainment": 1000,
+            "Bills": 561,
+            "Subscriptions": 778,
+            "Education": 839,
+            "Healthcare": 395,
+            "Transfers": 911,
+            "Loans": 959
+          },
+          "total": 7311
+        }
+      ],
+      "weeklyTotal": 38544
+    },
+    {
+      "weekNumber": 2,
+      "startDate": "2025-03-07T21:00:00.000Z",
+      "endDate": "2025-03-13T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-03-07T21:00:00.000Z",
+          "categories": {
+            "Shopping": 979,
+            "Transport": 406,
+            "Food and Drinks": 438,
+            "Entertainment": 337,
+            "Bills": 643,
+            "Subscriptions": 423,
+            "Education": 609,
+            "Healthcare": 194,
+            "Transfers": 215,
+            "Loans": 484
+          },
+          "total": 4728
+        },
+        {
+          "date": "2025-03-08T21:00:00.000Z",
+          "categories": {
+            "Shopping": 110,
+            "Transport": 148,
+            "Food and Drinks": 298,
+            "Entertainment": 967,
+            "Bills": 271,
+            "Subscriptions": 116,
+            "Education": 528,
+            "Healthcare": 525,
+            "Transfers": 484,
+            "Loans": 507
+          },
+          "total": 3954
+        },
+        {
+          "date": "2025-03-09T21:00:00.000Z",
+          "categories": {
+            "Shopping": 741,
+            "Transport": 225,
+            "Food and Drinks": 554,
+            "Entertainment": 729,
+            "Bills": 480,
+            "Subscriptions": 121,
+            "Education": 305,
+            "Healthcare": 848,
+            "Transfers": 818,
+            "Loans": 851
+          },
+          "total": 5672
+        },
+        {
+          "date": "2025-03-10T21:00:00.000Z",
+          "categories": {
+            "Shopping": 331,
+            "Transport": 476,
+            "Food and Drinks": 934,
+            "Entertainment": 805,
+            "Bills": 426,
+            "Subscriptions": 344,
+            "Education": 158,
+            "Healthcare": 644,
+            "Transfers": 308,
+            "Loans": 609
+          },
+          "total": 5035
+        },
+        {
+          "date": "2025-03-11T21:00:00.000Z",
+          "categories": {
+            "Shopping": 154,
+            "Transport": 857,
+            "Food and Drinks": 649,
+            "Entertainment": 817,
+            "Bills": 484,
+            "Subscriptions": 771,
+            "Education": 365,
+            "Healthcare": 849,
+            "Transfers": 253,
+            "Loans": 638
+          },
+          "total": 5837
+        },
+        {
+          "date": "2025-03-12T21:00:00.000Z",
+          "categories": {
+            "Shopping": 988,
+            "Transport": 107,
+            "Food and Drinks": 940,
+            "Entertainment": 952,
+            "Bills": 327,
+            "Subscriptions": 146,
+            "Education": 640,
+            "Healthcare": 424,
+            "Transfers": 223,
+            "Loans": 813
+          },
+          "total": 5560
+        },
+        {
+          "date": "2025-03-13T21:00:00.000Z",
+          "categories": {
+            "Shopping": 400,
+            "Transport": 502,
+            "Food and Drinks": 157,
+            "Entertainment": 266,
+            "Bills": 737,
+            "Subscriptions": 540,
+            "Education": 189,
+            "Healthcare": 894,
+            "Transfers": 102,
+            "Loans": 749
+          },
+          "total": 4536
+        }
+      ],
+      "weeklyTotal": 35322
+    },
+    {
+      "weekNumber": 3,
+      "startDate": "2025-03-14T21:00:00.000Z",
+      "endDate": "2025-03-20T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-03-14T21:00:00.000Z",
+          "categories": {
+            "Shopping": 386,
+            "Transport": 103,
+            "Food and Drinks": 525,
+            "Entertainment": 294,
+            "Bills": 914,
+            "Subscriptions": 755,
+            "Education": 118,
+            "Healthcare": 326,
+            "Transfers": 467,
+            "Loans": 299
+          },
+          "total": 4187
+        },
+        {
+          "date": "2025-03-15T21:00:00.000Z",
+          "categories": {
+            "Shopping": 449,
+            "Transport": 970,
+            "Food and Drinks": 315,
+            "Entertainment": 472,
+            "Bills": 857,
+            "Subscriptions": 594,
+            "Education": 275,
+            "Healthcare": 749,
+            "Transfers": 978,
+            "Loans": 718
+          },
+          "total": 6377
+        },
+        {
+          "date": "2025-03-16T21:00:00.000Z",
+          "categories": {
+            "Shopping": 901,
+            "Transport": 659,
+            "Food and Drinks": 381,
+            "Entertainment": 717,
+            "Bills": 551,
+            "Subscriptions": 393,
+            "Education": 135,
+            "Healthcare": 600,
+            "Transfers": 842,
+            "Loans": 993
+          },
+          "total": 6172
+        },
+        {
+          "date": "2025-03-17T21:00:00.000Z",
+          "categories": {
+            "Shopping": 891,
+            "Transport": 283,
+            "Food and Drinks": 599,
+            "Entertainment": 941,
+            "Bills": 747,
+            "Subscriptions": 238,
+            "Education": 524,
+            "Healthcare": 856,
+            "Transfers": 507,
+            "Loans": 209
+          },
+          "total": 5795
+        },
+        {
+          "date": "2025-03-18T21:00:00.000Z",
+          "categories": {
+            "Shopping": 134,
+            "Transport": 850,
+            "Food and Drinks": 381,
+            "Entertainment": 399,
+            "Bills": 801,
+            "Subscriptions": 120,
+            "Education": 354,
+            "Healthcare": 994,
+            "Transfers": 121,
+            "Loans": 724
+          },
+          "total": 4878
+        },
+        {
+          "date": "2025-03-19T21:00:00.000Z",
+          "categories": {
+            "Shopping": 895,
+            "Transport": 854,
+            "Food and Drinks": 659,
+            "Entertainment": 436,
+            "Bills": 117,
+            "Subscriptions": 566,
+            "Education": 965,
+            "Healthcare": 743,
+            "Transfers": 271,
+            "Loans": 863
+          },
+          "total": 6369
+        },
+        {
+          "date": "2025-03-20T21:00:00.000Z",
+          "categories": {
+            "Shopping": 783,
+            "Transport": 902,
+            "Food and Drinks": 619,
+            "Entertainment": 703,
+            "Bills": 259,
+            "Subscriptions": 120,
+            "Education": 991,
+            "Healthcare": 770,
+            "Transfers": 102,
+            "Loans": 297
+          },
+          "total": 5546
+        }
+      ],
+      "weeklyTotal": 39324
+    },
+    {
+      "weekNumber": 4,
+      "startDate": "2025-03-21T21:00:00.000Z",
+      "endDate": "2025-03-27T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-03-21T21:00:00.000Z",
+          "categories": {
+            "Shopping": 527,
+            "Transport": 968,
+            "Food and Drinks": 192,
+            "Entertainment": 456,
+            "Bills": 606,
+            "Subscriptions": 749,
+            "Education": 790,
+            "Healthcare": 652,
+            "Transfers": 516,
+            "Loans": 941
+          },
+          "total": 6397
+        },
+        {
+          "date": "2025-03-22T21:00:00.000Z",
+          "categories": {
+            "Shopping": 411,
+            "Transport": 790,
+            "Food and Drinks": 799,
+            "Entertainment": 253,
+            "Bills": 181,
+            "Subscriptions": 616,
+            "Education": 955,
+            "Healthcare": 863,
+            "Transfers": 497,
+            "Loans": 718
+          },
+          "total": 6083
+        },
+        {
+          "date": "2025-03-23T21:00:00.000Z",
+          "categories": {
+            "Shopping": 206,
+            "Transport": 257,
+            "Food and Drinks": 856,
+            "Entertainment": 706,
+            "Bills": 615,
+            "Subscriptions": 436,
+            "Education": 373,
+            "Healthcare": 951,
+            "Transfers": 457,
+            "Loans": 185
+          },
+          "total": 5042
+        },
+        {
+          "date": "2025-03-24T21:00:00.000Z",
+          "categories": {
+            "Shopping": 489,
+            "Transport": 462,
+            "Food and Drinks": 135,
+            "Entertainment": 800,
+            "Bills": 151,
+            "Subscriptions": 742,
+            "Education": 751,
+            "Healthcare": 540,
+            "Transfers": 440,
+            "Loans": 727
+          },
+          "total": 5237
+        },
+        {
+          "date": "2025-03-25T21:00:00.000Z",
+          "categories": {
+            "Shopping": 311,
+            "Transport": 827,
+            "Food and Drinks": 299,
+            "Entertainment": 286,
+            "Bills": 996,
+            "Subscriptions": 935,
+            "Education": 127,
+            "Healthcare": 518,
+            "Transfers": 547,
+            "Loans": 741
+          },
+          "total": 5587
+        },
+        {
+          "date": "2025-03-26T21:00:00.000Z",
+          "categories": {
+            "Shopping": 572,
+            "Transport": 509,
+            "Food and Drinks": 225,
+            "Entertainment": 699,
+            "Bills": 875,
+            "Subscriptions": 789,
+            "Education": 126,
+            "Healthcare": 799,
+            "Transfers": 125,
+            "Loans": 532
+          },
+          "total": 5251
+        },
+        {
+          "date": "2025-03-27T21:00:00.000Z",
+          "categories": {
+            "Shopping": 478,
+            "Transport": 567,
+            "Food and Drinks": 867,
+            "Entertainment": 316,
+            "Bills": 436,
+            "Subscriptions": 500,
+            "Education": 146,
+            "Healthcare": 121,
+            "Transfers": 417,
+            "Loans": 622
+          },
+          "total": 4470
+        }
+      ],
+      "weeklyTotal": 38067
+    }
+  ],
+  "monthlyTotal": 151257
+},
+{
+  "_id": {
+    "$oid": "68fa41cc4237485db16f4d7b"
+  },
+  "userId": "TIjvR0nNHnR2fXPveDOKT370Zz72",
+  "month": "April",
+  "year": 2025,
+  "weeks": [
+    {
+      "weekNumber": 1,
+      "startDate": "2025-03-31T21:00:00.000Z",
+      "endDate": "2025-04-06T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-03-31T21:00:00.000Z",
+          "categories": {
+            "Shopping": 339,
+            "Transport": 268,
+            "Food and Drinks": 104,
+            "Entertainment": 552,
+            "Bills": 294,
+            "Subscriptions": 635,
+            "Education": 326,
+            "Healthcare": 909,
+            "Transfers": 978,
+            "Loans": 184
+          },
+          "total": 4589
+        },
+        {
+          "date": "2025-04-01T21:00:00.000Z",
+          "categories": {
+            "Shopping": 863,
+            "Transport": 240,
+            "Food and Drinks": 815,
+            "Entertainment": 483,
+            "Bills": 851,
+            "Subscriptions": 434,
+            "Education": 286,
+            "Healthcare": 296,
+            "Transfers": 778,
+            "Loans": 658
+          },
+          "total": 5704
+        },
+        {
+          "date": "2025-04-02T21:00:00.000Z",
+          "categories": {
+            "Shopping": 384,
+            "Transport": 660,
+            "Food and Drinks": 400,
+            "Entertainment": 633,
+            "Bills": 248,
+            "Subscriptions": 669,
+            "Education": 811,
+            "Healthcare": 210,
+            "Transfers": 576,
+            "Loans": 524
+          },
+          "total": 5115
+        },
+        {
+          "date": "2025-04-03T21:00:00.000Z",
+          "categories": {
+            "Shopping": 652,
+            "Transport": 427,
+            "Food and Drinks": 973,
+            "Entertainment": 131,
+            "Bills": 373,
+            "Subscriptions": 559,
+            "Education": 796,
+            "Healthcare": 142,
+            "Transfers": 547,
+            "Loans": 544
+          },
+          "total": 5144
+        },
+        {
+          "date": "2025-04-04T21:00:00.000Z",
+          "categories": {
+            "Shopping": 621,
+            "Transport": 902,
+            "Food and Drinks": 705,
+            "Entertainment": 975,
+            "Bills": 426,
+            "Subscriptions": 257,
+            "Education": 888,
+            "Healthcare": 256,
+            "Transfers": 404,
+            "Loans": 574
+          },
+          "total": 6008
+        },
+        {
+          "date": "2025-04-05T21:00:00.000Z",
+          "categories": {
+            "Shopping": 504,
+            "Transport": 377,
+            "Food and Drinks": 439,
+            "Entertainment": 525,
+            "Bills": 302,
+            "Subscriptions": 630,
+            "Education": 879,
+            "Healthcare": 104,
+            "Transfers": 503,
+            "Loans": 711
+          },
+          "total": 4974
+        },
+        {
+          "date": "2025-04-06T21:00:00.000Z",
+          "categories": {
+            "Shopping": 367,
+            "Transport": 496,
+            "Food and Drinks": 909,
+            "Entertainment": 466,
+            "Bills": 752,
+            "Subscriptions": 955,
+            "Education": 453,
+            "Healthcare": 497,
+            "Transfers": 512,
+            "Loans": 413
+          },
+          "total": 5820
+        }
+      ],
+      "weeklyTotal": 37354
+    },
+    {
+      "weekNumber": 2,
+      "startDate": "2025-04-07T21:00:00.000Z",
+      "endDate": "2025-04-13T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-04-07T21:00:00.000Z",
+          "categories": {
+            "Shopping": 401,
+            "Transport": 533,
+            "Food and Drinks": 740,
+            "Entertainment": 371,
+            "Bills": 553,
+            "Subscriptions": 321,
+            "Education": 192,
+            "Healthcare": 194,
+            "Transfers": 624,
+            "Loans": 528
+          },
+          "total": 4457
+        },
+        {
+          "date": "2025-04-08T21:00:00.000Z",
+          "categories": {
+            "Shopping": 536,
+            "Transport": 914,
+            "Food and Drinks": 529,
+            "Entertainment": 876,
+            "Bills": 218,
+            "Subscriptions": 468,
+            "Education": 300,
+            "Healthcare": 393,
+            "Transfers": 775,
+            "Loans": 395
+          },
+          "total": 5404
+        },
+        {
+          "date": "2025-04-09T21:00:00.000Z",
+          "categories": {
+            "Shopping": 377,
+            "Transport": 388,
+            "Food and Drinks": 127,
+            "Entertainment": 440,
+            "Bills": 662,
+            "Subscriptions": 541,
+            "Education": 609,
+            "Healthcare": 568,
+            "Transfers": 940,
+            "Loans": 896
+          },
+          "total": 5548
+        },
+        {
+          "date": "2025-04-10T21:00:00.000Z",
+          "categories": {
+            "Shopping": 705,
+            "Transport": 513,
+            "Food and Drinks": 304,
+            "Entertainment": 593,
+            "Bills": 850,
+            "Subscriptions": 855,
+            "Education": 534,
+            "Healthcare": 889,
+            "Transfers": 378,
+            "Loans": 637
+          },
+          "total": 6258
+        },
+        {
+          "date": "2025-04-11T21:00:00.000Z",
+          "categories": {
+            "Shopping": 619,
+            "Transport": 423,
+            "Food and Drinks": 402,
+            "Entertainment": 159,
+            "Bills": 565,
+            "Subscriptions": 469,
+            "Education": 756,
+            "Healthcare": 214,
+            "Transfers": 142,
+            "Loans": 529
+          },
+          "total": 4278
+        },
+        {
+          "date": "2025-04-12T21:00:00.000Z",
+          "categories": {
+            "Shopping": 335,
+            "Transport": 373,
+            "Food and Drinks": 162,
+            "Entertainment": 580,
+            "Bills": 586,
+            "Subscriptions": 207,
+            "Education": 109,
+            "Healthcare": 271,
+            "Transfers": 993,
+            "Loans": 388
+          },
+          "total": 4004
+        },
+        {
+          "date": "2025-04-13T21:00:00.000Z",
+          "categories": {
+            "Shopping": 296,
+            "Transport": 233,
+            "Food and Drinks": 982,
+            "Entertainment": 826,
+            "Bills": 283,
+            "Subscriptions": 388,
+            "Education": 315,
+            "Healthcare": 896,
+            "Transfers": 984,
+            "Loans": 516
+          },
+          "total": 5719
+        }
+      ],
+      "weeklyTotal": 35668
+    },
+    {
+      "weekNumber": 3,
+      "startDate": "2025-04-14T21:00:00.000Z",
+      "endDate": "2025-04-20T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-04-14T21:00:00.000Z",
+          "categories": {
+            "Shopping": 772,
+            "Transport": 860,
+            "Food and Drinks": 180,
+            "Entertainment": 813,
+            "Bills": 143,
+            "Subscriptions": 833,
+            "Education": 370,
+            "Healthcare": 369,
+            "Transfers": 964,
+            "Loans": 947
+          },
+          "total": 6251
+        },
+        {
+          "date": "2025-04-15T21:00:00.000Z",
+          "categories": {
+            "Shopping": 385,
+            "Transport": 708,
+            "Food and Drinks": 665,
+            "Entertainment": 881,
+            "Bills": 657,
+            "Subscriptions": 313,
+            "Education": 432,
+            "Healthcare": 185,
+            "Transfers": 313,
+            "Loans": 427
+          },
+          "total": 4966
+        },
+        {
+          "date": "2025-04-16T21:00:00.000Z",
+          "categories": {
+            "Shopping": 991,
+            "Transport": 304,
+            "Food and Drinks": 340,
+            "Entertainment": 468,
+            "Bills": 527,
+            "Subscriptions": 385,
+            "Education": 692,
+            "Healthcare": 510,
+            "Transfers": 416,
+            "Loans": 224
+          },
+          "total": 4857
+        },
+        {
+          "date": "2025-04-17T21:00:00.000Z",
+          "categories": {
+            "Shopping": 717,
+            "Transport": 415,
+            "Food and Drinks": 270,
+            "Entertainment": 282,
+            "Bills": 213,
+            "Subscriptions": 806,
+            "Education": 996,
+            "Healthcare": 564,
+            "Transfers": 398,
+            "Loans": 861
+          },
+          "total": 5522
+        },
+        {
+          "date": "2025-04-18T21:00:00.000Z",
+          "categories": {
+            "Shopping": 878,
+            "Transport": 314,
+            "Food and Drinks": 905,
+            "Entertainment": 808,
+            "Bills": 644,
+            "Subscriptions": 677,
+            "Education": 958,
+            "Healthcare": 907,
+            "Transfers": 844,
+            "Loans": 446
+          },
+          "total": 7381
+        },
+        {
+          "date": "2025-04-19T21:00:00.000Z",
+          "categories": {
+            "Shopping": 225,
+            "Transport": 583,
+            "Food and Drinks": 528,
+            "Entertainment": 104,
+            "Bills": 916,
+            "Subscriptions": 745,
+            "Education": 404,
+            "Healthcare": 941,
+            "Transfers": 921,
+            "Loans": 233
+          },
+          "total": 5600
+        },
+        {
+          "date": "2025-04-20T21:00:00.000Z",
+          "categories": {
+            "Shopping": 260,
+            "Transport": 312,
+            "Food and Drinks": 288,
+            "Entertainment": 749,
+            "Bills": 923,
+            "Subscriptions": 108,
+            "Education": 212,
+            "Healthcare": 388,
+            "Transfers": 854,
+            "Loans": 635
+          },
+          "total": 4729
+        }
+      ],
+      "weeklyTotal": 39306
+    },
+    {
+      "weekNumber": 4,
+      "startDate": "2025-04-21T21:00:00.000Z",
+      "endDate": "2025-04-27T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-04-21T21:00:00.000Z",
+          "categories": {
+            "Shopping": 607,
+            "Transport": 144,
+            "Food and Drinks": 284,
+            "Entertainment": 605,
+            "Bills": 686,
+            "Subscriptions": 426,
+            "Education": 439,
+            "Healthcare": 799,
+            "Transfers": 436,
+            "Loans": 780
+          },
+          "total": 5206
+        },
+        {
+          "date": "2025-04-22T21:00:00.000Z",
+          "categories": {
+            "Shopping": 569,
+            "Transport": 252,
+            "Food and Drinks": 418,
+            "Entertainment": 435,
+            "Bills": 618,
+            "Subscriptions": 150,
+            "Education": 311,
+            "Healthcare": 452,
+            "Transfers": 313,
+            "Loans": 859
+          },
+          "total": 4377
+        },
+        {
+          "date": "2025-04-23T21:00:00.000Z",
+          "categories": {
+            "Shopping": 680,
+            "Transport": 251,
+            "Food and Drinks": 254,
+            "Entertainment": 343,
+            "Bills": 665,
+            "Subscriptions": 616,
+            "Education": 523,
+            "Healthcare": 299,
+            "Transfers": 308,
+            "Loans": 549
+          },
+          "total": 4488
+        },
+        {
+          "date": "2025-04-24T21:00:00.000Z",
+          "categories": {
+            "Shopping": 515,
+            "Transport": 496,
+            "Food and Drinks": 903,
+            "Entertainment": 551,
+            "Bills": 889,
+            "Subscriptions": 376,
+            "Education": 459,
+            "Healthcare": 794,
+            "Transfers": 855,
+            "Loans": 236
+          },
+          "total": 6074
+        },
+        {
+          "date": "2025-04-25T21:00:00.000Z",
+          "categories": {
+            "Shopping": 999,
+            "Transport": 812,
+            "Food and Drinks": 361,
+            "Entertainment": 632,
+            "Bills": 290,
+            "Subscriptions": 970,
+            "Education": 463,
+            "Healthcare": 629,
+            "Transfers": 233,
+            "Loans": 568
+          },
+          "total": 5957
+        },
+        {
+          "date": "2025-04-26T21:00:00.000Z",
+          "categories": {
+            "Shopping": 144,
+            "Transport": 368,
+            "Food and Drinks": 349,
+            "Entertainment": 139,
+            "Bills": 757,
+            "Subscriptions": 888,
+            "Education": 554,
+            "Healthcare": 112,
+            "Transfers": 812,
+            "Loans": 192
+          },
+          "total": 4315
+        },
+        {
+          "date": "2025-04-27T21:00:00.000Z",
+          "categories": {
+            "Shopping": 215,
+            "Transport": 303,
+            "Food and Drinks": 916,
+            "Entertainment": 607,
+            "Bills": 857,
+            "Subscriptions": 139,
+            "Education": 614,
+            "Healthcare": 580,
+            "Transfers": 544,
+            "Loans": 882
+          },
+          "total": 5657
+        }
+      ],
+      "weeklyTotal": 36074
+    }
+  ],
+  "monthlyTotal": 148402
+},
+{
+  "_id": {
+    "$oid": "68fa41cc4237485db16f4d7c"
+  },
+  "userId": "TIjvR0nNHnR2fXPveDOKT370Zz72",
+  "month": "May",
+  "year": 2025,
+  "weeks": [
+    {
+      "weekNumber": 1,
+      "startDate": "2025-04-30T21:00:00.000Z",
+      "endDate": "2025-05-06T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-04-30T21:00:00.000Z",
+          "categories": {
+            "Shopping": 812,
+            "Transport": 376,
+            "Food and Drinks": 256,
+            "Entertainment": 823,
+            "Bills": 293,
+            "Subscriptions": 417,
+            "Education": 547,
+            "Healthcare": 137,
+            "Transfers": 107,
+            "Loans": 221
+          },
+          "total": 3989
+        },
+        {
+          "date": "2025-05-01T21:00:00.000Z",
+          "categories": {
+            "Shopping": 467,
+            "Transport": 494,
+            "Food and Drinks": 725,
+            "Entertainment": 525,
+            "Bills": 271,
+            "Subscriptions": 826,
+            "Education": 827,
+            "Healthcare": 976,
+            "Transfers": 590,
+            "Loans": 664
+          },
+          "total": 6365
+        },
+        {
+          "date": "2025-05-02T21:00:00.000Z",
+          "categories": {
+            "Shopping": 214,
+            "Transport": 361,
+            "Food and Drinks": 953,
+            "Entertainment": 149,
+            "Bills": 577,
+            "Subscriptions": 705,
+            "Education": 210,
+            "Healthcare": 806,
+            "Transfers": 792,
+            "Loans": 937
+          },
+          "total": 5704
+        },
+        {
+          "date": "2025-05-03T21:00:00.000Z",
+          "categories": {
+            "Shopping": 891,
+            "Transport": 260,
+            "Food and Drinks": 736,
+            "Entertainment": 747,
+            "Bills": 133,
+            "Subscriptions": 885,
+            "Education": 710,
+            "Healthcare": 944,
+            "Transfers": 633,
+            "Loans": 905
+          },
+          "total": 6844
+        },
+        {
+          "date": "2025-05-04T21:00:00.000Z",
+          "categories": {
+            "Shopping": 421,
+            "Transport": 527,
+            "Food and Drinks": 280,
+            "Entertainment": 140,
+            "Bills": 396,
+            "Subscriptions": 907,
+            "Education": 991,
+            "Healthcare": 524,
+            "Transfers": 498,
+            "Loans": 448
+          },
+          "total": 5132
+        },
+        {
+          "date": "2025-05-05T21:00:00.000Z",
+          "categories": {
+            "Shopping": 335,
+            "Transport": 949,
+            "Food and Drinks": 350,
+            "Entertainment": 142,
+            "Bills": 267,
+            "Subscriptions": 756,
+            "Education": 866,
+            "Healthcare": 429,
+            "Transfers": 484,
+            "Loans": 435
+          },
+          "total": 5013
+        },
+        {
+          "date": "2025-05-06T21:00:00.000Z",
+          "categories": {
+            "Shopping": 382,
+            "Transport": 120,
+            "Food and Drinks": 212,
+            "Entertainment": 935,
+            "Bills": 663,
+            "Subscriptions": 797,
+            "Education": 302,
+            "Healthcare": 880,
+            "Transfers": 759,
+            "Loans": 701
+          },
+          "total": 5751
+        }
+      ],
+      "weeklyTotal": 38798
+    },
+    {
+      "weekNumber": 2,
+      "startDate": "2025-05-07T21:00:00.000Z",
+      "endDate": "2025-05-13T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-05-07T21:00:00.000Z",
+          "categories": {
+            "Shopping": 603,
+            "Transport": 758,
+            "Food and Drinks": 590,
+            "Entertainment": 740,
+            "Bills": 454,
+            "Subscriptions": 302,
+            "Education": 272,
+            "Healthcare": 603,
+            "Transfers": 251,
+            "Loans": 616
+          },
+          "total": 5189
+        },
+        {
+          "date": "2025-05-08T21:00:00.000Z",
+          "categories": {
+            "Shopping": 371,
+            "Transport": 209,
+            "Food and Drinks": 252,
+            "Entertainment": 253,
+            "Bills": 553,
+            "Subscriptions": 795,
+            "Education": 288,
+            "Healthcare": 865,
+            "Transfers": 768,
+            "Loans": 564
+          },
+          "total": 4918
+        },
+        {
+          "date": "2025-05-09T21:00:00.000Z",
+          "categories": {
+            "Shopping": 331,
+            "Transport": 895,
+            "Food and Drinks": 331,
+            "Entertainment": 124,
+            "Bills": 724,
+            "Subscriptions": 598,
+            "Education": 321,
+            "Healthcare": 863,
+            "Transfers": 229,
+            "Loans": 418
+          },
+          "total": 4834
+        },
+        {
+          "date": "2025-05-10T21:00:00.000Z",
+          "categories": {
+            "Shopping": 126,
+            "Transport": 453,
+            "Food and Drinks": 252,
+            "Entertainment": 630,
+            "Bills": 773,
+            "Subscriptions": 776,
+            "Education": 319,
+            "Healthcare": 799,
+            "Transfers": 229,
+            "Loans": 820
+          },
+          "total": 5177
+        },
+        {
+          "date": "2025-05-11T21:00:00.000Z",
+          "categories": {
+            "Shopping": 948,
+            "Transport": 349,
+            "Food and Drinks": 913,
+            "Entertainment": 763,
+            "Bills": 316,
+            "Subscriptions": 358,
+            "Education": 972,
+            "Healthcare": 702,
+            "Transfers": 639,
+            "Loans": 764
+          },
+          "total": 6724
+        },
+        {
+          "date": "2025-05-12T21:00:00.000Z",
+          "categories": {
+            "Shopping": 169,
+            "Transport": 572,
+            "Food and Drinks": 967,
+            "Entertainment": 286,
+            "Bills": 713,
+            "Subscriptions": 511,
+            "Education": 442,
+            "Healthcare": 710,
+            "Transfers": 523,
+            "Loans": 543
+          },
+          "total": 5436
+        },
+        {
+          "date": "2025-05-13T21:00:00.000Z",
+          "categories": {
+            "Shopping": 429,
+            "Transport": 320,
+            "Food and Drinks": 573,
+            "Entertainment": 806,
+            "Bills": 528,
+            "Subscriptions": 456,
+            "Education": 678,
+            "Healthcare": 505,
+            "Transfers": 655,
+            "Loans": 572
+          },
+          "total": 5522
+        }
+      ],
+      "weeklyTotal": 37800
+    },
+    {
+      "weekNumber": 3,
+      "startDate": "2025-05-14T21:00:00.000Z",
+      "endDate": "2025-05-20T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-05-14T21:00:00.000Z",
+          "categories": {
+            "Shopping": 336,
+            "Transport": 607,
+            "Food and Drinks": 749,
+            "Entertainment": 496,
+            "Bills": 740,
+            "Subscriptions": 161,
+            "Education": 847,
+            "Healthcare": 172,
+            "Transfers": 233,
+            "Loans": 424
+          },
+          "total": 4765
+        },
+        {
+          "date": "2025-05-15T21:00:00.000Z",
+          "categories": {
+            "Shopping": 464,
+            "Transport": 678,
+            "Food and Drinks": 248,
+            "Entertainment": 536,
+            "Bills": 746,
+            "Subscriptions": 160,
+            "Education": 856,
+            "Healthcare": 845,
+            "Transfers": 400,
+            "Loans": 297
+          },
+          "total": 5230
+        },
+        {
+          "date": "2025-05-16T21:00:00.000Z",
+          "categories": {
+            "Shopping": 157,
+            "Transport": 517,
+            "Food and Drinks": 592,
+            "Entertainment": 693,
+            "Bills": 559,
+            "Subscriptions": 271,
+            "Education": 391,
+            "Healthcare": 939,
+            "Transfers": 785,
+            "Loans": 878
+          },
+          "total": 5782
+        },
+        {
+          "date": "2025-05-17T21:00:00.000Z",
+          "categories": {
+            "Shopping": 649,
+            "Transport": 478,
+            "Food and Drinks": 211,
+            "Entertainment": 192,
+            "Bills": 690,
+            "Subscriptions": 908,
+            "Education": 672,
+            "Healthcare": 681,
+            "Transfers": 411,
+            "Loans": 341
+          },
+          "total": 5233
+        },
+        {
+          "date": "2025-05-18T21:00:00.000Z",
+          "categories": {
+            "Shopping": 426,
+            "Transport": 388,
+            "Food and Drinks": 471,
+            "Entertainment": 920,
+            "Bills": 629,
+            "Subscriptions": 719,
+            "Education": 740,
+            "Healthcare": 452,
+            "Transfers": 582,
+            "Loans": 342
+          },
+          "total": 5669
+        },
+        {
+          "date": "2025-05-19T21:00:00.000Z",
+          "categories": {
+            "Shopping": 454,
+            "Transport": 963,
+            "Food and Drinks": 653,
+            "Entertainment": 304,
+            "Bills": 917,
+            "Subscriptions": 959,
+            "Education": 332,
+            "Healthcare": 778,
+            "Transfers": 620,
+            "Loans": 476
+          },
+          "total": 6456
+        },
+        {
+          "date": "2025-05-20T21:00:00.000Z",
+          "categories": {
+            "Shopping": 250,
+            "Transport": 108,
+            "Food and Drinks": 958,
+            "Entertainment": 832,
+            "Bills": 279,
+            "Subscriptions": 394,
+            "Education": 933,
+            "Healthcare": 428,
+            "Transfers": 329,
+            "Loans": 259
+          },
+          "total": 4770
+        }
+      ],
+      "weeklyTotal": 37905
+    },
+    {
+      "weekNumber": 4,
+      "startDate": "2025-05-21T21:00:00.000Z",
+      "endDate": "2025-05-27T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-05-21T21:00:00.000Z",
+          "categories": {
+            "Shopping": 121,
+            "Transport": 373,
+            "Food and Drinks": 710,
+            "Entertainment": 696,
+            "Bills": 664,
+            "Subscriptions": 508,
+            "Education": 232,
+            "Healthcare": 588,
+            "Transfers": 773,
+            "Loans": 647
+          },
+          "total": 5312
+        },
+        {
+          "date": "2025-05-22T21:00:00.000Z",
+          "categories": {
+            "Shopping": 162,
+            "Transport": 955,
+            "Food and Drinks": 663,
+            "Entertainment": 284,
+            "Bills": 678,
+            "Subscriptions": 827,
+            "Education": 271,
+            "Healthcare": 478,
+            "Transfers": 774,
+            "Loans": 761
+          },
+          "total": 5853
+        },
+        {
+          "date": "2025-05-23T21:00:00.000Z",
+          "categories": {
+            "Shopping": 206,
+            "Transport": 236,
+            "Food and Drinks": 744,
+            "Entertainment": 216,
+            "Bills": 607,
+            "Subscriptions": 284,
+            "Education": 843,
+            "Healthcare": 150,
+            "Transfers": 514,
+            "Loans": 283
+          },
+          "total": 4083
+        },
+        {
+          "date": "2025-05-24T21:00:00.000Z",
+          "categories": {
+            "Shopping": 424,
+            "Transport": 935,
+            "Food and Drinks": 964,
+            "Entertainment": 582,
+            "Bills": 903,
+            "Subscriptions": 779,
+            "Education": 411,
+            "Healthcare": 651,
+            "Transfers": 488,
+            "Loans": 549
+          },
+          "total": 6686
+        },
+        {
+          "date": "2025-05-25T21:00:00.000Z",
+          "categories": {
+            "Shopping": 266,
+            "Transport": 396,
+            "Food and Drinks": 316,
+            "Entertainment": 628,
+            "Bills": 430,
+            "Subscriptions": 451,
+            "Education": 719,
+            "Healthcare": 796,
+            "Transfers": 837,
+            "Loans": 420
+          },
+          "total": 5259
+        },
+        {
+          "date": "2025-05-26T21:00:00.000Z",
+          "categories": {
+            "Shopping": 270,
+            "Transport": 857,
+            "Food and Drinks": 337,
+            "Entertainment": 794,
+            "Bills": 403,
+            "Subscriptions": 738,
+            "Education": 734,
+            "Healthcare": 961,
+            "Transfers": 663,
+            "Loans": 998
+          },
+          "total": 6755
+        },
+        {
+          "date": "2025-05-27T21:00:00.000Z",
+          "categories": {
+            "Shopping": 654,
+            "Transport": 981,
+            "Food and Drinks": 425,
+            "Entertainment": 355,
+            "Bills": 366,
+            "Subscriptions": 134,
+            "Education": 709,
+            "Healthcare": 960,
+            "Transfers": 759,
+            "Loans": 933
+          },
+          "total": 6276
+        }
+      ],
+      "weeklyTotal": 40224
+    }
+  ],
+  "monthlyTotal": 154727
+},
+{
+  "_id": {
+    "$oid": "68fa41cc4237485db16f4d7d"
+  },
+  "userId": "TIjvR0nNHnR2fXPveDOKT370Zz72",
+  "month": "June",
+  "year": 2025,
+  "weeks": [
+    {
+      "weekNumber": 1,
+      "startDate": "2025-05-31T21:00:00.000Z",
+      "endDate": "2025-06-06T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-05-31T21:00:00.000Z",
+          "categories": {
+            "Shopping": 202,
+            "Transport": 172,
+            "Food and Drinks": 662,
+            "Entertainment": 411,
+            "Bills": 192,
+            "Subscriptions": 885,
+            "Education": 872,
+            "Healthcare": 872,
+            "Transfers": 134,
+            "Loans": 152
+          },
+          "total": 4554
+        },
+        {
+          "date": "2025-06-01T21:00:00.000Z",
+          "categories": {
+            "Shopping": 516,
+            "Transport": 356,
+            "Food and Drinks": 857,
+            "Entertainment": 243,
+            "Bills": 125,
+            "Subscriptions": 577,
+            "Education": 447,
+            "Healthcare": 130,
+            "Transfers": 290,
+            "Loans": 452
+          },
+          "total": 3993
+        },
+        {
+          "date": "2025-06-02T21:00:00.000Z",
+          "categories": {
+            "Shopping": 513,
+            "Transport": 540,
+            "Food and Drinks": 889,
+            "Entertainment": 959,
+            "Bills": 745,
+            "Subscriptions": 870,
+            "Education": 616,
+            "Healthcare": 570,
+            "Transfers": 440,
+            "Loans": 638
+          },
+          "total": 6780
+        },
+        {
+          "date": "2025-06-03T21:00:00.000Z",
+          "categories": {
+            "Shopping": 309,
+            "Transport": 623,
+            "Food and Drinks": 775,
+            "Entertainment": 838,
+            "Bills": 178,
+            "Subscriptions": 172,
+            "Education": 698,
+            "Healthcare": 630,
+            "Transfers": 581,
+            "Loans": 770
+          },
+          "total": 5574
+        },
+        {
+          "date": "2025-06-04T21:00:00.000Z",
+          "categories": {
+            "Shopping": 657,
+            "Transport": 839,
+            "Food and Drinks": 397,
+            "Entertainment": 225,
+            "Bills": 348,
+            "Subscriptions": 414,
+            "Education": 247,
+            "Healthcare": 218,
+            "Transfers": 362,
+            "Loans": 898
+          },
+          "total": 4605
+        },
+        {
+          "date": "2025-06-05T21:00:00.000Z",
+          "categories": {
+            "Shopping": 746,
+            "Transport": 292,
+            "Food and Drinks": 181,
+            "Entertainment": 170,
+            "Bills": 187,
+            "Subscriptions": 720,
+            "Education": 519,
+            "Healthcare": 827,
+            "Transfers": 421,
+            "Loans": 439
+          },
+          "total": 4502
+        },
+        {
+          "date": "2025-06-06T21:00:00.000Z",
+          "categories": {
+            "Shopping": 895,
+            "Transport": 147,
+            "Food and Drinks": 523,
+            "Entertainment": 702,
+            "Bills": 900,
+            "Subscriptions": 516,
+            "Education": 684,
+            "Healthcare": 364,
+            "Transfers": 413,
+            "Loans": 262
+          },
+          "total": 5406
+        }
+      ],
+      "weeklyTotal": 35414
+    },
+    {
+      "weekNumber": 2,
+      "startDate": "2025-06-07T21:00:00.000Z",
+      "endDate": "2025-06-13T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-06-07T21:00:00.000Z",
+          "categories": {
+            "Shopping": 110,
+            "Transport": 369,
+            "Food and Drinks": 951,
+            "Entertainment": 517,
+            "Bills": 116,
+            "Subscriptions": 732,
+            "Education": 126,
+            "Healthcare": 300,
+            "Transfers": 935,
+            "Loans": 512
+          },
+          "total": 4668
+        },
+        {
+          "date": "2025-06-08T21:00:00.000Z",
+          "categories": {
+            "Shopping": 607,
+            "Transport": 598,
+            "Food and Drinks": 679,
+            "Entertainment": 805,
+            "Bills": 494,
+            "Subscriptions": 329,
+            "Education": 308,
+            "Healthcare": 693,
+            "Transfers": 849,
+            "Loans": 541
+          },
+          "total": 5903
+        },
+        {
+          "date": "2025-06-09T21:00:00.000Z",
+          "categories": {
+            "Shopping": 696,
+            "Transport": 264,
+            "Food and Drinks": 762,
+            "Entertainment": 841,
+            "Bills": 734,
+            "Subscriptions": 397,
+            "Education": 602,
+            "Healthcare": 804,
+            "Transfers": 447,
+            "Loans": 346
+          },
+          "total": 5893
+        },
+        {
+          "date": "2025-06-10T21:00:00.000Z",
+          "categories": {
+            "Shopping": 255,
+            "Transport": 328,
+            "Food and Drinks": 734,
+            "Entertainment": 536,
+            "Bills": 919,
+            "Subscriptions": 865,
+            "Education": 823,
+            "Healthcare": 922,
+            "Transfers": 337,
+            "Loans": 192
+          },
+          "total": 5911
+        },
+        {
+          "date": "2025-06-11T21:00:00.000Z",
+          "categories": {
+            "Shopping": 390,
+            "Transport": 665,
+            "Food and Drinks": 889,
+            "Entertainment": 934,
+            "Bills": 321,
+            "Subscriptions": 157,
+            "Education": 359,
+            "Healthcare": 290,
+            "Transfers": 806,
+            "Loans": 186
+          },
+          "total": 4997
+        },
+        {
+          "date": "2025-06-12T21:00:00.000Z",
+          "categories": {
+            "Shopping": 337,
+            "Transport": 913,
+            "Food and Drinks": 859,
+            "Entertainment": 322,
+            "Bills": 427,
+            "Subscriptions": 936,
+            "Education": 997,
+            "Healthcare": 869,
+            "Transfers": 558,
+            "Loans": 824
+          },
+          "total": 7042
+        },
+        {
+          "date": "2025-06-13T21:00:00.000Z",
+          "categories": {
+            "Shopping": 594,
+            "Transport": 625,
+            "Food and Drinks": 951,
+            "Entertainment": 444,
+            "Bills": 412,
+            "Subscriptions": 281,
+            "Education": 368,
+            "Healthcare": 843,
+            "Transfers": 682,
+            "Loans": 552
+          },
+          "total": 5752
+        }
+      ],
+      "weeklyTotal": 40166
+    },
+    {
+      "weekNumber": 3,
+      "startDate": "2025-06-14T21:00:00.000Z",
+      "endDate": "2025-06-20T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-06-14T21:00:00.000Z",
+          "categories": {
+            "Shopping": 764,
+            "Transport": 971,
+            "Food and Drinks": 204,
+            "Entertainment": 698,
+            "Bills": 964,
+            "Subscriptions": 378,
+            "Education": 646,
+            "Healthcare": 860,
+            "Transfers": 641,
+            "Loans": 106
+          },
+          "total": 6232
+        },
+        {
+          "date": "2025-06-15T21:00:00.000Z",
+          "categories": {
+            "Shopping": 371,
+            "Transport": 751,
+            "Food and Drinks": 952,
+            "Entertainment": 363,
+            "Bills": 711,
+            "Subscriptions": 769,
+            "Education": 122,
+            "Healthcare": 402,
+            "Transfers": 576,
+            "Loans": 480
+          },
+          "total": 5497
+        },
+        {
+          "date": "2025-06-16T21:00:00.000Z",
+          "categories": {
+            "Shopping": 471,
+            "Transport": 124,
+            "Food and Drinks": 154,
+            "Entertainment": 915,
+            "Bills": 681,
+            "Subscriptions": 197,
+            "Education": 871,
+            "Healthcare": 766,
+            "Transfers": 883,
+            "Loans": 526
+          },
+          "total": 5588
+        },
+        {
+          "date": "2025-06-17T21:00:00.000Z",
+          "categories": {
+            "Shopping": 552,
+            "Transport": 671,
+            "Food and Drinks": 930,
+            "Entertainment": 327,
+            "Bills": 549,
+            "Subscriptions": 344,
+            "Education": 630,
+            "Healthcare": 483,
+            "Transfers": 496,
+            "Loans": 975
+          },
+          "total": 5957
+        },
+        {
+          "date": "2025-06-18T21:00:00.000Z",
+          "categories": {
+            "Shopping": 217,
+            "Transport": 859,
+            "Food and Drinks": 157,
+            "Entertainment": 514,
+            "Bills": 648,
+            "Subscriptions": 444,
+            "Education": 489,
+            "Healthcare": 888,
+            "Transfers": 668,
+            "Loans": 736
+          },
+          "total": 5620
+        },
+        {
+          "date": "2025-06-19T21:00:00.000Z",
+          "categories": {
+            "Shopping": 891,
+            "Transport": 225,
+            "Food and Drinks": 198,
+            "Entertainment": 604,
+            "Bills": 983,
+            "Subscriptions": 951,
+            "Education": 248,
+            "Healthcare": 851,
+            "Transfers": 690,
+            "Loans": 197
+          },
+          "total": 5838
+        },
+        {
+          "date": "2025-06-20T21:00:00.000Z",
+          "categories": {
+            "Shopping": 147,
+            "Transport": 578,
+            "Food and Drinks": 324,
+            "Entertainment": 382,
+            "Bills": 198,
+            "Subscriptions": 450,
+            "Education": 922,
+            "Healthcare": 601,
+            "Transfers": 415,
+            "Loans": 544
+          },
+          "total": 4561
+        }
+      ],
+      "weeklyTotal": 39293
+    },
+    {
+      "weekNumber": 4,
+      "startDate": "2025-06-21T21:00:00.000Z",
+      "endDate": "2025-06-27T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-06-21T21:00:00.000Z",
+          "categories": {
+            "Shopping": 769,
+            "Transport": 324,
+            "Food and Drinks": 444,
+            "Entertainment": 740,
+            "Bills": 979,
+            "Subscriptions": 680,
+            "Education": 414,
+            "Healthcare": 604,
+            "Transfers": 891,
+            "Loans": 297
+          },
+          "total": 6142
+        },
+        {
+          "date": "2025-06-22T21:00:00.000Z",
+          "categories": {
+            "Shopping": 557,
+            "Transport": 173,
+            "Food and Drinks": 432,
+            "Entertainment": 186,
+            "Bills": 536,
+            "Subscriptions": 199,
+            "Education": 850,
+            "Healthcare": 418,
+            "Transfers": 159,
+            "Loans": 453
+          },
+          "total": 3963
+        },
+        {
+          "date": "2025-06-23T21:00:00.000Z",
+          "categories": {
+            "Shopping": 167,
+            "Transport": 269,
+            "Food and Drinks": 531,
+            "Entertainment": 545,
+            "Bills": 772,
+            "Subscriptions": 284,
+            "Education": 432,
+            "Healthcare": 647,
+            "Transfers": 487,
+            "Loans": 521
+          },
+          "total": 4655
+        },
+        {
+          "date": "2025-06-24T21:00:00.000Z",
+          "categories": {
+            "Shopping": 370,
+            "Transport": 989,
+            "Food and Drinks": 462,
+            "Entertainment": 125,
+            "Bills": 970,
+            "Subscriptions": 401,
+            "Education": 861,
+            "Healthcare": 763,
+            "Transfers": 285,
+            "Loans": 839
+          },
+          "total": 6065
+        },
+        {
+          "date": "2025-06-25T21:00:00.000Z",
+          "categories": {
+            "Shopping": 871,
+            "Transport": 252,
+            "Food and Drinks": 994,
+            "Entertainment": 665,
+            "Bills": 692,
+            "Subscriptions": 161,
+            "Education": 271,
+            "Healthcare": 835,
+            "Transfers": 395,
+            "Loans": 133
+          },
+          "total": 5269
+        },
+        {
+          "date": "2025-06-26T21:00:00.000Z",
+          "categories": {
+            "Shopping": 108,
+            "Transport": 605,
+            "Food and Drinks": 990,
+            "Entertainment": 930,
+            "Bills": 494,
+            "Subscriptions": 159,
+            "Education": 954,
+            "Healthcare": 790,
+            "Transfers": 617,
+            "Loans": 389
+          },
+          "total": 6036
+        },
+        {
+          "date": "2025-06-27T21:00:00.000Z",
+          "categories": {
+            "Shopping": 817,
+            "Transport": 986,
+            "Food and Drinks": 667,
+            "Entertainment": 873,
+            "Bills": 305,
+            "Subscriptions": 352,
+            "Education": 953,
+            "Healthcare": 322,
+            "Transfers": 110,
+            "Loans": 536
+          },
+          "total": 5921
+        }
+      ],
+      "weeklyTotal": 38051
+    }
+  ],
+  "monthlyTotal": 152924
+},
+{
+  "_id": {
+    "$oid": "68fa41cc4237485db16f4d7e"
+  },
+  "userId": "TIjvR0nNHnR2fXPveDOKT370Zz72",
+  "month": "July",
+  "year": 2025,
+  "weeks": [
+    {
+      "weekNumber": 1,
+      "startDate": "2025-06-30T21:00:00.000Z",
+      "endDate": "2025-07-06T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-06-30T21:00:00.000Z",
+          "categories": {
+            "Shopping": 609,
+            "Transport": 767,
+            "Food and Drinks": 345,
+            "Entertainment": 145,
+            "Bills": 510,
+            "Subscriptions": 942,
+            "Education": 319,
+            "Healthcare": 821,
+            "Transfers": 651,
+            "Loans": 465
+          },
+          "total": 5574
+        },
+        {
+          "date": "2025-07-01T21:00:00.000Z",
+          "categories": {
+            "Shopping": 864,
+            "Transport": 408,
+            "Food and Drinks": 739,
+            "Entertainment": 747,
+            "Bills": 503,
+            "Subscriptions": 902,
+            "Education": 305,
+            "Healthcare": 468,
+            "Transfers": 297,
+            "Loans": 514
+          },
+          "total": 5747
+        },
+        {
+          "date": "2025-07-02T21:00:00.000Z",
+          "categories": {
+            "Shopping": 604,
+            "Transport": 931,
+            "Food and Drinks": 251,
+            "Entertainment": 443,
+            "Bills": 101,
+            "Subscriptions": 374,
+            "Education": 765,
+            "Healthcare": 694,
+            "Transfers": 116,
+            "Loans": 485
+          },
+          "total": 4764
+        },
+        {
+          "date": "2025-07-03T21:00:00.000Z",
+          "categories": {
+            "Shopping": 371,
+            "Transport": 661,
+            "Food and Drinks": 747,
+            "Entertainment": 731,
+            "Bills": 789,
+            "Subscriptions": 263,
+            "Education": 846,
+            "Healthcare": 346,
+            "Transfers": 565,
+            "Loans": 874
+          },
+          "total": 6193
+        },
+        {
+          "date": "2025-07-04T21:00:00.000Z",
+          "categories": {
+            "Shopping": 248,
+            "Transport": 409,
+            "Food and Drinks": 271,
+            "Entertainment": 154,
+            "Bills": 903,
+            "Subscriptions": 846,
+            "Education": 525,
+            "Healthcare": 294,
+            "Transfers": 461,
+            "Loans": 897
+          },
+          "total": 5008
+        },
+        {
+          "date": "2025-07-05T21:00:00.000Z",
+          "categories": {
+            "Shopping": 445,
+            "Transport": 544,
+            "Food and Drinks": 196,
+            "Entertainment": 311,
+            "Bills": 980,
+            "Subscriptions": 815,
+            "Education": 899,
+            "Healthcare": 922,
+            "Transfers": 268,
+            "Loans": 645
+          },
+          "total": 6025
+        },
+        {
+          "date": "2025-07-06T21:00:00.000Z",
+          "categories": {
+            "Shopping": 237,
+            "Transport": 625,
+            "Food and Drinks": 779,
+            "Entertainment": 326,
+            "Bills": 755,
+            "Subscriptions": 276,
+            "Education": 499,
+            "Healthcare": 994,
+            "Transfers": 658,
+            "Loans": 187
+          },
+          "total": 5336
+        }
+      ],
+      "weeklyTotal": 38647
+    },
+    {
+      "weekNumber": 2,
+      "startDate": "2025-07-07T21:00:00.000Z",
+      "endDate": "2025-07-13T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-07-07T21:00:00.000Z",
+          "categories": {
+            "Shopping": 280,
+            "Transport": 176,
+            "Food and Drinks": 107,
+            "Entertainment": 132,
+            "Bills": 194,
+            "Subscriptions": 708,
+            "Education": 721,
+            "Healthcare": 313,
+            "Transfers": 700,
+            "Loans": 109
+          },
+          "total": 3440
+        },
+        {
+          "date": "2025-07-08T21:00:00.000Z",
+          "categories": {
+            "Shopping": 204,
+            "Transport": 130,
+            "Food and Drinks": 784,
+            "Entertainment": 644,
+            "Bills": 942,
+            "Subscriptions": 275,
+            "Education": 607,
+            "Healthcare": 369,
+            "Transfers": 544,
+            "Loans": 475
+          },
+          "total": 4974
+        },
+        {
+          "date": "2025-07-09T21:00:00.000Z",
+          "categories": {
+            "Shopping": 265,
+            "Transport": 706,
+            "Food and Drinks": 217,
+            "Entertainment": 555,
+            "Bills": 631,
+            "Subscriptions": 865,
+            "Education": 695,
+            "Healthcare": 561,
+            "Transfers": 602,
+            "Loans": 233
+          },
+          "total": 5330
+        },
+        {
+          "date": "2025-07-10T21:00:00.000Z",
+          "categories": {
+            "Shopping": 685,
+            "Transport": 185,
+            "Food and Drinks": 114,
+            "Entertainment": 471,
+            "Bills": 192,
+            "Subscriptions": 977,
+            "Education": 741,
+            "Healthcare": 200,
+            "Transfers": 440,
+            "Loans": 390
+          },
+          "total": 4395
+        },
+        {
+          "date": "2025-07-11T21:00:00.000Z",
+          "categories": {
+            "Shopping": 375,
+            "Transport": 739,
+            "Food and Drinks": 273,
+            "Entertainment": 737,
+            "Bills": 393,
+            "Subscriptions": 119,
+            "Education": 979,
+            "Healthcare": 909,
+            "Transfers": 211,
+            "Loans": 673
+          },
+          "total": 5408
+        },
+        {
+          "date": "2025-07-12T21:00:00.000Z",
+          "categories": {
+            "Shopping": 265,
+            "Transport": 839,
+            "Food and Drinks": 708,
+            "Entertainment": 970,
+            "Bills": 916,
+            "Subscriptions": 694,
+            "Education": 432,
+            "Healthcare": 506,
+            "Transfers": 127,
+            "Loans": 664
+          },
+          "total": 6121
+        },
+        {
+          "date": "2025-07-13T21:00:00.000Z",
+          "categories": {
+            "Shopping": 107,
+            "Transport": 983,
+            "Food and Drinks": 790,
+            "Entertainment": 787,
+            "Bills": 986,
+            "Subscriptions": 255,
+            "Education": 278,
+            "Healthcare": 540,
+            "Transfers": 325,
+            "Loans": 321
+          },
+          "total": 5372
+        }
+      ],
+      "weeklyTotal": 35040
+    },
+    {
+      "weekNumber": 3,
+      "startDate": "2025-07-14T21:00:00.000Z",
+      "endDate": "2025-07-20T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-07-14T21:00:00.000Z",
+          "categories": {
+            "Shopping": 202,
+            "Transport": 894,
+            "Food and Drinks": 323,
+            "Entertainment": 537,
+            "Bills": 192,
+            "Subscriptions": 818,
+            "Education": 778,
+            "Healthcare": 752,
+            "Transfers": 971,
+            "Loans": 303
+          },
+          "total": 5770
+        },
+        {
+          "date": "2025-07-15T21:00:00.000Z",
+          "categories": {
+            "Shopping": 738,
+            "Transport": 946,
+            "Food and Drinks": 878,
+            "Entertainment": 279,
+            "Bills": 459,
+            "Subscriptions": 903,
+            "Education": 906,
+            "Healthcare": 575,
+            "Transfers": 353,
+            "Loans": 197
+          },
+          "total": 6234
+        },
+        {
+          "date": "2025-07-16T21:00:00.000Z",
+          "categories": {
+            "Shopping": 323,
+            "Transport": 746,
+            "Food and Drinks": 872,
+            "Entertainment": 902,
+            "Bills": 699,
+            "Subscriptions": 177,
+            "Education": 845,
+            "Healthcare": 951,
+            "Transfers": 616,
+            "Loans": 979
+          },
+          "total": 7110
+        },
+        {
+          "date": "2025-07-17T21:00:00.000Z",
+          "categories": {
+            "Shopping": 606,
+            "Transport": 250,
+            "Food and Drinks": 815,
+            "Entertainment": 184,
+            "Bills": 549,
+            "Subscriptions": 465,
+            "Education": 364,
+            "Healthcare": 634,
+            "Transfers": 528,
+            "Loans": 405
+          },
+          "total": 4800
+        },
+        {
+          "date": "2025-07-18T21:00:00.000Z",
+          "categories": {
+            "Shopping": 658,
+            "Transport": 755,
+            "Food and Drinks": 386,
+            "Entertainment": 543,
+            "Bills": 489,
+            "Subscriptions": 849,
+            "Education": 900,
+            "Healthcare": 798,
+            "Transfers": 994,
+            "Loans": 655
+          },
+          "total": 7027
+        },
+        {
+          "date": "2025-07-19T21:00:00.000Z",
+          "categories": {
+            "Shopping": 465,
+            "Transport": 332,
+            "Food and Drinks": 838,
+            "Entertainment": 948,
+            "Bills": 914,
+            "Subscriptions": 928,
+            "Education": 929,
+            "Healthcare": 139,
+            "Transfers": 812,
+            "Loans": 247
+          },
+          "total": 6552
+        },
+        {
+          "date": "2025-07-20T21:00:00.000Z",
+          "categories": {
+            "Shopping": 436,
+            "Transport": 476,
+            "Food and Drinks": 379,
+            "Entertainment": 257,
+            "Bills": 754,
+            "Subscriptions": 507,
+            "Education": 772,
+            "Healthcare": 160,
+            "Transfers": 849,
+            "Loans": 463
+          },
+          "total": 5053
+        }
+      ],
+      "weeklyTotal": 42546
+    },
+    {
+      "weekNumber": 4,
+      "startDate": "2025-07-21T21:00:00.000Z",
+      "endDate": "2025-07-27T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-07-21T21:00:00.000Z",
+          "categories": {
+            "Shopping": 773,
+            "Transport": 121,
+            "Food and Drinks": 120,
+            "Entertainment": 235,
+            "Bills": 662,
+            "Subscriptions": 553,
+            "Education": 119,
+            "Healthcare": 810,
+            "Transfers": 649,
+            "Loans": 574
+          },
+          "total": 4616
+        },
+        {
+          "date": "2025-07-22T21:00:00.000Z",
+          "categories": {
+            "Shopping": 253,
+            "Transport": 964,
+            "Food and Drinks": 463,
+            "Entertainment": 791,
+            "Bills": 566,
+            "Subscriptions": 786,
+            "Education": 439,
+            "Healthcare": 292,
+            "Transfers": 698,
+            "Loans": 354
+          },
+          "total": 5606
+        },
+        {
+          "date": "2025-07-23T21:00:00.000Z",
+          "categories": {
+            "Shopping": 159,
+            "Transport": 730,
+            "Food and Drinks": 520,
+            "Entertainment": 509,
+            "Bills": 517,
+            "Subscriptions": 580,
+            "Education": 562,
+            "Healthcare": 119,
+            "Transfers": 304,
+            "Loans": 623
+          },
+          "total": 4623
+        },
+        {
+          "date": "2025-07-24T21:00:00.000Z",
+          "categories": {
+            "Shopping": 971,
+            "Transport": 314,
+            "Food and Drinks": 598,
+            "Entertainment": 308,
+            "Bills": 530,
+            "Subscriptions": 183,
+            "Education": 676,
+            "Healthcare": 272,
+            "Transfers": 219,
+            "Loans": 553
+          },
+          "total": 4624
+        },
+        {
+          "date": "2025-07-25T21:00:00.000Z",
+          "categories": {
+            "Shopping": 421,
+            "Transport": 963,
+            "Food and Drinks": 495,
+            "Entertainment": 742,
+            "Bills": 743,
+            "Subscriptions": 650,
+            "Education": 361,
+            "Healthcare": 429,
+            "Transfers": 383,
+            "Loans": 302
+          },
+          "total": 5489
+        },
+        {
+          "date": "2025-07-26T21:00:00.000Z",
+          "categories": {
+            "Shopping": 843,
+            "Transport": 691,
+            "Food and Drinks": 854,
+            "Entertainment": 560,
+            "Bills": 303,
+            "Subscriptions": 677,
+            "Education": 463,
+            "Healthcare": 584,
+            "Transfers": 838,
+            "Loans": 254
+          },
+          "total": 6067
+        },
+        {
+          "date": "2025-07-27T21:00:00.000Z",
+          "categories": {
+            "Shopping": 314,
+            "Transport": 440,
+            "Food and Drinks": 670,
+            "Entertainment": 537,
+            "Bills": 937,
+            "Subscriptions": 739,
+            "Education": 850,
+            "Healthcare": 370,
+            "Transfers": 622,
+            "Loans": 187
+          },
+          "total": 5666
+        }
+      ],
+      "weeklyTotal": 36691
+    }
+  ],
+  "monthlyTotal": 152924
+},
+{
+  "_id": {
+    "$oid": "68fa41cc4237485db16f4d7f"
+  },
+  "userId": "TIjvR0nNHnR2fXPveDOKT370Zz72",
+  "month": "August",
+  "year": 2025,
+  "weeks": [
+    {
+      "weekNumber": 1,
+      "startDate": "2025-07-31T21:00:00.000Z",
+      "endDate": "2025-08-06T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-07-31T21:00:00.000Z",
+          "categories": {
+            "Shopping": 318,
+            "Transport": 838,
+            "Food and Drinks": 648,
+            "Entertainment": 990,
+            "Bills": 903,
+            "Subscriptions": 551,
+            "Education": 194,
+            "Healthcare": 307,
+            "Transfers": 145,
+            "Loans": 700
+          },
+          "total": 5594
+        },
+        {
+          "date": "2025-08-01T21:00:00.000Z",
+          "categories": {
+            "Shopping": 265,
+            "Transport": 495,
+            "Food and Drinks": 510,
+            "Entertainment": 373,
+            "Bills": 973,
+            "Subscriptions": 137,
+            "Education": 180,
+            "Healthcare": 307,
+            "Transfers": 852,
+            "Loans": 197
+          },
+          "total": 4289
+        },
+        {
+          "date": "2025-08-02T21:00:00.000Z",
+          "categories": {
+            "Shopping": 825,
+            "Transport": 216,
+            "Food and Drinks": 170,
+            "Entertainment": 415,
+            "Bills": 881,
+            "Subscriptions": 407,
+            "Education": 815,
+            "Healthcare": 802,
+            "Transfers": 444,
+            "Loans": 267
+          },
+          "total": 5242
+        },
+        {
+          "date": "2025-08-03T21:00:00.000Z",
+          "categories": {
+            "Shopping": 485,
+            "Transport": 276,
+            "Food and Drinks": 592,
+            "Entertainment": 423,
+            "Bills": 661,
+            "Subscriptions": 800,
+            "Education": 917,
+            "Healthcare": 821,
+            "Transfers": 137,
+            "Loans": 383
+          },
+          "total": 5495
+        },
+        {
+          "date": "2025-08-04T21:00:00.000Z",
+          "categories": {
+            "Shopping": 634,
+            "Transport": 230,
+            "Food and Drinks": 218,
+            "Entertainment": 814,
+            "Bills": 657,
+            "Subscriptions": 678,
+            "Education": 999,
+            "Healthcare": 467,
+            "Transfers": 374,
+            "Loans": 338
+          },
+          "total": 5409
+        },
+        {
+          "date": "2025-08-05T21:00:00.000Z",
+          "categories": {
+            "Shopping": 195,
+            "Transport": 696,
+            "Food and Drinks": 666,
+            "Entertainment": 811,
+            "Bills": 811,
+            "Subscriptions": 392,
+            "Education": 239,
+            "Healthcare": 490,
+            "Transfers": 186,
+            "Loans": 283
+          },
+          "total": 4769
+        },
+        {
+          "date": "2025-08-06T21:00:00.000Z",
+          "categories": {
+            "Shopping": 422,
+            "Transport": 601,
+            "Food and Drinks": 555,
+            "Entertainment": 130,
+            "Bills": 351,
+            "Subscriptions": 950,
+            "Education": 356,
+            "Healthcare": 698,
+            "Transfers": 223,
+            "Loans": 686
+          },
+          "total": 4972
+        }
+      ],
+      "weeklyTotal": 35770
+    },
+    {
+      "weekNumber": 2,
+      "startDate": "2025-08-07T21:00:00.000Z",
+      "endDate": "2025-08-13T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-08-07T21:00:00.000Z",
+          "categories": {
+            "Shopping": 146,
+            "Transport": 420,
+            "Food and Drinks": 857,
+            "Entertainment": 140,
+            "Bills": 787,
+            "Subscriptions": 117,
+            "Education": 642,
+            "Healthcare": 929,
+            "Transfers": 128,
+            "Loans": 337
+          },
+          "total": 4503
+        },
+        {
+          "date": "2025-08-08T21:00:00.000Z",
+          "categories": {
+            "Shopping": 683,
+            "Transport": 419,
+            "Food and Drinks": 430,
+            "Entertainment": 694,
+            "Bills": 475,
+            "Subscriptions": 429,
+            "Education": 193,
+            "Healthcare": 599,
+            "Transfers": 892,
+            "Loans": 804
+          },
+          "total": 5618
+        },
+        {
+          "date": "2025-08-09T21:00:00.000Z",
+          "categories": {
+            "Shopping": 150,
+            "Transport": 443,
+            "Food and Drinks": 954,
+            "Entertainment": 865,
+            "Bills": 733,
+            "Subscriptions": 138,
+            "Education": 815,
+            "Healthcare": 733,
+            "Transfers": 879,
+            "Loans": 271
+          },
+          "total": 5981
+        },
+        {
+          "date": "2025-08-10T21:00:00.000Z",
+          "categories": {
+            "Shopping": 980,
+            "Transport": 601,
+            "Food and Drinks": 813,
+            "Entertainment": 369,
+            "Bills": 703,
+            "Subscriptions": 699,
+            "Education": 476,
+            "Healthcare": 477,
+            "Transfers": 884,
+            "Loans": 258
+          },
+          "total": 6260
+        },
+        {
+          "date": "2025-08-11T21:00:00.000Z",
+          "categories": {
+            "Shopping": 990,
+            "Transport": 804,
+            "Food and Drinks": 406,
+            "Entertainment": 870,
+            "Bills": 477,
+            "Subscriptions": 988,
+            "Education": 484,
+            "Healthcare": 895,
+            "Transfers": 845,
+            "Loans": 987
+          },
+          "total": 7746
+        },
+        {
+          "date": "2025-08-12T21:00:00.000Z",
+          "categories": {
+            "Shopping": 245,
+            "Transport": 108,
+            "Food and Drinks": 728,
+            "Entertainment": 923,
+            "Bills": 627,
+            "Subscriptions": 782,
+            "Education": 788,
+            "Healthcare": 306,
+            "Transfers": 986,
+            "Loans": 988
+          },
+          "total": 6481
+        },
+        {
+          "date": "2025-08-13T21:00:00.000Z",
+          "categories": {
+            "Shopping": 150,
+            "Transport": 571,
+            "Food and Drinks": 338,
+            "Entertainment": 954,
+            "Bills": 943,
+            "Subscriptions": 884,
+            "Education": 295,
+            "Healthcare": 599,
+            "Transfers": 656,
+            "Loans": 844
+          },
+          "total": 6234
+        }
+      ],
+      "weeklyTotal": 42823
+    },
+    {
+      "weekNumber": 3,
+      "startDate": "2025-08-14T21:00:00.000Z",
+      "endDate": "2025-08-20T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-08-14T21:00:00.000Z",
+          "categories": {
+            "Shopping": 803,
+            "Transport": 818,
+            "Food and Drinks": 715,
+            "Entertainment": 754,
+            "Bills": 347,
+            "Subscriptions": 188,
+            "Education": 387,
+            "Healthcare": 688,
+            "Transfers": 357,
+            "Loans": 883
+          },
+          "total": 5940
+        },
+        {
+          "date": "2025-08-15T21:00:00.000Z",
+          "categories": {
+            "Shopping": 706,
+            "Transport": 951,
+            "Food and Drinks": 912,
+            "Entertainment": 388,
+            "Bills": 708,
+            "Subscriptions": 732,
+            "Education": 299,
+            "Healthcare": 888,
+            "Transfers": 675,
+            "Loans": 729
+          },
+          "total": 6988
+        },
+        {
+          "date": "2025-08-16T21:00:00.000Z",
+          "categories": {
+            "Shopping": 442,
+            "Transport": 989,
+            "Food and Drinks": 104,
+            "Entertainment": 883,
+            "Bills": 239,
+            "Subscriptions": 954,
+            "Education": 734,
+            "Healthcare": 284,
+            "Transfers": 840,
+            "Loans": 162
+          },
+          "total": 5631
+        },
+        {
+          "date": "2025-08-17T21:00:00.000Z",
+          "categories": {
+            "Shopping": 110,
+            "Transport": 174,
+            "Food and Drinks": 585,
+            "Entertainment": 231,
+            "Bills": 573,
+            "Subscriptions": 503,
+            "Education": 455,
+            "Healthcare": 932,
+            "Transfers": 731,
+            "Loans": 507
+          },
+          "total": 4801
+        },
+        {
+          "date": "2025-08-18T21:00:00.000Z",
+          "categories": {
+            "Shopping": 918,
+            "Transport": 716,
+            "Food and Drinks": 380,
+            "Entertainment": 991,
+            "Bills": 818,
+            "Subscriptions": 838,
+            "Education": 951,
+            "Healthcare": 872,
+            "Transfers": 363,
+            "Loans": 789
+          },
+          "total": 7636
+        },
+        {
+          "date": "2025-08-19T21:00:00.000Z",
+          "categories": {
+            "Shopping": 177,
+            "Transport": 749,
+            "Food and Drinks": 749,
+            "Entertainment": 899,
+            "Bills": 976,
+            "Subscriptions": 392,
+            "Education": 107,
+            "Healthcare": 510,
+            "Transfers": 642,
+            "Loans": 664
+          },
+          "total": 5865
+        },
+        {
+          "date": "2025-08-20T21:00:00.000Z",
+          "categories": {
+            "Shopping": 690,
+            "Transport": 886,
+            "Food and Drinks": 848,
+            "Entertainment": 800,
+            "Bills": 697,
+            "Subscriptions": 875,
+            "Education": 435,
+            "Healthcare": 785,
+            "Transfers": 286,
+            "Loans": 277
+          },
+          "total": 6579
+        }
+      ],
+      "weeklyTotal": 43440
+    },
+    {
+      "weekNumber": 4,
+      "startDate": "2025-08-21T21:00:00.000Z",
+      "endDate": "2025-08-27T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-08-21T21:00:00.000Z",
+          "categories": {
+            "Shopping": 288,
+            "Transport": 547,
+            "Food and Drinks": 825,
+            "Entertainment": 165,
+            "Bills": 236,
+            "Subscriptions": 518,
+            "Education": 679,
+            "Healthcare": 525,
+            "Transfers": 276,
+            "Loans": 669
+          },
+          "total": 4728
+        },
+        {
+          "date": "2025-08-22T21:00:00.000Z",
+          "categories": {
+            "Shopping": 902,
+            "Transport": 301,
+            "Food and Drinks": 771,
+            "Entertainment": 678,
+            "Bills": 923,
+            "Subscriptions": 740,
+            "Education": 162,
+            "Healthcare": 199,
+            "Transfers": 328,
+            "Loans": 924
+          },
+          "total": 5928
+        },
+        {
+          "date": "2025-08-23T21:00:00.000Z",
+          "categories": {
+            "Shopping": 168,
+            "Transport": 754,
+            "Food and Drinks": 554,
+            "Entertainment": 229,
+            "Bills": 825,
+            "Subscriptions": 282,
+            "Education": 262,
+            "Healthcare": 823,
+            "Transfers": 325,
+            "Loans": 349
+          },
+          "total": 4571
+        },
+        {
+          "date": "2025-08-24T21:00:00.000Z",
+          "categories": {
+            "Shopping": 992,
+            "Transport": 284,
+            "Food and Drinks": 415,
+            "Entertainment": 286,
+            "Bills": 942,
+            "Subscriptions": 948,
+            "Education": 169,
+            "Healthcare": 467,
+            "Transfers": 424,
+            "Loans": 723
+          },
+          "total": 5650
+        },
+        {
+          "date": "2025-08-25T21:00:00.000Z",
+          "categories": {
+            "Shopping": 526,
+            "Transport": 138,
+            "Food and Drinks": 973,
+            "Entertainment": 833,
+            "Bills": 460,
+            "Subscriptions": 390,
+            "Education": 637,
+            "Healthcare": 128,
+            "Transfers": 769,
+            "Loans": 100
+          },
+          "total": 4954
+        },
+        {
+          "date": "2025-08-26T21:00:00.000Z",
+          "categories": {
+            "Shopping": 455,
+            "Transport": 908,
+            "Food and Drinks": 693,
+            "Entertainment": 479,
+            "Bills": 133,
+            "Subscriptions": 652,
+            "Education": 114,
+            "Healthcare": 491,
+            "Transfers": 161,
+            "Loans": 107
+          },
+          "total": 4193
+        },
+        {
+          "date": "2025-08-27T21:00:00.000Z",
+          "categories": {
+            "Shopping": 995,
+            "Transport": 256,
+            "Food and Drinks": 688,
+            "Entertainment": 759,
+            "Bills": 586,
+            "Subscriptions": 122,
+            "Education": 127,
+            "Healthcare": 189,
+            "Transfers": 578,
+            "Loans": 829
+          },
+          "total": 5129
+        }
+      ],
+      "weeklyTotal": 35153
+    }
+  ],
+  "monthlyTotal": 157186
+},
+{
+  "_id": {
+    "$oid": "68fa41cc4237485db16f4d80"
+  },
+  "userId": "TIjvR0nNHnR2fXPveDOKT370Zz72",
+  "month": "September",
+  "year": 2025,
+  "weeks": [
+    {
+      "weekNumber": 1,
+      "startDate": "2025-08-31T21:00:00.000Z",
+      "endDate": "2025-09-06T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-08-31T21:00:00.000Z",
+          "categories": {
+            "Shopping": 793,
+            "Transport": 212,
+            "Food and Drinks": 669,
+            "Entertainment": 445,
+            "Bills": 924,
+            "Subscriptions": 363,
+            "Education": 119,
+            "Healthcare": 278,
+            "Transfers": 177,
+            "Loans": 693
+          },
+          "total": 4673
+        },
+        {
+          "date": "2025-09-01T21:00:00.000Z",
+          "categories": {
+            "Shopping": 898,
+            "Transport": 673,
+            "Food and Drinks": 399,
+            "Entertainment": 787,
+            "Bills": 210,
+            "Subscriptions": 374,
+            "Education": 620,
+            "Healthcare": 663,
+            "Transfers": 108,
+            "Loans": 554
+          },
+          "total": 5286
+        },
+        {
+          "date": "2025-09-02T21:00:00.000Z",
+          "categories": {
+            "Shopping": 154,
+            "Transport": 216,
+            "Food and Drinks": 825,
+            "Entertainment": 784,
+            "Bills": 390,
+            "Subscriptions": 402,
+            "Education": 143,
+            "Healthcare": 245,
+            "Transfers": 348,
+            "Loans": 404
+          },
+          "total": 3911
+        },
+        {
+          "date": "2025-09-03T21:00:00.000Z",
+          "categories": {
+            "Shopping": 950,
+            "Transport": 520,
+            "Food and Drinks": 473,
+            "Entertainment": 217,
+            "Bills": 746,
+            "Subscriptions": 133,
+            "Education": 904,
+            "Healthcare": 331,
+            "Transfers": 336,
+            "Loans": 383
+          },
+          "total": 4993
+        },
+        {
+          "date": "2025-09-04T21:00:00.000Z",
+          "categories": {
+            "Shopping": 914,
+            "Transport": 630,
+            "Food and Drinks": 124,
+            "Entertainment": 141,
+            "Bills": 544,
+            "Subscriptions": 549,
+            "Education": 787,
+            "Healthcare": 442,
+            "Transfers": 152,
+            "Loans": 270
+          },
+          "total": 4553
+        },
+        {
+          "date": "2025-09-05T21:00:00.000Z",
+          "categories": {
+            "Shopping": 889,
+            "Transport": 528,
+            "Food and Drinks": 337,
+            "Entertainment": 835,
+            "Bills": 956,
+            "Subscriptions": 361,
+            "Education": 841,
+            "Healthcare": 840,
+            "Transfers": 670,
+            "Loans": 235
+          },
+          "total": 6492
+        },
+        {
+          "date": "2025-09-06T21:00:00.000Z",
+          "categories": {
+            "Shopping": 271,
+            "Transport": 862,
+            "Food and Drinks": 917,
+            "Entertainment": 937,
+            "Bills": 363,
+            "Subscriptions": 202,
+            "Education": 294,
+            "Healthcare": 625,
+            "Transfers": 755,
+            "Loans": 871
+          },
+          "total": 6097
+        }
+      ],
+      "weeklyTotal": 36005
+    },
+    {
+      "weekNumber": 2,
+      "startDate": "2025-09-07T21:00:00.000Z",
+      "endDate": "2025-09-13T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-09-07T21:00:00.000Z",
+          "categories": {
+            "Shopping": 199,
+            "Transport": 397,
+            "Food and Drinks": 791,
+            "Entertainment": 144,
+            "Bills": 273,
+            "Subscriptions": 106,
+            "Education": 771,
+            "Healthcare": 219,
+            "Transfers": 574,
+            "Loans": 994
+          },
+          "total": 4468
+        },
+        {
+          "date": "2025-09-08T21:00:00.000Z",
+          "categories": {
+            "Shopping": 408,
+            "Transport": 277,
+            "Food and Drinks": 417,
+            "Entertainment": 713,
+            "Bills": 123,
+            "Subscriptions": 225,
+            "Education": 793,
+            "Healthcare": 998,
+            "Transfers": 745,
+            "Loans": 305
+          },
+          "total": 5004
+        },
+        {
+          "date": "2025-09-09T21:00:00.000Z",
+          "categories": {
+            "Shopping": 914,
+            "Transport": 567,
+            "Food and Drinks": 489,
+            "Entertainment": 978,
+            "Bills": 794,
+            "Subscriptions": 191,
+            "Education": 586,
+            "Healthcare": 503,
+            "Transfers": 593,
+            "Loans": 740
+          },
+          "total": 6355
+        },
+        {
+          "date": "2025-09-10T21:00:00.000Z",
+          "categories": {
+            "Shopping": 544,
+            "Transport": 206,
+            "Food and Drinks": 771,
+            "Entertainment": 522,
+            "Bills": 454,
+            "Subscriptions": 412,
+            "Education": 100,
+            "Healthcare": 688,
+            "Transfers": 953,
+            "Loans": 627
+          },
+          "total": 5277
+        },
+        {
+          "date": "2025-09-11T21:00:00.000Z",
+          "categories": {
+            "Shopping": 276,
+            "Transport": 183,
+            "Food and Drinks": 371,
+            "Entertainment": 344,
+            "Bills": 548,
+            "Subscriptions": 770,
+            "Education": 670,
+            "Healthcare": 719,
+            "Transfers": 819,
+            "Loans": 801
+          },
+          "total": 5501
+        },
+        {
+          "date": "2025-09-12T21:00:00.000Z",
+          "categories": {
+            "Shopping": 871,
+            "Transport": 883,
+            "Food and Drinks": 831,
+            "Entertainment": 568,
+            "Bills": 243,
+            "Subscriptions": 196,
+            "Education": 511,
+            "Healthcare": 830,
+            "Transfers": 966,
+            "Loans": 485
+          },
+          "total": 6384
+        },
+        {
+          "date": "2025-09-13T21:00:00.000Z",
+          "categories": {
+            "Shopping": 567,
+            "Transport": 219,
+            "Food and Drinks": 620,
+            "Entertainment": 642,
+            "Bills": 479,
+            "Subscriptions": 792,
+            "Education": 339,
+            "Healthcare": 934,
+            "Transfers": 968,
+            "Loans": 779
+          },
+          "total": 6339
+        }
+      ],
+      "weeklyTotal": 39328
+    },
+    {
+      "weekNumber": 3,
+      "startDate": "2025-09-14T21:00:00.000Z",
+      "endDate": "2025-09-20T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-09-14T21:00:00.000Z",
+          "categories": {
+            "Shopping": 982,
+            "Transport": 755,
+            "Food and Drinks": 544,
+            "Entertainment": 962,
+            "Bills": 991,
+            "Subscriptions": 104,
+            "Education": 475,
+            "Healthcare": 570,
+            "Transfers": 963,
+            "Loans": 429
+          },
+          "total": 6775
+        },
+        {
+          "date": "2025-09-15T21:00:00.000Z",
+          "categories": {
+            "Shopping": 174,
+            "Transport": 211,
+            "Food and Drinks": 674,
+            "Entertainment": 285,
+            "Bills": 285,
+            "Subscriptions": 928,
+            "Education": 130,
+            "Healthcare": 474,
+            "Transfers": 216,
+            "Loans": 735
+          },
+          "total": 4112
+        },
+        {
+          "date": "2025-09-16T21:00:00.000Z",
+          "categories": {
+            "Shopping": 532,
+            "Transport": 198,
+            "Food and Drinks": 100,
+            "Entertainment": 817,
+            "Bills": 897,
+            "Subscriptions": 443,
+            "Education": 719,
+            "Healthcare": 670,
+            "Transfers": 661,
+            "Loans": 519
+          },
+          "total": 5556
+        },
+        {
+          "date": "2025-09-17T21:00:00.000Z",
+          "categories": {
+            "Shopping": 600,
+            "Transport": 443,
+            "Food and Drinks": 887,
+            "Entertainment": 649,
+            "Bills": 928,
+            "Subscriptions": 157,
+            "Education": 760,
+            "Healthcare": 982,
+            "Transfers": 664,
+            "Loans": 379
+          },
+          "total": 6449
+        },
+        {
+          "date": "2025-09-18T21:00:00.000Z",
+          "categories": {
+            "Shopping": 725,
+            "Transport": 518,
+            "Food and Drinks": 439,
+            "Entertainment": 824,
+            "Bills": 825,
+            "Subscriptions": 257,
+            "Education": 467,
+            "Healthcare": 473,
+            "Transfers": 737,
+            "Loans": 797
+          },
+          "total": 6062
+        },
+        {
+          "date": "2025-09-19T21:00:00.000Z",
+          "categories": {
+            "Shopping": 448,
+            "Transport": 893,
+            "Food and Drinks": 333,
+            "Entertainment": 179,
+            "Bills": 224,
+            "Subscriptions": 159,
+            "Education": 377,
+            "Healthcare": 873,
+            "Transfers": 961,
+            "Loans": 329
+          },
+          "total": 4776
+        },
+        {
+          "date": "2025-09-20T21:00:00.000Z",
+          "categories": {
+            "Shopping": 531,
+            "Transport": 650,
+            "Food and Drinks": 297,
+            "Entertainment": 864,
+            "Bills": 711,
+            "Subscriptions": 246,
+            "Education": 190,
+            "Healthcare": 563,
+            "Transfers": 885,
+            "Loans": 556
+          },
+          "total": 5493
+        }
+      ],
+      "weeklyTotal": 39223
+    },
+    {
+      "weekNumber": 4,
+      "startDate": "2025-09-21T21:00:00.000Z",
+      "endDate": "2025-09-27T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-09-21T21:00:00.000Z",
+          "categories": {
+            "Shopping": 616,
+            "Transport": 691,
+            "Food and Drinks": 465,
+            "Entertainment": 152,
+            "Bills": 714,
+            "Subscriptions": 322,
+            "Education": 199,
+            "Healthcare": 769,
+            "Transfers": 269,
+            "Loans": 210
+          },
+          "total": 4407
+        },
+        {
+          "date": "2025-09-22T21:00:00.000Z",
+          "categories": {
+            "Shopping": 431,
+            "Transport": 263,
+            "Food and Drinks": 416,
+            "Entertainment": 537,
+            "Bills": 975,
+            "Subscriptions": 856,
+            "Education": 729,
+            "Healthcare": 740,
+            "Transfers": 359,
+            "Loans": 681
+          },
+          "total": 5987
+        },
+        {
+          "date": "2025-09-23T21:00:00.000Z",
+          "categories": {
+            "Shopping": 680,
+            "Transport": 469,
+            "Food and Drinks": 255,
+            "Entertainment": 616,
+            "Bills": 320,
+            "Subscriptions": 586,
+            "Education": 742,
+            "Healthcare": 227,
+            "Transfers": 267,
+            "Loans": 209
+          },
+          "total": 4371
+        },
+        {
+          "date": "2025-09-24T21:00:00.000Z",
+          "categories": {
+            "Shopping": 843,
+            "Transport": 311,
+            "Food and Drinks": 887,
+            "Entertainment": 676,
+            "Bills": 442,
+            "Subscriptions": 176,
+            "Education": 482,
+            "Healthcare": 668,
+            "Transfers": 631,
+            "Loans": 392
+          },
+          "total": 5508
+        },
+        {
+          "date": "2025-09-25T21:00:00.000Z",
+          "categories": {
+            "Shopping": 856,
+            "Transport": 395,
+            "Food and Drinks": 528,
+            "Entertainment": 178,
+            "Bills": 439,
+            "Subscriptions": 868,
+            "Education": 316,
+            "Healthcare": 927,
+            "Transfers": 993,
+            "Loans": 454
+          },
+          "total": 5954
+        },
+        {
+          "date": "2025-09-26T21:00:00.000Z",
+          "categories": {
+            "Shopping": 644,
+            "Transport": 189,
+            "Food and Drinks": 523,
+            "Entertainment": 676,
+            "Bills": 908,
+            "Subscriptions": 157,
+            "Education": 718,
+            "Healthcare": 985,
+            "Transfers": 297,
+            "Loans": 667
+          },
+          "total": 5764
+        },
+        {
+          "date": "2025-09-27T21:00:00.000Z",
+          "categories": {
+            "Shopping": 566,
+            "Transport": 438,
+            "Food and Drinks": 135,
+            "Entertainment": 884,
+            "Bills": 144,
+            "Subscriptions": 502,
+            "Education": 645,
+            "Healthcare": 630,
+            "Transfers": 302,
+            "Loans": 124
+          },
+          "total": 4370
+        }
+      ],
+      "weeklyTotal": 36361
+    }
+  ],
+  "monthlyTotal": 150917
+},
+{
+  "_id": {
+    "$oid": "68fa41cc4237485db16f4d81"
+  },
+  "userId": "TIjvR0nNHnR2fXPveDOKT370Zz72",
+  "month": "October",
+  "year": 2025,
+  "weeks": [
+    {
+      "weekNumber": 1,
+      "startDate": "2025-09-30T21:00:00.000Z",
+      "endDate": "2025-10-06T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-09-30T21:00:00.000Z",
+          "categories": {
+            "Shopping": 455,
+            "Transport": 927,
+            "Food and Drinks": 700,
+            "Entertainment": 888,
+            "Bills": 923,
+            "Subscriptions": 497,
+            "Education": 898,
+            "Healthcare": 865,
+            "Transfers": 767,
+            "Loans": 204
+          },
+          "total": 7124
+        },
+        {
+          "date": "2025-10-01T21:00:00.000Z",
+          "categories": {
+            "Shopping": 831,
+            "Transport": 207,
+            "Food and Drinks": 570,
+            "Entertainment": 589,
+            "Bills": 681,
+            "Subscriptions": 185,
+            "Education": 503,
+            "Healthcare": 674,
+            "Transfers": 746,
+            "Loans": 336
+          },
+          "total": 5322
+        },
+        {
+          "date": "2025-10-02T21:00:00.000Z",
+          "categories": {
+            "Shopping": 981,
+            "Transport": 930,
+            "Food and Drinks": 595,
+            "Entertainment": 711,
+            "Bills": 677,
+            "Subscriptions": 677,
+            "Education": 110,
+            "Healthcare": 812,
+            "Transfers": 986,
+            "Loans": 553
+          },
+          "total": 7032
+        },
+        {
+          "date": "2025-10-03T21:00:00.000Z",
+          "categories": {
+            "Shopping": 966,
+            "Transport": 577,
+            "Food and Drinks": 534,
+            "Entertainment": 875,
+            "Bills": 452,
+            "Subscriptions": 553,
+            "Education": 587,
+            "Healthcare": 591,
+            "Transfers": 159,
+            "Loans": 149
+          },
+          "total": 5443
+        },
+        {
+          "date": "2025-10-04T21:00:00.000Z",
+          "categories": {
+            "Shopping": 508,
+            "Transport": 631,
+            "Food and Drinks": 545,
+            "Entertainment": 235,
+            "Bills": 260,
+            "Subscriptions": 990,
+            "Education": 368,
+            "Healthcare": 351,
+            "Transfers": 479,
+            "Loans": 166
+          },
+          "total": 4533
+        },
+        {
+          "date": "2025-10-05T21:00:00.000Z",
+          "categories": {
+            "Shopping": 841,
+            "Transport": 756,
+            "Food and Drinks": 108,
+            "Entertainment": 738,
+            "Bills": 819,
+            "Subscriptions": 777,
+            "Education": 545,
+            "Healthcare": 623,
+            "Transfers": 752,
+            "Loans": 459
+          },
+          "total": 6418
+        },
+        {
+          "date": "2025-10-06T21:00:00.000Z",
+          "categories": {
+            "Shopping": 303,
+            "Transport": 452,
+            "Food and Drinks": 607,
+            "Entertainment": 544,
+            "Bills": 914,
+            "Subscriptions": 963,
+            "Education": 119,
+            "Healthcare": 348,
+            "Transfers": 278,
+            "Loans": 122
+          },
+          "total": 4650
+        }
+      ],
+      "weeklyTotal": 40522
+    },
+    {
+      "weekNumber": 2,
+      "startDate": "2025-10-07T21:00:00.000Z",
+      "endDate": "2025-10-13T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-10-07T21:00:00.000Z",
+          "categories": {
+            "Shopping": 678,
+            "Transport": 699,
+            "Food and Drinks": 841,
+            "Entertainment": 569,
+            "Bills": 547,
+            "Subscriptions": 709,
+            "Education": 209,
+            "Healthcare": 465,
+            "Transfers": 624,
+            "Loans": 829
+          },
+          "total": 6170
+        },
+        {
+          "date": "2025-10-08T21:00:00.000Z",
+          "categories": {
+            "Shopping": 809,
+            "Transport": 570,
+            "Food and Drinks": 187,
+            "Entertainment": 811,
+            "Bills": 699,
+            "Subscriptions": 677,
+            "Education": 421,
+            "Healthcare": 478,
+            "Transfers": 551,
+            "Loans": 121
+          },
+          "total": 5324
+        },
+        {
+          "date": "2025-10-09T21:00:00.000Z",
+          "categories": {
+            "Shopping": 413,
+            "Transport": 924,
+            "Food and Drinks": 230,
+            "Entertainment": 373,
+            "Bills": 328,
+            "Subscriptions": 615,
+            "Education": 540,
+            "Healthcare": 541,
+            "Transfers": 281,
+            "Loans": 601
+          },
+          "total": 4846
+        },
+        {
+          "date": "2025-10-10T21:00:00.000Z",
+          "categories": {
+            "Shopping": 786,
+            "Transport": 107,
+            "Food and Drinks": 302,
+            "Entertainment": 850,
+            "Bills": 307,
+            "Subscriptions": 512,
+            "Education": 475,
+            "Healthcare": 641,
+            "Transfers": 712,
+            "Loans": 348
+          },
+          "total": 5040
+        },
+        {
+          "date": "2025-10-11T21:00:00.000Z",
+          "categories": {
+            "Shopping": 808,
+            "Transport": 609,
+            "Food and Drinks": 175,
+            "Entertainment": 150,
+            "Bills": 250,
+            "Subscriptions": 272,
+            "Education": 558,
+            "Healthcare": 802,
+            "Transfers": 192,
+            "Loans": 508
+          },
+          "total": 4324
+        },
+        {
+          "date": "2025-10-12T21:00:00.000Z",
+          "categories": {
+            "Shopping": 937,
+            "Transport": 415,
+            "Food and Drinks": 472,
+            "Entertainment": 438,
+            "Bills": 784,
+            "Subscriptions": 287,
+            "Education": 450,
+            "Healthcare": 234,
+            "Transfers": 906,
+            "Loans": 104
+          },
+          "total": 5027
+        },
+        {
+          "date": "2025-10-13T21:00:00.000Z",
+          "categories": {
+            "Shopping": 687,
+            "Transport": 602,
+            "Food and Drinks": 229,
+            "Entertainment": 590,
+            "Bills": 677,
+            "Subscriptions": 169,
+            "Education": 638,
+            "Healthcare": 377,
+            "Transfers": 961,
+            "Loans": 692
+          },
+          "total": 5622
+        }
+      ],
+      "weeklyTotal": 36353
+    },
+    {
+      "weekNumber": 3,
+      "startDate": "2025-10-14T21:00:00.000Z",
+      "endDate": "2025-10-20T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-10-14T21:00:00.000Z",
+          "categories": {
+            "Shopping": 431,
+            "Transport": 156,
+            "Food and Drinks": 212,
+            "Entertainment": 749,
+            "Bills": 153,
+            "Subscriptions": 911,
+            "Education": 762,
+            "Healthcare": 252,
+            "Transfers": 780,
+            "Loans": 100
+          },
+          "total": 4506
+        },
+        {
+          "date": "2025-10-15T21:00:00.000Z",
+          "categories": {
+            "Shopping": 583,
+            "Transport": 595,
+            "Food and Drinks": 262,
+            "Entertainment": 853,
+            "Bills": 850,
+            "Subscriptions": 945,
+            "Education": 978,
+            "Healthcare": 874,
+            "Transfers": 989,
+            "Loans": 663
+          },
+          "total": 7592
+        },
+        {
+          "date": "2025-10-16T21:00:00.000Z",
+          "categories": {
+            "Shopping": 672,
+            "Transport": 582,
+            "Food and Drinks": 118,
+            "Entertainment": 103,
+            "Bills": 185,
+            "Subscriptions": 596,
+            "Education": 660,
+            "Healthcare": 825,
+            "Transfers": 265,
+            "Loans": 883
+          },
+          "total": 4889
+        },
+        {
+          "date": "2025-10-17T21:00:00.000Z",
+          "categories": {
+            "Shopping": 198,
+            "Transport": 384,
+            "Food and Drinks": 991,
+            "Entertainment": 724,
+            "Bills": 666,
+            "Subscriptions": 152,
+            "Education": 309,
+            "Healthcare": 307,
+            "Transfers": 566,
+            "Loans": 295
+          },
+          "total": 4592
+        },
+        {
+          "date": "2025-10-18T21:00:00.000Z",
+          "categories": {
+            "Shopping": 779,
+            "Transport": 380,
+            "Food and Drinks": 128,
+            "Entertainment": 286,
+            "Bills": 922,
+            "Subscriptions": 930,
+            "Education": 830,
+            "Healthcare": 481,
+            "Transfers": 120,
+            "Loans": 738
+          },
+          "total": 5594
+        },
+        {
+          "date": "2025-10-19T21:00:00.000Z",
+          "categories": {
+            "Shopping": 268,
+            "Transport": 425,
+            "Food and Drinks": 855,
+            "Entertainment": 342,
+            "Bills": 497,
+            "Subscriptions": 530,
+            "Education": 312,
+            "Healthcare": 223,
+            "Transfers": 521,
+            "Loans": 474
+          },
+          "total": 4447
+        },
+        {
+          "date": "2025-10-20T21:00:00.000Z",
+          "categories": {
+            "Shopping": 147,
+            "Transport": 681,
+            "Food and Drinks": 693,
+            "Entertainment": 386,
+            "Bills": 822,
+            "Subscriptions": 539,
+            "Education": 752,
+            "Healthcare": 767,
+            "Transfers": 970,
+            "Loans": 693
+          },
+          "total": 6450
+        }
+      ],
+      "weeklyTotal": 38070
+    },
+    {
+      "weekNumber": 4,
+      "startDate": "2025-10-21T21:00:00.000Z",
+      "endDate": "2025-10-27T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-10-21T21:00:00.000Z",
+          "categories": {
+            "Shopping": 858,
+            "Transport": 918,
+            "Food and Drinks": 836,
+            "Entertainment": 978,
+            "Bills": 279,
+            "Subscriptions": 566,
+            "Education": 620,
+            "Healthcare": 128,
+            "Transfers": 850,
+            "Loans": 293
+          },
+          "total": 6326
+        },
+        {
+          "date": "2025-10-22T21:00:00.000Z",
+          "categories": {
+            "Shopping": 700,
+            "Transport": 299,
+            "Food and Drinks": 108,
+            "Entertainment": 918,
+            "Bills": 923,
+            "Subscriptions": 429,
+            "Education": 943,
+            "Healthcare": 464,
+            "Transfers": 790,
+            "Loans": 685
+          },
+          "total": 6259
+        },
+        {
+          "date": "2025-10-23T21:00:00.000Z",
+          "categories": {
+            "Shopping": 694,
+            "Transport": 624,
+            "Food and Drinks": 226,
+            "Entertainment": 263,
+            "Bills": 307,
+            "Subscriptions": 293,
+            "Education": 559,
+            "Healthcare": 556,
+            "Transfers": 154,
+            "Loans": 938
+          },
+          "total": 4614
+        },
+        {
+          "date": "2025-10-24T21:00:00.000Z",
+          "categories": {
+            "Shopping": 388,
+            "Transport": 287,
+            "Food and Drinks": 554,
+            "Entertainment": 295,
+            "Bills": 896,
+            "Subscriptions": 433,
+            "Education": 190,
+            "Healthcare": 541,
+            "Transfers": 736,
+            "Loans": 506
+          },
+          "total": 4826
+        },
+        {
+          "date": "2025-10-25T21:00:00.000Z",
+          "categories": {
+            "Shopping": 220,
+            "Transport": 209,
+            "Food and Drinks": 663,
+            "Entertainment": 957,
+            "Bills": 436,
+            "Subscriptions": 391,
+            "Education": 518,
+            "Healthcare": 301,
+            "Transfers": 189,
+            "Loans": 460
+          },
+          "total": 4344
+        },
+        {
+          "date": "2025-10-26T21:00:00.000Z",
+          "categories": {
+            "Shopping": 404,
+            "Transport": 678,
+            "Food and Drinks": 545,
+            "Entertainment": 226,
+            "Bills": 737,
+            "Subscriptions": 852,
+            "Education": 391,
+            "Healthcare": 858,
+            "Transfers": 596,
+            "Loans": 777
+          },
+          "total": 6064
+        },
+        {
+          "date": "2025-10-27T21:00:00.000Z",
+          "categories": {
+            "Shopping": 519,
+            "Transport": 905,
+            "Food and Drinks": 262,
+            "Entertainment": 127,
+            "Bills": 622,
+            "Subscriptions": 907,
+            "Education": 480,
+            "Healthcare": 489,
+            "Transfers": 750,
+            "Loans": 934
+          },
+          "total": 5995
+        }
+      ],
+      "weeklyTotal": 38428
+    }
+  ],
+  "monthlyTotal": 153373
+},
+{
+  "_id": {
+    "$oid": "68fa41cc4237485db16f4d82"
+  },
+  "userId": "TIjvR0nNHnR2fXPveDOKT370Zz72",
+  "month": "November",
+  "year": 2025,
+  "weeks": [
+    {
+      "weekNumber": 1,
+      "startDate": "2025-10-31T21:00:00.000Z",
+      "endDate": "2025-11-06T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-10-31T21:00:00.000Z",
+          "categories": {
+            "Shopping": 937,
+            "Transport": 521,
+            "Food and Drinks": 100,
+            "Entertainment": 984,
+            "Bills": 947,
+            "Subscriptions": 356,
+            "Education": 660,
+            "Healthcare": 246,
+            "Transfers": 927,
+            "Loans": 100
+          },
+          "total": 5778
+        },
+        {
+          "date": "2025-11-01T21:00:00.000Z",
+          "categories": {
+            "Shopping": 499,
+            "Transport": 327,
+            "Food and Drinks": 458,
+            "Entertainment": 996,
+            "Bills": 980,
+            "Subscriptions": 614,
+            "Education": 891,
+            "Healthcare": 989,
+            "Transfers": 549,
+            "Loans": 863
+          },
+          "total": 7166
+        },
+        {
+          "date": "2025-11-02T21:00:00.000Z",
+          "categories": {
+            "Shopping": 889,
+            "Transport": 770,
+            "Food and Drinks": 696,
+            "Entertainment": 519,
+            "Bills": 481,
+            "Subscriptions": 827,
+            "Education": 509,
+            "Healthcare": 535,
+            "Transfers": 579,
+            "Loans": 856
+          },
+          "total": 6661
+        },
+        {
+          "date": "2025-11-03T21:00:00.000Z",
+          "categories": {
+            "Shopping": 523,
+            "Transport": 949,
+            "Food and Drinks": 329,
+            "Entertainment": 185,
+            "Bills": 678,
+            "Subscriptions": 434,
+            "Education": 508,
+            "Healthcare": 610,
+            "Transfers": 389,
+            "Loans": 524
+          },
+          "total": 5129
+        },
+        {
+          "date": "2025-11-04T21:00:00.000Z",
+          "categories": {
+            "Shopping": 913,
+            "Transport": 705,
+            "Food and Drinks": 325,
+            "Entertainment": 787,
+            "Bills": 355,
+            "Subscriptions": 485,
+            "Education": 755,
+            "Healthcare": 754,
+            "Transfers": 731,
+            "Loans": 756
+          },
+          "total": 6566
+        },
+        {
+          "date": "2025-11-05T21:00:00.000Z",
+          "categories": {
+            "Shopping": 362,
+            "Transport": 869,
+            "Food and Drinks": 989,
+            "Entertainment": 590,
+            "Bills": 854,
+            "Subscriptions": 315,
+            "Education": 361,
+            "Healthcare": 140,
+            "Transfers": 746,
+            "Loans": 159
+          },
+          "total": 5385
+        },
+        {
+          "date": "2025-11-06T21:00:00.000Z",
+          "categories": {
+            "Shopping": 296,
+            "Transport": 769,
+            "Food and Drinks": 300,
+            "Entertainment": 931,
+            "Bills": 314,
+            "Subscriptions": 543,
+            "Education": 106,
+            "Healthcare": 878,
+            "Transfers": 313,
+            "Loans": 323
+          },
+          "total": 4773
+        }
+      ],
+      "weeklyTotal": 41458
+    },
+    {
+      "weekNumber": 2,
+      "startDate": "2025-11-07T21:00:00.000Z",
+      "endDate": "2025-11-13T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-11-07T21:00:00.000Z",
+          "categories": {
+            "Shopping": 775,
+            "Transport": 794,
+            "Food and Drinks": 947,
+            "Entertainment": 958,
+            "Bills": 991,
+            "Subscriptions": 141,
+            "Education": 864,
+            "Healthcare": 803,
+            "Transfers": 237,
+            "Loans": 998
+          },
+          "total": 7508
+        },
+        {
+          "date": "2025-11-08T21:00:00.000Z",
+          "categories": {
+            "Shopping": 166,
+            "Transport": 493,
+            "Food and Drinks": 914,
+            "Entertainment": 254,
+            "Bills": 745,
+            "Subscriptions": 594,
+            "Education": 895,
+            "Healthcare": 744,
+            "Transfers": 813,
+            "Loans": 422
+          },
+          "total": 6040
+        },
+        {
+          "date": "2025-11-09T21:00:00.000Z",
+          "categories": {
+            "Shopping": 492,
+            "Transport": 113,
+            "Food and Drinks": 662,
+            "Entertainment": 662,
+            "Bills": 1000,
+            "Subscriptions": 776,
+            "Education": 660,
+            "Healthcare": 556,
+            "Transfers": 894,
+            "Loans": 638
+          },
+          "total": 6453
+        },
+        {
+          "date": "2025-11-10T21:00:00.000Z",
+          "categories": {
+            "Shopping": 622,
+            "Transport": 960,
+            "Food and Drinks": 483,
+            "Entertainment": 519,
+            "Bills": 490,
+            "Subscriptions": 786,
+            "Education": 165,
+            "Healthcare": 487,
+            "Transfers": 973,
+            "Loans": 590
+          },
+          "total": 6075
+        },
+        {
+          "date": "2025-11-11T21:00:00.000Z",
+          "categories": {
+            "Shopping": 537,
+            "Transport": 806,
+            "Food and Drinks": 893,
+            "Entertainment": 405,
+            "Bills": 931,
+            "Subscriptions": 933,
+            "Education": 960,
+            "Healthcare": 389,
+            "Transfers": 365,
+            "Loans": 805
+          },
+          "total": 7024
+        },
+        {
+          "date": "2025-11-12T21:00:00.000Z",
+          "categories": {
+            "Shopping": 799,
+            "Transport": 750,
+            "Food and Drinks": 385,
+            "Entertainment": 656,
+            "Bills": 792,
+            "Subscriptions": 602,
+            "Education": 421,
+            "Healthcare": 471,
+            "Transfers": 611,
+            "Loans": 891
+          },
+          "total": 6378
+        },
+        {
+          "date": "2025-11-13T21:00:00.000Z",
+          "categories": {
+            "Shopping": 818,
+            "Transport": 226,
+            "Food and Drinks": 405,
+            "Entertainment": 627,
+            "Bills": 660,
+            "Subscriptions": 289,
+            "Education": 644,
+            "Healthcare": 353,
+            "Transfers": 166,
+            "Loans": 268
+          },
+          "total": 4456
+        }
+      ],
+      "weeklyTotal": 43934
+    },
+    {
+      "weekNumber": 3,
+      "startDate": "2025-11-14T21:00:00.000Z",
+      "endDate": "2025-11-20T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-11-14T21:00:00.000Z",
+          "categories": {
+            "Shopping": 701,
+            "Transport": 451,
+            "Food and Drinks": 357,
+            "Entertainment": 912,
+            "Bills": 226,
+            "Subscriptions": 132,
+            "Education": 161,
+            "Healthcare": 756,
+            "Transfers": 986,
+            "Loans": 496
+          },
+          "total": 5178
+        },
+        {
+          "date": "2025-11-15T21:00:00.000Z",
+          "categories": {
+            "Shopping": 319,
+            "Transport": 651,
+            "Food and Drinks": 512,
+            "Entertainment": 931,
+            "Bills": 158,
+            "Subscriptions": 790,
+            "Education": 621,
+            "Healthcare": 692,
+            "Transfers": 969,
+            "Loans": 968
+          },
+          "total": 6611
+        },
+        {
+          "date": "2025-11-16T21:00:00.000Z",
+          "categories": {
+            "Shopping": 408,
+            "Transport": 232,
+            "Food and Drinks": 834,
+            "Entertainment": 499,
+            "Bills": 995,
+            "Subscriptions": 315,
+            "Education": 842,
+            "Healthcare": 691,
+            "Transfers": 451,
+            "Loans": 161
+          },
+          "total": 5428
+        },
+        {
+          "date": "2025-11-17T21:00:00.000Z",
+          "categories": {
+            "Shopping": 694,
+            "Transport": 467,
+            "Food and Drinks": 940,
+            "Entertainment": 865,
+            "Bills": 452,
+            "Subscriptions": 527,
+            "Education": 559,
+            "Healthcare": 506,
+            "Transfers": 436,
+            "Loans": 134
+          },
+          "total": 5580
+        },
+        {
+          "date": "2025-11-18T21:00:00.000Z",
+          "categories": {
+            "Shopping": 149,
+            "Transport": 871,
+            "Food and Drinks": 753,
+            "Entertainment": 334,
+            "Bills": 1000,
+            "Subscriptions": 801,
+            "Education": 591,
+            "Healthcare": 692,
+            "Transfers": 332,
+            "Loans": 634
+          },
+          "total": 6157
+        },
+        {
+          "date": "2025-11-19T21:00:00.000Z",
+          "categories": {
+            "Shopping": 386,
+            "Transport": 926,
+            "Food and Drinks": 240,
+            "Entertainment": 970,
+            "Bills": 948,
+            "Subscriptions": 839,
+            "Education": 147,
+            "Healthcare": 157,
+            "Transfers": 244,
+            "Loans": 784
+          },
+          "total": 5641
+        },
+        {
+          "date": "2025-11-20T21:00:00.000Z",
+          "categories": {
+            "Shopping": 305,
+            "Transport": 244,
+            "Food and Drinks": 700,
+            "Entertainment": 354,
+            "Bills": 310,
+            "Subscriptions": 204,
+            "Education": 378,
+            "Healthcare": 841,
+            "Transfers": 548,
+            "Loans": 469
+          },
+          "total": 4353
+        }
+      ],
+      "weeklyTotal": 38948
+    },
+    {
+      "weekNumber": 4,
+      "startDate": "2025-11-21T21:00:00.000Z",
+      "endDate": "2025-11-27T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-11-21T21:00:00.000Z",
+          "categories": {
+            "Shopping": 561,
+            "Transport": 596,
+            "Food and Drinks": 819,
+            "Entertainment": 908,
+            "Bills": 378,
+            "Subscriptions": 916,
+            "Education": 823,
+            "Healthcare": 457,
+            "Transfers": 984,
+            "Loans": 161
+          },
+          "total": 6603
+        },
+        {
+          "date": "2025-11-22T21:00:00.000Z",
+          "categories": {
+            "Shopping": 514,
+            "Transport": 942,
+            "Food and Drinks": 781,
+            "Entertainment": 808,
+            "Bills": 939,
+            "Subscriptions": 667,
+            "Education": 777,
+            "Healthcare": 849,
+            "Transfers": 651,
+            "Loans": 276
+          },
+          "total": 7204
+        },
+        {
+          "date": "2025-11-23T21:00:00.000Z",
+          "categories": {
+            "Shopping": 231,
+            "Transport": 557,
+            "Food and Drinks": 578,
+            "Entertainment": 969,
+            "Bills": 937,
+            "Subscriptions": 136,
+            "Education": 211,
+            "Healthcare": 853,
+            "Transfers": 470,
+            "Loans": 433
+          },
+          "total": 5375
+        },
+        {
+          "date": "2025-11-24T21:00:00.000Z",
+          "categories": {
+            "Shopping": 752,
+            "Transport": 436,
+            "Food and Drinks": 157,
+            "Entertainment": 139,
+            "Bills": 530,
+            "Subscriptions": 379,
+            "Education": 813,
+            "Healthcare": 208,
+            "Transfers": 876,
+            "Loans": 866
+          },
+          "total": 5156
+        },
+        {
+          "date": "2025-11-25T21:00:00.000Z",
+          "categories": {
+            "Shopping": 799,
+            "Transport": 849,
+            "Food and Drinks": 323,
+            "Entertainment": 269,
+            "Bills": 792,
+            "Subscriptions": 990,
+            "Education": 832,
+            "Healthcare": 364,
+            "Transfers": 797,
+            "Loans": 296
+          },
+          "total": 6311
+        },
+        {
+          "date": "2025-11-26T21:00:00.000Z",
+          "categories": {
+            "Shopping": 728,
+            "Transport": 258,
+            "Food and Drinks": 756,
+            "Entertainment": 242,
+            "Bills": 163,
+            "Subscriptions": 341,
+            "Education": 139,
+            "Healthcare": 395,
+            "Transfers": 399,
+            "Loans": 216
+          },
+          "total": 3637
+        },
+        {
+          "date": "2025-11-27T21:00:00.000Z",
+          "categories": {
+            "Shopping": 583,
+            "Transport": 688,
+            "Food and Drinks": 479,
+            "Entertainment": 184,
+            "Bills": 398,
+            "Subscriptions": 564,
+            "Education": 498,
+            "Healthcare": 487,
+            "Transfers": 345,
+            "Loans": 699
+          },
+          "total": 4925
+        }
+      ],
+      "weeklyTotal": 39211
+    }
+  ],
+  "monthlyTotal": 163551
+},
+{
+  "_id": {
+    "$oid": "68fa41cc4237485db16f4d83"
+  },
+  "userId": "TIjvR0nNHnR2fXPveDOKT370Zz72",
+  "month": "December",
+  "year": 2025,
+  "weeks": [
+    {
+      "weekNumber": 1,
+      "startDate": "2025-11-30T21:00:00.000Z",
+      "endDate": "2025-12-06T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-11-30T21:00:00.000Z",
+          "categories": {
+            "Shopping": 742,
+            "Transport": 878,
+            "Food and Drinks": 306,
+            "Entertainment": 386,
+            "Bills": 859,
+            "Subscriptions": 484,
+            "Education": 204,
+            "Healthcare": 134,
+            "Transfers": 906,
+            "Loans": 529
+          },
+          "total": 5428
+        },
+        {
+          "date": "2025-12-01T21:00:00.000Z",
+          "categories": {
+            "Shopping": 828,
+            "Transport": 300,
+            "Food and Drinks": 767,
+            "Entertainment": 895,
+            "Bills": 178,
+            "Subscriptions": 909,
+            "Education": 807,
+            "Healthcare": 581,
+            "Transfers": 299,
+            "Loans": 490
+          },
+          "total": 6054
+        },
+        {
+          "date": "2025-12-02T21:00:00.000Z",
+          "categories": {
+            "Shopping": 389,
+            "Transport": 300,
+            "Food and Drinks": 987,
+            "Entertainment": 321,
+            "Bills": 166,
+            "Subscriptions": 181,
+            "Education": 609,
+            "Healthcare": 606,
+            "Transfers": 468,
+            "Loans": 979
+          },
+          "total": 5006
+        },
+        {
+          "date": "2025-12-03T21:00:00.000Z",
+          "categories": {
+            "Shopping": 569,
+            "Transport": 549,
+            "Food and Drinks": 469,
+            "Entertainment": 534,
+            "Bills": 936,
+            "Subscriptions": 974,
+            "Education": 603,
+            "Healthcare": 515,
+            "Transfers": 544,
+            "Loans": 589
+          },
+          "total": 6282
+        },
+        {
+          "date": "2025-12-04T21:00:00.000Z",
+          "categories": {
+            "Shopping": 105,
+            "Transport": 947,
+            "Food and Drinks": 635,
+            "Entertainment": 604,
+            "Bills": 893,
+            "Subscriptions": 778,
+            "Education": 387,
+            "Healthcare": 354,
+            "Transfers": 151,
+            "Loans": 494
+          },
+          "total": 5348
+        },
+        {
+          "date": "2025-12-05T21:00:00.000Z",
+          "categories": {
+            "Shopping": 684,
+            "Transport": 472,
+            "Food and Drinks": 230,
+            "Entertainment": 238,
+            "Bills": 711,
+            "Subscriptions": 718,
+            "Education": 108,
+            "Healthcare": 708,
+            "Transfers": 707,
+            "Loans": 435
+          },
+          "total": 5011
+        },
+        {
+          "date": "2025-12-06T21:00:00.000Z",
+          "categories": {
+            "Shopping": 850,
+            "Transport": 747,
+            "Food and Drinks": 318,
+            "Entertainment": 997,
+            "Bills": 146,
+            "Subscriptions": 731,
+            "Education": 924,
+            "Healthcare": 676,
+            "Transfers": 214,
+            "Loans": 982
+          },
+          "total": 6585
+        }
+      ],
+      "weeklyTotal": 39714
+    },
+    {
+      "weekNumber": 2,
+      "startDate": "2025-12-07T21:00:00.000Z",
+      "endDate": "2025-12-13T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-12-07T21:00:00.000Z",
+          "categories": {
+            "Shopping": 587,
+            "Transport": 511,
+            "Food and Drinks": 256,
+            "Entertainment": 522,
+            "Bills": 536,
+            "Subscriptions": 761,
+            "Education": 831,
+            "Healthcare": 326,
+            "Transfers": 591,
+            "Loans": 362
+          },
+          "total": 5283
+        },
+        {
+          "date": "2025-12-08T21:00:00.000Z",
+          "categories": {
+            "Shopping": 136,
+            "Transport": 292,
+            "Food and Drinks": 885,
+            "Entertainment": 126,
+            "Bills": 313,
+            "Subscriptions": 602,
+            "Education": 135,
+            "Healthcare": 493,
+            "Transfers": 257,
+            "Loans": 487
+          },
+          "total": 3726
+        },
+        {
+          "date": "2025-12-09T21:00:00.000Z",
+          "categories": {
+            "Shopping": 299,
+            "Transport": 408,
+            "Food and Drinks": 788,
+            "Entertainment": 405,
+            "Bills": 404,
+            "Subscriptions": 672,
+            "Education": 270,
+            "Healthcare": 449,
+            "Transfers": 454,
+            "Loans": 733
+          },
+          "total": 4882
+        },
+        {
+          "date": "2025-12-10T21:00:00.000Z",
+          "categories": {
+            "Shopping": 698,
+            "Transport": 450,
+            "Food and Drinks": 541,
+            "Entertainment": 373,
+            "Bills": 930,
+            "Subscriptions": 801,
+            "Education": 108,
+            "Healthcare": 497,
+            "Transfers": 330,
+            "Loans": 763
+          },
+          "total": 5491
+        },
+        {
+          "date": "2025-12-11T21:00:00.000Z",
+          "categories": {
+            "Shopping": 919,
+            "Transport": 859,
+            "Food and Drinks": 286,
+            "Entertainment": 764,
+            "Bills": 707,
+            "Subscriptions": 143,
+            "Education": 701,
+            "Healthcare": 562,
+            "Transfers": 266,
+            "Loans": 812
+          },
+          "total": 6019
+        },
+        {
+          "date": "2025-12-12T21:00:00.000Z",
+          "categories": {
+            "Shopping": 553,
+            "Transport": 163,
+            "Food and Drinks": 246,
+            "Entertainment": 240,
+            "Bills": 719,
+            "Subscriptions": 759,
+            "Education": 335,
+            "Healthcare": 971,
+            "Transfers": 391,
+            "Loans": 766
+          },
+          "total": 5143
+        },
+        {
+          "date": "2025-12-13T21:00:00.000Z",
+          "categories": {
+            "Shopping": 702,
+            "Transport": 131,
+            "Food and Drinks": 532,
+            "Entertainment": 815,
+            "Bills": 132,
+            "Subscriptions": 663,
+            "Education": 199,
+            "Healthcare": 508,
+            "Transfers": 228,
+            "Loans": 756
+          },
+          "total": 4666
+        }
+      ],
+      "weeklyTotal": 35210
+    },
+    {
+      "weekNumber": 3,
+      "startDate": "2025-12-14T21:00:00.000Z",
+      "endDate": "2025-12-20T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-12-14T21:00:00.000Z",
+          "categories": {
+            "Shopping": 366,
+            "Transport": 342,
+            "Food and Drinks": 404,
+            "Entertainment": 191,
+            "Bills": 145,
+            "Subscriptions": 486,
+            "Education": 881,
+            "Healthcare": 658,
+            "Transfers": 708,
+            "Loans": 806
+          },
+          "total": 4987
+        },
+        {
+          "date": "2025-12-15T21:00:00.000Z",
+          "categories": {
+            "Shopping": 697,
+            "Transport": 479,
+            "Food and Drinks": 967,
+            "Entertainment": 968,
+            "Bills": 673,
+            "Subscriptions": 933,
+            "Education": 410,
+            "Healthcare": 455,
+            "Transfers": 802,
+            "Loans": 606
+          },
+          "total": 6990
+        },
+        {
+          "date": "2025-12-16T21:00:00.000Z",
+          "categories": {
+            "Shopping": 506,
+            "Transport": 147,
+            "Food and Drinks": 931,
+            "Entertainment": 628,
+            "Bills": 309,
+            "Subscriptions": 412,
+            "Education": 494,
+            "Healthcare": 654,
+            "Transfers": 447,
+            "Loans": 224
+          },
+          "total": 4752
+        },
+        {
+          "date": "2025-12-17T21:00:00.000Z",
+          "categories": {
+            "Shopping": 356,
+            "Transport": 370,
+            "Food and Drinks": 288,
+            "Entertainment": 760,
+            "Bills": 845,
+            "Subscriptions": 551,
+            "Education": 678,
+            "Healthcare": 898,
+            "Transfers": 315,
+            "Loans": 794
+          },
+          "total": 5855
+        },
+        {
+          "date": "2025-12-18T21:00:00.000Z",
+          "categories": {
+            "Shopping": 428,
+            "Transport": 453,
+            "Food and Drinks": 828,
+            "Entertainment": 923,
+            "Bills": 385,
+            "Subscriptions": 524,
+            "Education": 160,
+            "Healthcare": 829,
+            "Transfers": 273,
+            "Loans": 565
+          },
+          "total": 5368
+        },
+        {
+          "date": "2025-12-19T21:00:00.000Z",
+          "categories": {
+            "Shopping": 583,
+            "Transport": 847,
+            "Food and Drinks": 189,
+            "Entertainment": 255,
+            "Bills": 278,
+            "Subscriptions": 834,
+            "Education": 952,
+            "Healthcare": 800,
+            "Transfers": 188,
+            "Loans": 610
+          },
+          "total": 5536
+        },
+        {
+          "date": "2025-12-20T21:00:00.000Z",
+          "categories": {
+            "Shopping": 663,
+            "Transport": 864,
+            "Food and Drinks": 216,
+            "Entertainment": 486,
+            "Bills": 352,
+            "Subscriptions": 538,
+            "Education": 105,
+            "Healthcare": 289,
+            "Transfers": 614,
+            "Loans": 628
+          },
+          "total": 4755
+        }
+      ],
+      "weeklyTotal": 38243
+    },
+    {
+      "weekNumber": 4,
+      "startDate": "2025-12-21T21:00:00.000Z",
+      "endDate": "2025-12-27T21:00:00.000Z",
+      "days": [
+        {
+          "date": "2025-12-21T21:00:00.000Z",
+          "categories": {
+            "Shopping": 911,
+            "Transport": 756,
+            "Food and Drinks": 932,
+            "Entertainment": 919,
+            "Bills": 404,
+            "Subscriptions": 775,
+            "Education": 733,
+            "Healthcare": 219,
+            "Transfers": 920,
+            "Loans": 973
+          },
+          "total": 7542
+        },
+        {
+          "date": "2025-12-22T21:00:00.000Z",
+          "categories": {
+            "Shopping": 851,
+            "Transport": 354,
+            "Food and Drinks": 856,
+            "Entertainment": 814,
+            "Bills": 471,
+            "Subscriptions": 145,
+            "Education": 233,
+            "Healthcare": 285,
+            "Transfers": 433,
+            "Loans": 950
+          },
+          "total": 5392
+        },
+        {
+          "date": "2025-12-23T21:00:00.000Z",
+          "categories": {
+            "Shopping": 418,
+            "Transport": 480,
+            "Food and Drinks": 325,
+            "Entertainment": 206,
+            "Bills": 798,
+            "Subscriptions": 179,
+            "Education": 491,
+            "Healthcare": 956,
+            "Transfers": 591,
+            "Loans": 504
+          },
+          "total": 4948
+        },
+        {
+          "date": "2025-12-24T21:00:00.000Z",
+          "categories": {
+            "Shopping": 401,
+            "Transport": 898,
+            "Food and Drinks": 612,
+            "Entertainment": 550,
+            "Bills": 829,
+            "Subscriptions": 473,
+            "Education": 349,
+            "Healthcare": 747,
+            "Transfers": 298,
+            "Loans": 386
+          },
+          "total": 5543
+        },
+        {
+          "date": "2025-12-25T21:00:00.000Z",
+          "categories": {
+            "Shopping": 808,
+            "Transport": 278,
+            "Food and Drinks": 288,
+            "Entertainment": 243,
+            "Bills": 865,
+            "Subscriptions": 845,
+            "Education": 472,
+            "Healthcare": 234,
+            "Transfers": 804,
+            "Loans": 559
+          },
+          "total": 5396
+        },
+        {
+          "date": "2025-12-26T21:00:00.000Z",
+          "categories": {
+            "Shopping": 504,
+            "Transport": 986,
+            "Food and Drinks": 815,
+            "Entertainment": 211,
+            "Bills": 987,
+            "Subscriptions": 668,
+            "Education": 443,
+            "Healthcare": 352,
+            "Transfers": 967,
+            "Loans": 729
+          },
+          "total": 6662
+        },
+        {
+          "date": "2025-12-27T21:00:00.000Z",
+          "categories": {
+            "Shopping": 439,
+            "Transport": 393,
+            "Food and Drinks": 157,
+            "Entertainment": 968,
+            "Bills": 681,
+            "Subscriptions": 687,
+            "Education": 530,
+            "Healthcare": 636,
+            "Transfers": 184,
+            "Loans": 968
+          },
+          "total": 5643
+        }
+      ],
+      "weeklyTotal": 41126
+    }
+  ],
+  "monthlyTotal": 154293
+}]
