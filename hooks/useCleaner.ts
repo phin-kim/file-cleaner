@@ -13,7 +13,7 @@ export default function useCleaner() {
         null
     );
     const [downloadURL, setDownloadURL] = useState<string | null>(null);
-
+    const [openPopup, setOpenPopUp] = useState(false);
     /* ---------- Handlers ---------- */
     const handleDragEnter = (event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault();
@@ -51,7 +51,10 @@ export default function useCleaner() {
                             const dirEntry = entry as FileSystemDirectoryEntry;
                             // capture the folder name locally so we can reliably send it
                             folderName = dirEntry.name;
-                            setUploadedFolder({ name: dirEntry.name, files: [] });
+                            setUploadedFolder({
+                                name: dirEntry.name,
+                                files: [],
+                            });
                             console.log(
                                 `[FRONTEND] processing folder ${dirEntry.name}`
                             );
@@ -65,7 +68,10 @@ export default function useCleaner() {
                 }
             }
             const formData = new FormData();
-            formData.append('folderName', folderName || uploadedFolder?.name || 'folder');
+            formData.append(
+                'folderName',
+                folderName || uploadedFolder?.name || 'folder'
+            );
             files.forEach((file) => formData.append('files', file, file.name));
             setStatus('processing');
             const start = Date.now();
@@ -83,6 +89,7 @@ export default function useCleaner() {
             setCleaningStats(response.data.stats);
             setDownloadURL(response.data.downloadURL);
             setStatus('complete');
+            setOpenPopUp(true);
         } catch (error) {
             console.error(error);
             setStatus('error');
@@ -111,6 +118,8 @@ export default function useCleaner() {
         status,
         cleaningStats,
         downloadURL,
+        openPopup,
+        setOpenPopUp,
         handleDragEnter,
         handleDragLeave,
         handleDragOver,

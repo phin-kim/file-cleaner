@@ -7,14 +7,18 @@ import {
     AlertCircle,
     CheckCircle,
     Loader2,
+    X,
 } from 'lucide-react';
 import useCleaner from '../hooks/usecleaner';
+import SuccessPopup from './Popup';
 export default function FolderCleanerUI() {
     const {
         isDragging,
         uploadedFolder,
         status,
         cleaningStats,
+        openPopup,
+        setOpenPopUp,
         handleDragEnter,
         handleDragLeave,
         handleDragOver,
@@ -22,7 +26,9 @@ export default function FolderCleanerUI() {
         handleDownload,
         handleReset,
     } = useCleaner();
-
+    const handleClose = () => {
+        setOpenPopUp(false);
+    };
     return (
         <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
             <div className="w-full max-w-2xl">
@@ -252,6 +258,42 @@ export default function FolderCleanerUI() {
                                 </div>
                             </div>
                         </motion.div>
+                    )}
+                    {status === 'complete' && cleaningStats && openPopup && (
+                        <AnimatePresence>
+                            <>
+                                {/* Backdrop */}
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    onClick={handleClose}
+                                    className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
+                                />
+
+                                {/* Popup */}
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 0.8, y: 50 }}
+                                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                                    exit={{ opacity: 0, scale: 0.8, y: 50 }}
+                                    transition={{
+                                        type: 'spring',
+                                        stiffness: 300,
+                                        damping: 25,
+                                    }}
+                                    className="fixed inset-0 z-50 flex items-center justify-center p-4"
+                                >
+                                    {/* Close Button */}
+                                    <button
+                                        onClick={handleClose}
+                                        className="absolute top-4 right-4 rounded-full p-2 text-blue-300 transition-colors hover:bg-white/10 hover:text-white"
+                                    >
+                                        <X className="h-5 w-5" />
+                                    </button>
+                                    <SuccessPopup onDownload={handleDownload} onClose={handleClose} />
+                                </motion.div>
+                            </>
+                        </AnimatePresence>
                     )}
                 </AnimatePresence>
 

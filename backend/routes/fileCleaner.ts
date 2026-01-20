@@ -1,20 +1,16 @@
-import express from 'express';
+import { Router } from 'express';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs-extra';
-import cors from 'cors';
 import { fileURLToPath } from 'url';
 import archiver from 'archiver';
-import { tidyFolder } from './utils/tidy';
-const app = express();
-app.use(
-    cors({ origin: true, methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'] })
-);
-app.use(express.json());
+import { tidyFolder } from '../utils/tidy';
+export const cleanerRoute = Router();
+
 const upload = multer({ dest: 'upload/' }); //temporary storage
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-app.post('/api/processFolder', upload.array('files'), async (req, res) => {
+cleanerRoute.post('/processFolder', upload.array('files'), async (req, res) => {
     const startTime = Date.now();
     console.log('🟢 [BACKEND] request recieved at', new Date().toISOString());
     try {
@@ -102,7 +98,7 @@ app.post('/api/processFolder', upload.array('files'), async (req, res) => {
         res.status(500).json({ error: 'Failed to process folder' });
     }
 });
-app.get('/download/:filename', (req, res) => {
+cleanerRoute.get('/download/:filename', (req, res) => {
     try {
         console.log(
             `⬇️ [BACKEND] Download requested for ${req.params.filename}`
@@ -124,4 +120,3 @@ app.get('/download/:filename', (req, res) => {
         res.status(500).json({ error: 'Failed to download' });
     }
 });
-app.listen(5000, () => console.log('Server running on http://localhost:5000'));
