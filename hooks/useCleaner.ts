@@ -40,6 +40,7 @@ export default function useCleaner() {
         setStatus('uploading');
         try {
             const files: File[] = [];
+            let folderName = 'folder';
             const items = event.dataTransfer.items;
             console.log(`[FRONTEND] ${items.length} items in drop`);
             if (items && items.length > 0) {
@@ -48,10 +49,9 @@ export default function useCleaner() {
                         const entry = item.webkitGetAsEntry();
                         if (entry && entry.isDirectory) {
                             const dirEntry = entry as FileSystemDirectoryEntry;
-                            setUploadedFolder({
-                                name: dirEntry.name,
-                                files: [],
-                            });
+                            // capture the folder name locally so we can reliably send it
+                            folderName = dirEntry.name;
+                            setUploadedFolder({ name: dirEntry.name, files: [] });
                             console.log(
                                 `[FRONTEND] processing folder ${dirEntry.name}`
                             );
@@ -65,7 +65,7 @@ export default function useCleaner() {
                 }
             }
             const formData = new FormData();
-            formData.append('folderName', uploadedFolder?.name || 'folder');
+            formData.append('folderName', folderName || uploadedFolder?.name || 'folder');
             files.forEach((file) => formData.append('files', file, file.name));
             setStatus('processing');
             const start = Date.now();

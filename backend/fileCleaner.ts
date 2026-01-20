@@ -62,8 +62,8 @@ app.post('/api/processFolder', upload.array('files'), async (req, res) => {
             console.error('[BACKEND] Archiver error:', err);
             throw err;
         });
-        // Directory with root path (avoids extra unnamed folder)
-        archive.directory(tempDir, false); // `false` ensures no extra root folder
+        // Put files inside a folder that preserves the original uploaded folder name
+        archive.directory(tempDir, safeFolderName);
 
         // Proper async completion handling
         await Promise.all([
