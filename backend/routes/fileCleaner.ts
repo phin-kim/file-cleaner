@@ -5,6 +5,7 @@ import fs from 'fs-extra';
 import { fileURLToPath } from 'url';
 import archiver from 'archiver';
 import { tidyFolder } from '../utils/tidy';
+
 export const cleanerRoute = Router();
 
 const upload = multer({ dest: 'upload/' }); //temporary storage
@@ -26,11 +27,20 @@ cleanerRoute.post('/processFolder', upload.array('files'), async (req, res) => {
         const tempDir = path.join(__dirname, 'temp', Date.now().toString());
         await fs.ensureDir(tempDir);
         console.log('[BACKEND] temp folder created at ', tempDir);
-        // move uploaded files to temp dir
-        for (const file of uploadedFiles) {
-            const destPath = path.join(tempDir, file.originalname);
-            await fs.move(file.path, destPath);
-            console.log(`[BACKEND] moved ${file.originalname} to temp`);
+        // move uploaded files to temp dir and in case of failure they are deleted
+        try {
+            for (const file of uploadedFiles) {
+                const destPath = path.join(tempDir, file.originalname);
+                await fs.move(file.path, destPath);
+                console.log(`[BACKEND] moved ${file.originalname} to temp`);
+            }
+        } finally {
+            for (const file of uploadedFiles) {
+                if (await fs.pathExists(file.path)) {
+                    await fs.remove(file.path);
+                    console.log(`[CLEANUP] removed orphan upload &{file.path}`);
+                }
+            }
         }
         //remove duplicate files based on hash
         console.log('[BACKEND] starting duplicate removal...');
@@ -81,8 +91,9 @@ cleanerRoute.post('/processFolder', upload.array('files'), async (req, res) => {
         // Build absolute download URL so frontend (different origin) can access it
         const host = req.get('host') || 'localhost:5000';
         const protocol = req.protocol || 'http';
-        const downloadURL = `${protocol}://${host}/download/${path.basename(zipPath)}`;
+        const downloadURL = `${protocol}://${host}/api/download/${path.basename(zipPath)}`;
 
+        //cleanup
         // return zip download link
         res.json({
             downloadURL,
