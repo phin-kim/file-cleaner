@@ -1,6 +1,6 @@
 import FolderCleanerUI from '../components/Cleaner';
 import BillingPage from '../components/Billing';
-import FileMergerApp from '../components/FileMerger';
+import FolderQuestionAnalyzer from '../components/Merger';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { UpgradeModal } from '../components/Popup';
 function App() {
@@ -10,7 +10,10 @@ function App() {
                 <Routes>
                     <Route path="/" element={<FolderCleanerUI />} />
                     <Route path="/billing" element={<BillingPage />} />
-                    <Route path="/file-merge" element={<FileMergerApp />} />
+                    <Route
+                        path="/file-merge"
+                        element={<FolderQuestionAnalyzer />}
+                    />
                     <Route path="/upgrade-modal" element={<UpgradeModal />} />
                 </Routes>
             </BrowserRouter>

@@ -9,7 +9,7 @@ import {
     Loader2,
     X,
 } from 'lucide-react';
-import useCleaner from '../hooks/usecleaner';
+import useCleaner from '../hooks/useCleaner';
 import SuccessPopup from './Popup';
 export default function FolderCleanerUI() {
     const {
@@ -29,6 +29,7 @@ export default function FolderCleanerUI() {
     const handleClose = () => {
         setOpenPopUp(false);
     };
+    const path = 'processFolder';
     return (
         <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
             <div className="w-full max-w-2xl">
@@ -55,7 +56,7 @@ export default function FolderCleanerUI() {
                             onDragEnter={handleDragEnter}
                             onDragOver={handleDragOver}
                             onDragLeave={handleDragLeave}
-                            onDrop={handleDrop}
+                            onDrop={(event) => handleDrop(event, path)}
                             className={`relative overflow-hidden rounded-2xl border-2 border-dashed transition-all duration-300 ${
                                 isDragging
                                     ? 'border-purple-400 bg-purple-500/10 shadow-lg shadow-purple-500/30'
@@ -290,7 +291,10 @@ export default function FolderCleanerUI() {
                                     >
                                         <X className="h-5 w-5" />
                                     </button>
-                                    <SuccessPopup onDownload={handleDownload} onClose={handleClose} />
+                                    <SuccessPopup
+                                        onDownload={handleDownload}
+                                        onClose={handleClose}
+                                    />
                                 </motion.div>
                             </>
                         </AnimatePresence>

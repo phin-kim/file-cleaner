@@ -6,6 +6,7 @@ import 'dotenv/config';
 import { cleanerRoute } from '../routes/fileCleaner';
 import { subRouter } from '../routes/subscription';
 import cleanupByAge from '../utils/cleanByAge';
+import { mergerRoute } from '../routes/mergerRoute';
 const PORT = process.env.PORT;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,6 +18,9 @@ app.use(express.json());
 
 app.use('/api', cleanerRoute);
 app.use('/api', subRouter);
+app.use('/api', mergerRoute);
+
+app.use('/downloads', express.static(path.join(process.cwd(), 'backend/temp')));
 
 const ROUTES_TEMP = path.join(__dirname, 'routes', 'temp');
 const BACKEND_TEMP = path.join(__dirname, 'temp');

@@ -16,3 +16,8 @@ export interface PaymentMethod {
     name: string;
     icon: ReactNode;
 }
+
+export interface AnalysisResult {
+    filesProcessed: number;
+    pdfUrl: string;
+}
