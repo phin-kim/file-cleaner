@@ -116,43 +116,7 @@ export default function useCleaner() {
             setStatus('error');
         }
     };
-    const processFiles = async (files: File[]) => {
-        setStatus('uploading');
-        setProgress(0);
 
-        // Smooth upload progress animation
-        const progressInterval = setInterval(() => {
-            setProgress((prev) => {
-                if (prev >= 100) {
-                    clearInterval(progressInterval);
-                    return 100;
-                }
-                return prev + 5;
-            });
-        }, 100);
-
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        clearInterval(progressInterval);
-        setProgress(100);
-
-        setStatus('processing');
-
-        // Simulate backend processing
-        await new Promise((resolve) => setTimeout(resolve, 3000));
-
-        // TODO: Replace with actual backend response
-        // const data = await response.json();
-        // setResult(data);
-
-        // Mock result
-        const mockResult: AnalysisResult = {
-            filesProcessed: files.length,
-            pdfUrl: 'https://example.com/report.pdf', // Replace with actual PDF URL from backend
-        };
-
-        setResult(mockResult);
-        setStatus('complete');
-    };
     console.log(`[FRONTEND] download url ${downloadURL}`);
 
     const handleDownload = () => {
@@ -192,6 +156,5 @@ export default function useCleaner() {
         handleDownload,
         handleReset,
         resetMergerUpload,
-        processFiles,
     };
 }

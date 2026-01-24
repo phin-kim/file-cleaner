@@ -1,10 +1,12 @@
 import fs from 'fs-extra';
 import { PDFParse } from 'pdf-parse';
 import 'dotenv/config';
+import { GoogleGenAI } from '@google/genai';
 import mammoth from 'mammoth';
 import { InferenceClient } from '@huggingface/inference';
 import path from 'path';
 const huggingFace = new InferenceClient(process.env.HF_API_KEY);
+const AI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 /**
 Upload folder -> temp storage
         
@@ -22,19 +24,31 @@ Upload folder -> temp storage
  */
 
 //extract the text from the files
-export const extractTextFromFile = async (filePath: string) => {
-    if (filePath.endsWith('.txt')) {
-        return fs.readFile(filePath, 'utf-8');
-    } else if (filePath.endsWith('.pdf')) {
-        const dataBuffer = await fs.readFile(filePath);
-        const parser = new PDFParse(dataBuffer);
-        const pdf = await parser.getText();
-        return pdf.text;
-    } else if (filePath.endsWith('.docx')) {
-        const result = await mammoth.extractRawText({ path: filePath });
-        return result.value;
+export const extractTextFromFile = async (
+    filePath: string
+): Promise<string> => {
+    try {
+        const ext = path.extname(filePath).toLowerCase();
+        if (ext === '.txt') {
+            return await fs.readFile(filePath, 'utf-8');
+        }
+        if (ext === '.pdf') {
+            const buffer = await fs.readFile(filePath); // Buffer
+            const uint8Array = new Uint8Array(buffer); // Convert to Uint8Array
+            const parser = new PDFParse(uint8Array); // parse PDF
+            const text = await parser.getText();
+            return text.text;
+        }
+        if (ext === '.docx') {
+            const result = await mammoth.extractRawText({ path: filePath });
+            return result.value;
+        }
+        console.warn(`[SKIP] Unsupported file type${filePath}`);
+        return '';
+    } catch (error) {
+        console.log(`[PARSE ERROR],${filePath}`, error);
+        return '';
     }
-    return '';
 };
 /**
  * Extract questions from exam-style text
@@ -88,6 +102,7 @@ export async function getEmbeddings(questions: string[]): Promise<number[][]> {
             const response = await huggingFace.featureExtraction({
                 model: 'sentence-transformers/distilbert-base-nli-mean-tokens',
                 inputs: [quest],
+                provider: 'hf-inference',
             });
             embeddings.push(response[0] as number[]);
         } catch (error) {
@@ -150,27 +165,35 @@ Merged question:
 `;
 
     try {
-        const response = await huggingFace.textGeneration({
-            model: 'deepseek-ai/DeepSeek-V3',
-            inputs: prompt,
-            parameters: {
-                max_new_tokens: 120,
-                temperature: 0.3,
-                return_full_text: false,
+        const response = await AI.models.generateContent({
+            model: 'gemini-3-flash-preview',
+            config: {
+                systemInstruction:
+                    'You merge duplicate or highly similar exam questions into pne academic question',
             },
+            contents: [
+                {
+                    text: prompt,
+                },
+            ],
         });
-        return response.generated_text.trim();
+        const mergedQuestion = response.text?.trim();
+        if (!mergedQuestion) throw new Error('No response from Gemini');
+
+        return mergedQuestion;
     } catch (error) {
-        console.error('Deepseek merge failes:  ', error);
+        console.error('gemini merge failes:  ', error);
         return questions[0];
     }
 }
 export async function processUploadedFiles(folderPath: string) {
-    const files = await fs.readdir(folderPath);
+    let files = await fs.readdir(folderPath);
+    files = files.filter((file) => !file.startsWith('~$'));
     //extract all questions
     const allQuestions: string[] = [];
     for (const file of files) {
         const fullPath = path.join(folderPath, file);
+        console.log(`[PROCESSING FILE] `, fullPath);
         const text = await extractTextFromFile(fullPath);
         const questions = await extractQuestion(text);
         allQuestions.push(...questions);
@@ -189,4 +212,5 @@ export async function processUploadedFiles(folderPath: string) {
             mergedQuestions.push(merged);
         }
     }
+    return mergedQuestions;
 }

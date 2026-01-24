@@ -5,19 +5,15 @@ import multer from 'multer';
 import { processUploadedFiles } from '../utils/fileMerger';
 import generatePDF from '../utils/generatePDF';
 export const mergerRoute = Router();
+const uploadDir = path.join(process.cwd(), 'backend/temp/merger/uploads');
+fs.mkdirSync(uploadDir, { recursive: true });
 const storage = multer.diskStorage({
-    destination: async (req, file, cb) => {
-        const folderName = req.body.folderName || 'folder';
-        const uploadPath = path.join(
-            process.cwd(),
-            'backend/temp/uploads',
-            folderName
-        );
-        await fs.ensureDir(uploadPath);
-        cb(null, file.originalname);
+    destination: async (_req, _file, cb) => {
+        cb(null, uploadDir);
     },
-    filename: (req, file, cb) => {
-        cb(null, file.originalname);
+    filename: (_req, file, cb) => {
+        const safeName = path.basename(file.originalname);
+        cb(null, `${Date.now()}-${safeName}`);
     },
 });
 const upload = multer({ storage });
@@ -29,9 +25,9 @@ mergerRoute.post('/merge-files', upload.array('files'), async (req, res) => {
         }
         const uploadDir = path.join(
             process.cwd(),
-            'backend/temp/uploads',
-            folderName
+            'backend/temp/merger/uploads'
         );
+        console.log('[DEBUG] folder exists?', fs.existsSync(uploadDir));
         const mergedQuestions = await processUploadedFiles(uploadDir);
         if (!mergedQuestions || mergedQuestions.length === 0) {
             return res.status(200).json({
@@ -44,11 +40,10 @@ mergerRoute.post('/merge-files', upload.array('files'), async (req, res) => {
                 downloadURL: null,
             });
         }
-        const outputFile = path.join(
-            process.cwd(),
-            'backend/temp',
-            `merged-${Date.now()}.pdf`
-        );
+        const outputDir = path.join(process.cwd(), 'backend/temp/outputs');
+        await fs.ensureDir(outputDir); //creates the folder if missing
+        const outputFile = path.join(outputDir, `merged-${Date.now()}.pdf`);
+
         await generatePDF(mergedQuestions, outputFile);
         setTimeout(
             () => {
@@ -56,9 +51,13 @@ mergerRoute.post('/merge-files', upload.array('files'), async (req, res) => {
             },
             2 * 60 * 60 * 1000
         );
+        // Build absolute download URL so frontend (different origin) can access it
+        const host = req.get('host') || 'localhost:5000';
+        const protocol = req.protocol || 'http';
+        const downloadURL = `${protocol}://${host}/api/download/${path.basename(outputFile)}`;
         res.json({
             success: true,
-            downloadURL: `/downloads/${path.basename(outputFile)}`,
+            downloadURL,
         });
     } catch (error) {
         console.error('Merge route error', error);
