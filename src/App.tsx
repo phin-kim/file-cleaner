@@ -1,20 +1,41 @@
-import FolderCleanerUI from '../components/Cleaner';
-import BillingPage from '../components/Billing';
-import FolderQuestionAnalyzer from '../components/Merger';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { UpgradeModal } from '../components/Popup';
+import FolderCleanerUI from './components/Cleaner';
+import BillingPage from './components/Billing';
+import FolderQuestionAnalyzer from './components/Merger';
+import {
+    BrowserRouter,
+    Routes,
+    Route,
+    Outlet,
+    Navigate,
+} from 'react-router-dom';
+import { UpgradeModal } from './components/Popup';
+import WelcomeModal from './components/WelcomePage';
+import Header from './components/Header';
 function App() {
     return (
         <>
             <BrowserRouter>
                 <Routes>
-                    <Route path="/" element={<FolderCleanerUI />} />
-                    <Route path="/billing" element={<BillingPage />} />
-                    <Route
-                        path="/file-merge"
-                        element={<FolderQuestionAnalyzer />}
-                    />
-                    <Route path="/upgrade-modal" element={<UpgradeModal />} />
+                    <Route element={<AppLayout />}>
+                        <Route
+                            path="/"
+                            element={<Navigate to="/welcome" replace />}
+                        />
+                        <Route path="/welcome" element={<WelcomeModal />} />
+                        <Route
+                            path="/folder-cleanup"
+                            element={<FolderCleanerUI />}
+                        />
+                        <Route path="/billing" element={<BillingPage />} />
+                        <Route
+                            path="/file-merge"
+                            element={<FolderQuestionAnalyzer />}
+                        />
+                        <Route
+                            path="/upgrade-modal"
+                            element={<UpgradeModal />}
+                        />
+                    </Route>
                 </Routes>
             </BrowserRouter>
         </>
@@ -22,3 +43,11 @@ function App() {
 }
 
 export default App;
+function AppLayout() {
+    return (
+        <>
+            <Header />
+            <Outlet />
+        </>
+    );
+}

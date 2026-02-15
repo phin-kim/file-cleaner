@@ -3,10 +3,12 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import 'dotenv/config';
-import { cleanerRoute } from '../routes/fileCleaner';
-import { subRouter } from '../routes/subscription';
-import cleanupByAge from '../utils/cleanByAge';
-import { mergerRoute } from '../routes/mergerRoute';
+import { cleanerRoute } from './routes/fileCleaner';
+import { subRouter } from './routes/subscription';
+import { startPeriodicCleanup, cleanupOrphanedFiles } from './utils/cleanUp';
+import { mergerRoute } from './routes/mergerRoute';
+import createLogger from './utils/logger';
+const log = createLogger('APP.TS');
 const PORT = process.env.PORT;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -25,21 +27,25 @@ app.use('/downloads', express.static(path.join(process.cwd(), 'backend/temp')));
 const ROUTES_TEMP = path.join(__dirname, 'routes', 'temp');
 const BACKEND_TEMP = path.join(__dirname, 'temp');
 const UPLOADS = path.join(process.cwd(), 'upload');
+const MERGER_UPLOADS = path.join(process.cwd(), 'backend/temp/merger/uploads');
+const MERGER_OUTPUTS = path.join(process.cwd(), 'backend/temp/outputs');
+const TEMP_DIRS = [
+    ROUTES_TEMP,
+    UPLOADS,
+    BACKEND_TEMP,
+    MERGER_OUTPUTS,
+    MERGER_UPLOADS,
+];
 
-// ───── startup cleanup ─────
-console.log('[CLEANUP] startup');
-cleanupByAge(ROUTES_TEMP, 'ROUTES_TEMP');
-cleanupByAge(BACKEND_TEMP, 'BACKEND_TEMP');
-cleanupByAge(UPLOADS, 'UPLOADS');
+// ───── startup cleanup ─────1
+log.highlight('CLEANUP STARTING', { context: 'Cleanup' });
+startPeriodicCleanup(TEMP_DIRS);
+//also clean up orphaned files on startup
+cleanupOrphanedFiles(path.join(__dirname, '../'), [
+    /\.tmp$/,
+    /^~.*/,
+    /\.crdownload$/,
+    //add other patterns for temp files
+]).catch(console.error);
 
-// ───── scheduled cleanup ─────
-setInterval(
-    () => {
-        console.log('[CLEANUP] scheduled');
-        cleanupByAge(ROUTES_TEMP, 'ROUTES_TEMP');
-        cleanupByAge(BACKEND_TEMP, 'BACKEND_TEMP');
-        cleanupByAge(UPLOADS, 'UPLOADS');
-    },
-    30 * 60 * 1000
-);
-app.listen(PORT, () => console.log(`Serveris running on port ${PORT}`));
+app.listen(PORT, () => log.highlight(`Server is running on port ${PORT}`));

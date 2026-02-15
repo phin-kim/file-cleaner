@@ -1,11 +1,13 @@
 import PDFDocument from 'pdfkit';
 import fs from 'fs-extra';
-
+import createLogger from './logger';
+const log = createLogger('Pdf generator');
 export default async function generatePDF(
     questions: string[],
     outputPath: string
 ) {
     return new Promise<void>((resolve) => {
+        log.highlight('generating pdf');
         const doc = new PDFDocument({ margin: 50 });
         const stream = fs.createWriteStream(outputPath);
         doc.pipe(stream);

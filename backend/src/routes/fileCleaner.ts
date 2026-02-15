@@ -38,7 +38,7 @@ cleanerRoute.post('/processFolder', upload.array('files'), async (req, res) => {
             for (const file of uploadedFiles) {
                 if (await fs.pathExists(file.path)) {
                     await fs.remove(file.path);
-                    console.log(`[CLEANUP] removed orphan upload &{file.path}`);
+                    console.log(`[CLEANUP] removed orphan upload ${file.path}`);
                 }
             }
         }

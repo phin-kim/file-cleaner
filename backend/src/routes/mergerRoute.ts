@@ -50,12 +50,7 @@ mergerRoute.post(
             const outputFile = path.join(outputDir, `merged-${Date.now()}.pdf`);
 
             await generatePDF(mergedQuestions, outputFile);
-            setTimeout(
-                () => {
-                    fs.remove(uploadDir).catch(console.error);
-                },
-                2 * 60 * 60 * 1000
-            );
+
             // Build absolute download URL so frontend (different origin) can access it
             const host = req.get('host') || 'localhost:5000';
             const protocol = req.protocol || 'http';

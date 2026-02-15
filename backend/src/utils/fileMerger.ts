@@ -8,9 +8,11 @@ import path from 'path';
 const huggingFace = new InferenceClient(process.env.HF_API_KEY);
 const AI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 import pLimit from 'p-limit';
+import createLogger from './logger';
+import { cleanupByAge } from './cleanUp';
 const mergeCachePath = '../../merged-cache.json';
 const embeddingCachePath = '../../embeddings-cache.json';
-
+const log = createLogger('FILE MERGER');
 let mergeCache: Record<string, string> = {};
 let embeddingCache: Record<string, number[]> = {};
 //load cache if it exists
@@ -157,6 +159,7 @@ export async function getEmbeddings(questions: string[]): Promise<number[][]> {
             saveEmbeddingsCache();
         }
     }
+    log.highlight('Done with the mebedings ');
     return questions.map(
         (question) => embeddingCache[normalizeQuestions(question)]
     );
@@ -172,6 +175,7 @@ export function clusterQuestions(
     embeddings: number[][],
     threshold = 0.8
 ): string[][] {
+    log.highlight('Starting cluster');
     const clusters: { [key: string]: number[] } = {};
     questions.forEach((quest, indx) => {
         let added = false;
@@ -189,6 +193,7 @@ export function clusterQuestions(
         if (!added) clusters[indx] = [indx];
     });
     //consvert index clusters to actual questions
+    log.highlight('Ending clustering');
     return Object.values(clusters).map((indices) =>
         indices.map((ind) => questions[ind])
     );
@@ -202,7 +207,7 @@ Rules:
 - Keep academic wording
 - Remove repetition
 - Preserve intent and difficulty
-
+- If they dont look like questions don't bother touching them
 Questions:
 ${questions.map((q) => `- ${q}`).join('\n')}
 
@@ -210,6 +215,7 @@ Merged question:
 `;
 
     try {
+        log.highlight('Start merging clusters');
         const response = await AI.models.generateContent({
             model: 'gemini-2.5-flash',
             config: {
@@ -225,63 +231,77 @@ Merged question:
             ],
         });
         const mergedQuestion = response.text?.trim();
-        if (!mergedQuestion) throw new Error('No response from Gemini');
+        log.highlight('FInalize merging clusters');
 
+        if (!mergedQuestion) throw new Error('No response from Gemini');
         return mergedQuestion;
     } catch (error) {
-        console.error('gemini merge failes:  ', error);
+        log.error('gemini merge fails:  ', { data: { error } });
         return questions[0];
     }
 }
 export async function processUploadedFiles(folderPath: string) {
-    let files = await fs.readdir(folderPath);
-    files = files.filter((file) => !file.startsWith('~$'));
-    //extract all questions
-    const allQuestions: string[] = [];
-    for (const file of files) {
-        const fullPath = path.join(folderPath, file);
-        console.log(`[PROCESSING FILE] `, fullPath);
-        const text = await extractTextFromFile(fullPath);
-        const questions = await extractQuestion(text);
-        allQuestions.push(...questions);
+    try {
+        log.highlight('Statrting to process the files');
+        let files = await fs.readdir(folderPath);
+        files = files.filter((file) => !file.startsWith('~$'));
+        //extract all questions
+        const allQuestions: string[] = [];
+        for (const file of files) {
+            const fullPath = path.join(folderPath, file);
+            console.log(`[PROCESSING FILE] `, fullPath);
+            const text = await extractTextFromFile(fullPath);
+            const questions = await extractQuestion(text);
+            allQuestions.push(...questions);
+        }
+        if (allQuestions.length === 0) return [];
+        //create embeddings
+        const embeddings = await getEmbeddings(allQuestions);
+        // cluster similar questions
+        const clusters = clusterQuestions(allQuestions, embeddings, 0.8);
+        const limit = pLimit(2);
+        const mergedQuestions = await Promise.all(
+            clusters.map((cluster) =>
+                limit(async () => {
+                    //unique questions return as-is
+                    if (cluster.length === 1) return cluster[0];
+                    //use cache key
+                    const key = clusterKey(cluster.slice(0, 5));
+                    if (mergeCache[key]) {
+                        console.log('Using chached merged questions');
+                        return mergeCache[key];
+                    }
+                    await sleep(800);
+                    //limit prompt size
+                    const trimmedCluster = cluster.slice(0, 5);
+                    //if questioins are identical pick the first one
+                    const first = normalizeQuestions(cluster[0]);
+                    const allSame = cluster.every(
+                        (quest) => normalizeQuestions(quest) === first
+                    );
+
+                    if (allSame) {
+                        return cluster[0];
+                    }
+                    //otherwise call gemini
+                    const merged = await mergeCluster(trimmedCluster);
+                    mergeCache[key] = merged;
+                    saveMergeCache();
+                    return merged;
+                })
+            )
+        );
+        // after processing ,cleanup temp folder
+        log.highlight('finalize the processing of files');
+        await cleanupByAge(folderPath, 'TEMP-CLEANUP');
+        return mergedQuestions;
+    } catch (error) {
+        log.error(`Processing failed`, {
+            context: 'failed cleaning',
+            data: { error },
+        });
+        //even on error try clean up
+        await cleanupByAge(folderPath, 'TEMP_CLEANUP_ERROR');
+        throw error;
     }
-    if (allQuestions.length === 0) return [];
-    //create embeddings
-    const embeddings = await getEmbeddings(allQuestions);
-    // cluster similar questions
-    const clusters = clusterQuestions(allQuestions, embeddings, 0.8);
-    const limit = pLimit(2);
-    const mergedQuestions = await Promise.all(
-        clusters.map((cluster) =>
-            limit(async () => {
-                //unique questions return as-is
-                if (cluster.length === 1) return cluster[0];
-                //use cache key
-                const key = clusterKey(cluster.slice(0, 5));
-                if (mergeCache[key]) {
-                    console.log('Using chached merged questions');
-                    return mergeCache[key];
-                }
-                await sleep(800);
-                //limit prompt size
-                const trimmedCluster = cluster.slice(0, 5);
-                //if questioins are identical pick the first one
-                const first = normalizeQuestions(cluster[0]);
-                const allSame = cluster.every(
-                    (quest) => normalizeQuestions(quest) === first
-                );
-
-                if (allSame) {
-                    return cluster[0];
-                }
-                //otherwise call gemini
-                const merged = await mergeCluster(trimmedCluster);
-                mergeCache[key] = merged;
-                saveMergeCache();
-                return merged;
-            })
-        )
-    );
-
-    return mergedQuestions;
 }
