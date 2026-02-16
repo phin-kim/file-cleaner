@@ -12,16 +12,14 @@ export async function cleanupByAge(dir: string, label = 'CLEANUP') {
     async function cleanupContents(currentPath: string) {
         try {
             const entries = await fs.readdir(currentPath);
-            log.info('Enries present ', {
-                context: 'clen up by age',
+            log.info('Entries present ', {
+                context: 'clean up by age',
                 data: { entries },
             });
             for (const entry of entries) {
                 const fullPath = path.join(currentPath, entry);
-                log.info('fullpath', { data: { fullPath } });
                 try {
                     const stat = await fs.stat(fullPath);
-                    log.info('Stats', { data: { stat } });
                     //check if its older than one hour
                     if (now - stat.mtimeMs > TWO_HOURS) {
                         //track size b4 deletion
@@ -88,30 +86,44 @@ export async function cleanupByAge(dir: string, label = 'CLEANUP') {
             }
         } catch (error) {
             log.error(`[${label}] failed to read directory ${currentPath}`, {
-                data: { error },
+                context: 'cleanupContents',
+                data: { error, path: currentPath },
             });
         }
     }
-    async function getDirectorySize(dirPath: string): Promise<number> {
+    async function getDirectorySize(
+        dirPath: string,
+        maxDepth = 5
+    ): Promise<number> {
         let size = 0;
-        try {
-            const entries = await fs.readdir(dirPath);
-            for (const entry of entries) {
-                const fullPath = path.join(dirPath, entry);
-                try {
-                    const stat = await fs.stat(fullPath);
-                    if (stat.isFile()) {
-                        size += stat.size;
-                    } else if (stat.isDirectory()) {
-                        size += await getDirectorySize(fullPath);
+
+        async function walk(currentPath: string, currentDepth: number) {
+            if (currentDepth > maxDepth) return 0;
+            try {
+                const entries = await fs.readdir(currentPath);
+                for (const entry of entries) {
+                    const fullPath = path.join(currentPath, entry);
+                    try {
+                        const stat = await fs.stat(fullPath);
+                        if (stat.isFile()) {
+                            size += stat.size;
+                        } else if (stat.isDirectory()) {
+                            await walk(fullPath, currentDepth + 1);
+                        }
+                    } catch (error) {
+                        log.error(`Error in size calculation`, {
+                            context: 'sizeCalculation',
+                            data: { error },
+                        });
                     }
-                } catch (error) {
-                    log.error('errors in gettingthesize', { data: { error } });
                 }
+            } catch (error) {
+                log.error(`Error in reading the directory: ${dirPath}`, {
+                    data: { error },
+                });
             }
-        } catch (error) {
-            log.error('errors in gettingthesize', { data: { error } });
         }
+        await walk(dirPath, 0);
         return size;
     }
     // startcleanup from parent direcory

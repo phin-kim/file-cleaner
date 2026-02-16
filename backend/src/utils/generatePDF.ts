@@ -17,6 +17,7 @@ export default async function generatePDF(
             doc.fontSize(12).text(`${indx + 1}. ${question}`);
             doc.moveDown();
         });
+        log.highlight('Done generating pdf sent url to front end');
         doc.end();
         stream.on('finish', resolve);
     });

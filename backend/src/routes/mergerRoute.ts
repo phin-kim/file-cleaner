@@ -5,6 +5,8 @@ import multer from 'multer';
 import { processUploadedFiles } from '../utils/fileMerger';
 import generatePDF from '../utils/generatePDF';
 import uploadLimiter from '../utils/rateLimiter';
+import createLogger from '../utils/logger';
+const log = createLogger('Merge route');
 export const mergerRoute = Router();
 const uploadDir = path.join(process.cwd(), 'backend/temp/merger/uploads');
 fs.mkdirSync(uploadDir, { recursive: true });
@@ -55,6 +57,9 @@ mergerRoute.post(
             const host = req.get('host') || 'localhost:5000';
             const protocol = req.protocol || 'http';
             const downloadURL = `${protocol}://${host}/api/download/${path.basename(outputFile)}`;
+            log.highlight(
+                `Done generating the pdf and sent ${downloadURL} to front end`
+            );
             res.json({
                 success: true,
                 downloadURL,

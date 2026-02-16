@@ -24,3 +24,5 @@ dist-ssr
 *.sw?
 .env
 serviceAccountKey.json
+embeddings-cahce.json
+merged-chache.json

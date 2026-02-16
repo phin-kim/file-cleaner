@@ -10,24 +10,170 @@ const AI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 import pLimit from 'p-limit';
 import createLogger from './logger';
 import { cleanupByAge } from './cleanUp';
-const mergeCachePath = '../../merged-cache.json';
-const embeddingCachePath = '../../embeddings-cache.json';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+//using absolute path instead of relive ones
+const mergeCachePath = path.join(__dirname, '../../merged-cache.json');
+const embeddingCachePath = path.join(__dirname, '../../embeddings-cache.json');
 const log = createLogger('FILE MERGER');
+
+//  Save locks to prevent race conditions
+let isSavingMerge = false;
+let isSavingEmbedding = false;
+
+//  Cache size limits to prevent memory leaks
+const MAX_CACHE_ENTRIES = 10000;
+
+//  Retry configuration for API calls
+//const MAX_RETRIES = 3;
+//const RETRY_DELAY_MS = 1000;
+
 let mergeCache: Record<string, string> = {};
 let embeddingCache: Record<string, number[]> = {};
-//load cache if it exists
-if (fs.existsSync(mergeCachePath)) {
-    mergeCache = fs.readJSONSync(mergeCachePath);
+
+//ensure cahe directories exist b4 any operations
+const cacheDir = path.dirname(mergeCachePath);
+if (!fs.existsSync(cacheDir)) {
+    fs.mkdirSync(cacheDir, { recursive: true });
+    log.info(`created cache directory: ${cacheDir}`);
 }
+//load cache if it exists
+// Replace your current load section with this:
+if (fs.existsSync(mergeCachePath)) {
+    try {
+        const content = fs.readFileSync(mergeCachePath, 'utf-8');
+        if (content.trim()) {
+            const parsed = JSON.parse(content);
+            if (typeof parsed === 'object' && parsed !== null) {
+                mergeCache = parsed;
+                log.debug(
+                    `✅ Loaded ${Object.keys(mergeCache).length} merge cache entries`
+                );
+            } else {
+                throw new Error('Invalid cache format');
+            }
+        } else {
+            log.warn('Merge cache file is empty, starting fresh');
+            mergeCache = {};
+        }
+    } catch (error) {
+        log.error('Failed to parse merge cache, starting fresh:', {
+            data: { error },
+        });
+        mergeCache = {};
+        // Optionally backup the corrupt file
+        fs.renameSync(
+            mergeCachePath,
+            mergeCachePath + '.corrupt.' + Date.now()
+        );
+    }
+}
+
 if (fs.existsSync(embeddingCachePath)) {
-    embeddingCache = fs.readJSONSync(embeddingCachePath);
+    try {
+        const content = fs.readFileSync(embeddingCachePath, 'utf-8');
+        if (content.trim()) {
+            const parsed = JSON.parse(content);
+            if (typeof parsed === 'object' && parsed !== null) {
+                //spot check first entry and correct format
+                const sampleKey = Object.keys(parsed)[0];
+                if (sampleKey) {
+                    const sampleValue = parsed[sampleKey];
+                    if (
+                        !Array.isArray(sampleValue) ||
+                        !sampleValue.every((n) => typeof n === 'number')
+                    ) {
+                        throw new Error(
+                            'Embeddings contain invalid data format '
+                        );
+                    }
+                }
+                embeddingCache = parsed;
+                log.debug(
+                    `✅ Loaded ${Object.keys(embeddingCache).length} embeddings cahce from entries`
+                );
+            }
+        } else {
+            log.warn('Embedding cache file is empty, starting fresh');
+            embeddingCache = {};
+        }
+    } catch (error) {
+        log.error('Failed to parse embedding cache, starting fresh:', {
+            data: { error },
+        });
+        embeddingCache = {};
+        fs.renameSync(
+            embeddingCachePath,
+            embeddingCachePath + '.corrupt.' + Date.now()
+        );
+    }
 }
 //save cache helper
+//Race conditon proof saves withtemp files and lks
 function saveMergeCache() {
-    fs.writeJSONSync(mergeCachePath, mergeCache, { spaces: 2 });
+    if (isSavingMerge) {
+        log.debug(`⏳ merge cache save already in progress, skipping`);
+        return;
+    }
+    try {
+        isSavingMerge = true;
+        // Only save if there's actual data
+        if (Object.keys(mergeCache).length === 0) {
+            log.debug('Merge cache is empty, skipping save');
+            return;
+        }
+
+        // Write to a temp file first, then rename (prevents corruption)
+        const tempPath = mergeCachePath + '.tmp';
+        fs.writeJSONSync(tempPath, mergeCache, { spaces: 2 });
+        fs.renameSync(tempPath, mergeCachePath);
+
+        log.debug(
+            `✅ Merge cache saved with ${Object.keys(mergeCache).length} entries`
+        );
+    } catch (error) {
+        log.error('Failed to save merge cache:', { data: { error } });
+    }
 }
+
 function saveEmbeddingsCache() {
-    fs.writeJSONSync(embeddingCachePath, embeddingCache, { spaces: 2 });
+    if (isSavingEmbedding) {
+        log.debug(
+            `⏳ Embedding cache save already exists in progresss, skipping`
+        );
+        return;
+    }
+    try {
+        isSavingEmbedding = true;
+        if (Object.keys(embeddingCache).length === 0) {
+            log.debug('Embedding cache is empty, skipping save');
+            return;
+        }
+
+        const tempPath = embeddingCachePath + '.tmp';
+        fs.writeJSONSync(tempPath, embeddingCache, { spaces: 2 });
+        fs.renameSync(tempPath, embeddingCachePath);
+
+        log.debug(
+            `✅ Embedding cache saved with ${Object.keys(embeddingCache).length} entries`
+        );
+    } catch (error) {
+        log.error('Failed to save embedding cache:', { data: { error } });
+    }
+}
+//cache size manaegemnt to prevent leaks
+function trimEmbeddingsCache() {
+    if (Object.keys(embeddingCache).length > MAX_CACHE_ENTRIES) {
+        const entries = Object.entries(embeddingCache);
+        const toRemove = entries.slice(0, entries.length - MAX_CACHE_ENTRIES);
+        toRemove.forEach(([key]) => delete embeddingCache[key]);
+        log.debug(
+            `✂ Trimmed embeddings chase to a max of ${MAX_CACHE_ENTRIES} entries`
+        );
+        saveEmbeddingsCache();
+    }
 }
 function clusterKey(cluster: string[]) {
     return cluster
@@ -145,21 +291,57 @@ export async function getEmbeddings(questions: string[]): Promise<number[][]> {
         const batchSize = 50;
         for (let i = 0; i < uncachedQuestions.length; i += batchSize) {
             const batch = uncachedQuestions.slice(i, i + batchSize);
-            const response = await huggingFace.featureExtraction({
-                model: 'sentence-transformers/all-MiniLM-L6-v2',
-                inputs: batch,
+            try {
+                const response = await huggingFace.featureExtraction({
+                    model: 'sentence-transformers/all-MiniLM-L6-v2',
+                    inputs: batch,
 
-                provider: 'hf-inference',
-            });
-            //save new embeddings to cache
-            batch.forEach((question, indx) => {
-                const key = normalizeQuestions(question);
-                embeddingCache[key] = response[indx] as number[];
-            });
-            saveEmbeddingsCache();
+                    provider: 'hf-inference',
+                });
+                if (Array.isArray(response)) {
+                    //save new embeddings to cache
+                    batch.forEach((question, indx) => {
+                        const key = normalizeQuestions(question);
+                        const embedding = response[indx];
+                        if (
+                            Array.isArray(embedding) &&
+                            embedding.every((n) => typeof n === 'number')
+                        ) {
+                            embeddingCache[key] = embedding;
+                        } else {
+                            log.error(
+                                `Invalid embedding format recieved for question`,
+                                {
+                                    data: {
+                                        questionPreview: question.substring(
+                                            0,
+                                            50
+                                        ),
+                                    },
+                                }
+                            );
+                        }
+                    });
+                } else {
+                    log.error('Unexpected repsonse format from ugging face');
+                }
+                saveEmbeddingsCache();
+                //trim embeding after adding new entries
+                trimEmbeddingsCache();
+            } catch (error) {
+                log.error('Failed to generate embeddings batch', {
+                    data: {
+                        error:
+                            error instanceof Error
+                                ? error.message
+                                : String(error),
+                        batchSize: batch.length,
+                    },
+                });
+            }
         }
     }
-    log.highlight('Done with the mebedings ');
+    log.highlight('Done with the embedings ');
     return questions.map(
         (question) => embeddingCache[normalizeQuestions(question)]
     );
@@ -192,12 +374,37 @@ export function clusterQuestions(
         }
         if (!added) clusters[indx] = [indx];
     });
-    //consvert index clusters to actual questions
+    log.highlight(
+        `Clustering complete: ${Object.keys(clusters).length} clusters formed`
+    );
+    //convert index clusters to actual questions
     log.highlight('Ending clustering');
     return Object.values(clusters).map((indices) =>
         indices.map((ind) => questions[ind])
     );
 }
+/*retry Wrappr for gemini api clls
+async function mergeClusterWithRetry(questions: string[], retries = MAX_RETRIES): Promise<string> {
+    for (let attempt = 1; attempt <= retries; attempt++) {
+        try {
+            return await mergeCluster(questions);
+        } catch (error) {
+            if (attempt === retries) {
+                log.error(`All ${retries} retry attempts failed`, {
+                    data: { error: error instanceof Error ? error.message : String(error) }
+                });
+                return questions[0]; // Fallback to first question
+            }
+            
+            const waitTime = RETRY_DELAY_MS * Math.pow(2, attempt - 1); // Exponential backoff
+            log.warn(`Merge failed, retrying in ${waitTime}ms (attempt ${attempt}/${retries})`);
+            await sleep(waitTime);
+        }
+    }
+    return questions[0]; // TypeScript satisfaction
+}
+*/
+
 export async function mergeCluster(questions: string[]): Promise<string> {
     const prompt = `
 You are merging duplicate or highly similar exam questions.
@@ -213,9 +420,9 @@ ${questions.map((q) => `- ${q}`).join('\n')}
 
 Merged question:
 `;
+    log.highlight('Start merging clusters');
 
     try {
-        log.highlight('Start merging clusters');
         const response = await AI.models.generateContent({
             model: 'gemini-2.5-flash',
             config: {
@@ -231,27 +438,89 @@ Merged question:
             ],
         });
         const mergedQuestion = response.text?.trim();
-        log.highlight('FInalize merging clusters');
+        log.highlight('Finalize merging clusters');
 
         if (!mergedQuestion) throw new Error('No response from Gemini');
         return mergedQuestion;
     } catch (error) {
-        log.error('gemini merge fails:  ', { data: { error } });
+        const errorDetails: Record<string, unknown> = {
+            message: error instanceof Error ? error.message : String(error),
+        };
+
+        if (error instanceof Error) {
+            errorDetails.stack = error.stack;
+            errorDetails.name = error.name;
+
+            // Safe property access without type assertions
+            const possibleCode = (error as { code?: unknown }).code;
+            if (typeof possibleCode === 'string') {
+                errorDetails.systemCode = possibleCode;
+            }
+
+            const possibleCause = (error as { cause?: unknown }).cause;
+            if (possibleCause) {
+                errorDetails.cause = possibleCause;
+                if (possibleCause instanceof Error) {
+                    errorDetails.causeMessage = possibleCause.message;
+                    errorDetails.causeStack = possibleCause.stack;
+                }
+            }
+        }
+
+        log.error('Gemini merge failed', { data: { errorDetails } });
+
+        log.debug('Failed cluster questions', {
+            data: {
+                questionCount: questions.length,
+                preview: questions.slice(0, 2),
+            },
+        });
+
         return questions[0];
     }
 }
 export async function processUploadedFiles(folderPath: string) {
     try {
-        log.highlight('Statrting to process the files');
+        log.highlight('Starting to process the files');
+        const oldFiles = await fs.readdir(folderPath);
+        for (const file of oldFiles) {
+            const filePath = path.join(folderPath, file);
+            const stat = await fs.stat(filePath);
+            //deldte files older than 1 hour
+            if (Date.now() - stat.mtimeMs > 60 * 60 * 1000) {
+                await fs.remove(filePath);
+                log.debug(`Removed old file:${file}`);
+            }
+        }
+        //get current files
         let files = await fs.readdir(folderPath);
         files = files.filter((file) => !file.startsWith('~$'));
+        //check for duplicate name partens
+        const uniqueFiles: string[] = [];
+        const seen = new Set();
+        for (const file of files) {
+            //extract base name without timestamp
+            const basename = file
+                .replace(/^\d+-/, '')
+                .replace(/^\d{13,14}/, '');
+            if (!seen.has(basename)) {
+                seen.add(basename);
+                uniqueFiles.push(file);
+            } else {
+                log.debug(`🚮 Skipping duplicate: ${file}`);
+                //delete duplicate
+                await fs.remove(path.join(folderPath, file));
+            }
+        }
+        files = uniqueFiles;
+
         //extract all questions
         const allQuestions: string[] = [];
         for (const file of files) {
             const fullPath = path.join(folderPath, file);
             console.log(`[PROCESSING FILE] `, fullPath);
             const text = await extractTextFromFile(fullPath);
-            const questions = await extractQuestion(text);
+            const questions = extractQuestion(text);
             allQuestions.push(...questions);
         }
         if (allQuestions.length === 0) return [];
@@ -268,7 +537,7 @@ export async function processUploadedFiles(folderPath: string) {
                     //use cache key
                     const key = clusterKey(cluster.slice(0, 5));
                     if (mergeCache[key]) {
-                        console.log('Using chached merged questions');
+                        console.log('Using cached merged questions');
                         return mergeCache[key];
                     }
                     await sleep(800);

@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { FaArrowLeftLong } from 'react-icons/fa6';
+import { PiBroomBold } from 'react-icons/pi';
 const Header = () => {
     const navigate = useNavigate();
     return (
@@ -10,7 +11,7 @@ const Header = () => {
                     onClick={() => navigate('/welcome')}
                 >
                     <div className="bg-gradient-purple-blue flex h-8 w-8 items-center justify-center rounded-lg font-bold text-white">
-                        T
+                        <PiBroomBold className="text-2xl" />
                     </div>
                     <span className="text-xl font-bold text-slate-100">
                         Tidy up

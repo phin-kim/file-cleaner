@@ -7,7 +7,9 @@
         "dev": "vite",
         "build": "tsc -b && vite build",
         "lint": "eslint .",
-        "cleaner": "nodemon --exec tsx backend/src/App.ts",
+        "ignore": "temp/**/*|uploads/**/*|backend/temp/**/*|",
+        "clean": "tsx backend/src/App.ts",
+        "cleaner": "nodemon --ignore 'backend/temp/**' --ignore 'uploads/**' --ignore '**/temp/**' --watch 'src' --exec tsx backend/src/App.ts",
         "preview": "vite preview"
     },
     "dependencies": {
