@@ -56,7 +56,7 @@ mergerRoute.post(
             // Build absolute download URL so frontend (different origin) can access it
             const host = req.get('host') || 'localhost:5000';
             const protocol = req.protocol || 'http';
-            const downloadURL = `${protocol}://${host}/api/download/${path.basename(outputFile)}`;
+            const downloadURL = `${protocol}://${host}/api/download-merged/${path.basename(outputFile)}`;
             log.highlight(
                 `Done generating the pdf and sent ${downloadURL} to front end`
             );
@@ -74,8 +74,20 @@ mergerRoute.get('/download-merged/:filename', (req, res) => {
     try {
         const filename = req.params.filename;
         //adjust filename to where merged pdfs are stored
-        const filePath = path.join(process.cwd(), 'backend/temp', filename);
+        const filePath = path.join(
+            process.cwd(),
+            'backend/temp/outputs',
+            filename
+        );
+        log.debug(`[DOWNLOAD] looking for file at :${filePath} `);
+        log.debug(`[DOOWNLOAD] file exists? ${fs.exists(filePath)}`);
         if (!fs.existsSync(filePath)) {
+            //list out what exists in this folder
+            const outputsDir = path.join(process.cwd(), 'backend/temp/outputs');
+            if (fs.existsSync(outputsDir)) {
+                const files = fs.readdir(outputsDir);
+                log.debug('Files in the output folder', { data: { files } });
+            }
             return res.status(404).json({ error: 'File not found' });
         }
         //foce download

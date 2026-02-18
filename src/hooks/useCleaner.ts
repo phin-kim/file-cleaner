@@ -103,13 +103,19 @@ export default function useCleaner() {
             console.log(
                 `[FRONTEND] backend responded in ${Date.now() - start}ms`
             );
+            console.log(
+                `[LINK] download link from the backend ${response.data.downloadURL}`
+            );
             clearInterval(progressInterval);
             setProgress(100);
 
             setCleaningStats(response.data.stats);
             setDownloadURL(response.data.downloadURL);
+            console.log(`status is set to complete ${status}`);
             setStatus('complete');
-            setOpenPopUp(true);
+            if (path === 'processFolder') {
+                setOpenPopUp(true);
+            }
         } catch (error) {
             clearInterval(progressInterval);
             console.error(error);

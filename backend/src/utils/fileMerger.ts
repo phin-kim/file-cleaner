@@ -277,9 +277,12 @@ export function extractQuestion(text: string): string[] {
  */
 //sends in batches
 export async function getEmbeddings(questions: string[]): Promise<number[][]> {
-    //prepare cahcekeys
+    //prepare cache keys
     const keys = questions.map((question) => normalizeQuestions(question));
+    //intialize results arry with cached emebeddings where available
+
     //identify which questions arent cached
+
     const uncachedQuestions = questions.filter(
         (question, indx) => !embeddingCache[keys[indx]]
     );
@@ -338,6 +341,9 @@ export async function getEmbeddings(questions: string[]): Promise<number[][]> {
                         batchSize: batch.length,
                     },
                 });
+                throw new Error(
+                    'Embedding generations failed.Cannoe continue processing'
+                );
             }
         }
     }

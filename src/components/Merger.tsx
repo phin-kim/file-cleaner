@@ -14,13 +14,12 @@ const FolderQuestionAnalyzer = () => {
         handleDrop,
         isDragging,
         progress,
-        result,
         status,
+        downloadURL,
         handleDragEnter,
         handleDragLeave,
         handleDragOver,
         handleDownload,
-        resetMergerUpload,
     } = useCleaner();
 
     const path = 'merge-files';
@@ -152,7 +151,7 @@ const FolderQuestionAnalyzer = () => {
                             </motion.div>
                         )}
 
-                        {status === 'complete' && result && (
+                        {status === 'complete' && downloadURL && (
                             <motion.div
                                 key="results"
                                 initial={{ opacity: 0, scale: 0.9 }}
@@ -180,15 +179,6 @@ const FolderQuestionAnalyzer = () => {
                                     >
                                         Analysis Complete!
                                     </motion.h3>
-                                    <motion.p
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: 0.3 }}
-                                        className="text-lg text-purple-200"
-                                    >
-                                        Processed {result.filesProcessed} files
-                                        successfully
-                                    </motion.p>
                                 </div>
 
                                 <motion.div
@@ -222,18 +212,6 @@ const FolderQuestionAnalyzer = () => {
                                         Download PDF Report
                                     </motion.button>
                                 </motion.div>
-
-                                <motion.button
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    transition={{ delay: 0.5 }}
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    onClick={resetMergerUpload}
-                                    className="w-full rounded-xl bg-white/10 py-3 font-semibold text-white transition-all hover:bg-white/20"
-                                >
-                                    Analyze Another Folder
-                                </motion.button>
                             </motion.div>
                         )}
                     </AnimatePresence>
