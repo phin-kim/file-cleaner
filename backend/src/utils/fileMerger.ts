@@ -11,7 +11,15 @@ import pLimit from 'p-limit';
 import createLogger from './logger';
 import { cleanupByAge } from './cleanUp';
 import { fileURLToPath } from 'url';
-
+import cleanMergedQuestions from '../helpers/cleanMerged';
+import isValidQuestion from '../helpers/checkValidity';
+import cosineSimilarity from '../helpers/similarityCheck';
+import clusterKey from '../helpers/clusterKey';
+import {
+    sleep,
+    normalizeQuestions,
+    trimEmbeddingsCache,
+} from '../helpers/miniHelpers';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 //using absolute path instead of relive ones
@@ -24,16 +32,15 @@ let isSavingMerge = false;
 let isSavingEmbedding = false;
 
 //  Cache size limits to prevent memory leaks
-const MAX_CACHE_ENTRIES = 10000;
 
 //  Retry configuration for API calls
 //const MAX_RETRIES = 3;
 //const RETRY_DELAY_MS = 1000;
 
 let mergeCache: Record<string, string> = {};
-let embeddingCache: Record<string, number[]> = {};
+export let embeddingCache: Record<string, number[]> = {};
 
-//ensure cahe directories exist b4 any operations
+//ensure cache directories exist b4 any operations
 const cacheDir = path.dirname(mergeCachePath);
 if (!fs.existsSync(cacheDir)) {
     fs.mkdirSync(cacheDir, { recursive: true });
@@ -92,7 +99,7 @@ if (fs.existsSync(embeddingCachePath)) {
                 }
                 embeddingCache = parsed;
                 log.debug(
-                    `✅ Loaded ${Object.keys(embeddingCache).length} embeddings cahce from entries`
+                    `✅ Loaded ${Object.keys(embeddingCache).length} embeddings cache from entries`
                 );
             }
         } else {
@@ -111,7 +118,7 @@ if (fs.existsSync(embeddingCachePath)) {
     }
 }
 //save cache helper
-//Race conditon proof saves withtemp files and lks
+//Race condition proof saves with temp files and lks
 function saveMergeCache() {
     if (isSavingMerge) {
         log.debug(`⏳ merge cache save already in progress, skipping`);
@@ -138,10 +145,10 @@ function saveMergeCache() {
     }
 }
 
-function saveEmbeddingsCache() {
+export function saveEmbeddingsCache() {
     if (isSavingEmbedding) {
         log.debug(
-            `⏳ Embedding cache save already exists in progresss, skipping`
+            `⏳ Embedding cache save already exists in progress, skipping`
         );
         return;
     }
@@ -163,30 +170,8 @@ function saveEmbeddingsCache() {
         log.error('Failed to save embedding cache:', { data: { error } });
     }
 }
-//cache size manaegemnt to prevent leaks
-function trimEmbeddingsCache() {
-    if (Object.keys(embeddingCache).length > MAX_CACHE_ENTRIES) {
-        const entries = Object.entries(embeddingCache);
-        const toRemove = entries.slice(0, entries.length - MAX_CACHE_ENTRIES);
-        toRemove.forEach(([key]) => delete embeddingCache[key]);
-        log.debug(
-            `✂ Trimmed embeddings chase to a max of ${MAX_CACHE_ENTRIES} entries`
-        );
-        saveEmbeddingsCache();
-    }
-}
-function clusterKey(cluster: string[]) {
-    return cluster
-        .map((question) => question.toLowerCase().trim())
-        .sort()
-        .join('|');
-}
-function normalizeQuestions(question: string) {
-    return question.toLocaleLowerCase().replace(/\s+/g, ' ').trim();
-}
-function sleep(ms: number) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-}
+//cache size management to prevent leaks
+
 /**
 Upload folder -> temp storage
         
@@ -245,33 +230,56 @@ export function extractQuestion(text: string): string[] {
     const lines = text.split(/\r?\n/);
     const questions: string[] = [];
     let currentQuestion = '';
+    log.debug(`[DEBUG] Total lines to process: ${lines.length}`);
+    //patterns to skip (HEADER,INSTRUCTIONS,METADATA)
+    const skipPatterns = [
+        /^\s*BACHELOR OF/i,
+        /^\s*Instructions:/i,
+        /^\s*QUESTION\s*(ONE|TWO|THREE|FOUR|FIVE|SIX|SEVEN|EIGHT|NINE|TEN)\s*$/i, // Just the header, not the content
+        /^--\s*\d+\s*of\s*\d+\s*--/i, // Page markers
+        /Examination Irregularity/i,
+        /Page \d+ of \d+/i,
+        /^\s*\d+\s*$/, // Just numbers
+        /^\s*Merged question:/i,
+        /^\s*Here's\s*$/i,
+        /^\s*Please\s*$/i,
+        /^\s*These are not/i,
+        /^\s*The provided input/i,
+        /^\s*Models are/i,
+        /^\s*Analyze and discuss/i,
+    ];
     for (let line of lines) {
         line = line.trim();
         if (!line) continue;
-        //detect start of a new main question or subquestion
-        const isMainQuestion = /^QUESTION\s+\w+/i.test(line);
-        const isSubQuestion = /^[a-z]\)/i.test(line);
-        const hasMarksorKeywords =
-            /(marks|Write|Describe|Outline|Define|Differentiate|Compute|Calculate)/i.test(
-                line
-            );
-        if (isMainQuestion || isSubQuestion || hasMarksorKeywords) {
-            //save previous question if exists
-            if (currentQuestion) {
+        //skip meta data lines entirely
+        if (skipPatterns.some((pattern) => pattern.test(line))) continue;
+        //detect start of a new main question or sub-question
+        const isMainQuestion =
+            /^QUESTION\s+\w+/i.test(line) && line.length > 15;
+        const isSubQuestion = /^[a-z]\)\s+\w/.test(line); // Must have content after "a) "
+        // Must have marks indicator
+        const hasMarks = /\(\d+\s*marks?\)/i.test(line);
+        //more strict detection :must have marks or be a sub-question with substantive content
+        const isQuestionStart = isSubQuestion || (isMainQuestion && hasMarks);
+        if (isQuestionStart) {
+            if (currentQuestion && isValidQuestion(currentQuestion)) {
                 questions.push(currentQuestion.trim());
             }
             currentQuestion = line;
-        } else {
-            //consinuation of prevous question (multiline)
-            currentQuestion += ' ' + line;
+        } else if (currentQuestion) {
+            //continuation but only if it looks like a question content
+            if (!skipPatterns.some((patterns) => patterns.test(line))) {
+                currentQuestion += ' ' + line;
+            }
         }
     }
-    //push the last question
-    if (currentQuestion) {
+    if (currentQuestion && isValidQuestion(currentQuestion)) {
         questions.push(currentQuestion.trim());
     }
+    log.debug(`[DEBUG] Questions extracted: ${questions.length}`);
     return questions;
 }
+
 /**
  * Get embeddings for a list of questions
  */
@@ -279,16 +287,16 @@ export function extractQuestion(text: string): string[] {
 export async function getEmbeddings(questions: string[]): Promise<number[][]> {
     //prepare cache keys
     const keys = questions.map((question) => normalizeQuestions(question));
-    //intialize results arry with cached emebeddings where available
+    //initialize results array with cached embeddings where available
 
-    //identify which questions arent cached
+    //identify which questions aren't cached
 
     const uncachedQuestions = questions.filter(
         (question, indx) => !embeddingCache[keys[indx]]
     );
     if (uncachedQuestions.length > 0) {
         console.log(
-            `Generating embedings for ${uncachedQuestions.length} new questions ...`
+            `Generating embeddings for ${uncachedQuestions.length} new questions ...`
         );
         //batch requests to HF
         const batchSize = 50;
@@ -313,7 +321,7 @@ export async function getEmbeddings(questions: string[]): Promise<number[][]> {
                             embeddingCache[key] = embedding;
                         } else {
                             log.error(
-                                `Invalid embedding format recieved for question`,
+                                `Invalid embedding format received for question`,
                                 {
                                     data: {
                                         questionPreview: question.substring(
@@ -326,10 +334,10 @@ export async function getEmbeddings(questions: string[]): Promise<number[][]> {
                         }
                     });
                 } else {
-                    log.error('Unexpected repsonse format from ugging face');
+                    log.error('Unexpected response format from hugging face');
                 }
                 saveEmbeddingsCache();
-                //trim embeding after adding new entries
+                //trim embedding after adding new entries
                 trimEmbeddingsCache();
             } catch (error) {
                 log.error('Failed to generate embeddings batch', {
@@ -342,22 +350,17 @@ export async function getEmbeddings(questions: string[]): Promise<number[][]> {
                     },
                 });
                 throw new Error(
-                    'Embedding generations failed.Cannoe continue processing'
+                    'Embedding generations failed.Can not continue processing'
                 );
             }
         }
     }
-    log.highlight('Done with the embedings ');
+    log.highlight('Done with the embeddings ');
     return questions.map(
         (question) => embeddingCache[normalizeQuestions(question)]
     );
 }
-function cosineSimilarity(a: number[], b: number[]): number {
-    const dot = a.reduce((sum, val, i) => sum + val * b[i], 0);
-    const magA = Math.sqrt(a.reduce((sum, val) => sum + val * val, 0));
-    const magB = Math.sqrt(b.reduce((sum, val) => sum + val * val, 0));
-    return dot / (magA * magB);
-}
+
 export function clusterQuestions(
     questions: string[],
     embeddings: number[][],
@@ -389,7 +392,7 @@ export function clusterQuestions(
         indices.map((ind) => questions[ind])
     );
 }
-/*retry Wrappr for gemini api clls
+/*retry Wrapper for gemini api calls
 async function mergeClusterWithRetry(questions: string[], retries = MAX_RETRIES): Promise<string> {
     for (let attempt = 1; attempt <= retries; attempt++) {
         try {
@@ -412,19 +415,36 @@ async function mergeClusterWithRetry(questions: string[], retries = MAX_RETRIES)
 */
 
 export async function mergeCluster(questions: string[]): Promise<string> {
+    // Pre-check: if questions are nearly identical, just return the longest one
+    const normalized = questions.map((q) =>
+        q.toLowerCase().replace(/\s+/g, ' ').trim()
+    );
+    if (new Set(normalized).size === 1) {
+        return questions.reduce((a, b) => (a.length > b.length ? a : b)); // Return longest
+    }
     const prompt = `
-You are merging duplicate or highly similar exam questions.
+You are merging duplicate or highly similar exam questions into ONE well-formatted question.
 
-Rules:
-- Produce ONE clear exam question
-- Keep academic wording
-- Remove repetition
-- Preserve intent and difficulty
-- If they dont look like questions don't bother touching them
-Questions:
-${questions.map((q) => `- ${q}`).join('\n')}
+STRICT RULES:
+1. Output ONLY the merged question text - NO labels like "Merged question:", NO explanations, NO markdown
+2. MUST preserve: question letter/number (e.g., "a)", "b)", "1."), mark values (e.g., "(4 marks)"), and the complete question text
+3. If questions are fragments that form one complete question, combine them into a single coherent question
+4. If questions are different, pick the most complete and well-formed one
+5. NEVER output multiple choice options unless they exist in all inputs
+6. NEVER truncate or cut off the question mid-sentence
+7. Maximum length: 300 characters
+8. If input is garbage (just "Here's", "Please", etc.), output "INVALID"
 
-Merged question:
+Examples of GOOD output:
+"a) Explain the concept of database normalization and its importance. (4 marks)"
+"b) Distinguish between primary key and foreign key with examples. (6 marks)"
+"c) Write SQL commands to create a table and insert records. (8 marks)"
+
+Input questions to merge:
+${questions.map((q, i) => `${i + 1}. ${q}`).join('\n')}
+
+Output only the single best merged question:
+
 `;
     log.highlight('Start merging clusters');
 
@@ -433,9 +453,9 @@ Merged question:
             model: 'gemini-2.5-flash',
             config: {
                 systemInstruction:
-                    'You merge duplicate or highly similar exam questions into pne academic question',
-                maxOutputTokens: 80,
-                temperature: 0.2,
+                    'You merge duplicate exam questions into ONE well-formatted academic question. Return ONLY the merged question, no explanations, no metadata, no multiple questions.',
+                maxOutputTokens: 150,
+                temperature: 0.1,
             },
             contents: [
                 {
@@ -443,11 +463,28 @@ Merged question:
                 },
             ],
         });
-        const mergedQuestion = response.text?.trim();
-        log.highlight('Finalize merging clusters');
+        let merged = response.text?.trim() ?? '';
+        // Post-process cleanup
+        merged = merged
+            .replace(/^Merged question:\s*/i, '')
+            .replace(/^["']|["']$/g, '') // Remove surrounding quotes
+            .replace(/\n+/g, ' ')
+            .trim();
 
-        if (!mergedQuestion) throw new Error('No response from Gemini');
-        return mergedQuestion;
+        // Validate output
+        if (
+            merged.length < 10 ||
+            /^(Here's|Please|These are|Models are|Analyze|Explain|INVALID)$/i.test(
+                merged
+            )
+        ) {
+            // Fallback to best original question
+            return questions.reduce((a, b) => (a.length > b.length ? a : b));
+        }
+        log.highlight('Finalize merging clusters');
+        if (!merged) throw new Error('No response from Gemini');
+        //cleanup any remaining formatting issues
+        return cleanMergedQuestions(merged, questions);
     } catch (error) {
         const errorDetails: Record<string, unknown> = {
             message: error instanceof Error ? error.message : String(error),
@@ -492,7 +529,7 @@ export async function processUploadedFiles(folderPath: string) {
         for (const file of oldFiles) {
             const filePath = path.join(folderPath, file);
             const stat = await fs.stat(filePath);
-            //deldte files older than 1 hour
+            //delete files older than 1 hour
             if (Date.now() - stat.mtimeMs > 60 * 60 * 1000) {
                 await fs.remove(filePath);
                 log.debug(`Removed old file:${file}`);
@@ -501,7 +538,7 @@ export async function processUploadedFiles(folderPath: string) {
         //get current files
         let files = await fs.readdir(folderPath);
         files = files.filter((file) => !file.startsWith('~$'));
-        //check for duplicate name partens
+        //check for duplicate name pa
         const uniqueFiles: string[] = [];
         const seen = new Set();
         for (const file of files) {
@@ -524,14 +561,18 @@ export async function processUploadedFiles(folderPath: string) {
         const allQuestions: string[] = [];
         for (const file of files) {
             const fullPath = path.join(folderPath, file);
-            console.log(`[PROCESSING FILE] `, fullPath);
+            log.debug(`[PROCESSING FILE] `, { data: { fullPath } });
             const text = await extractTextFromFile(fullPath);
+            log.info('Extracting texts from files ');
             const questions = extractQuestion(text);
+            log.debug('Extracting questions');
             allQuestions.push(...questions);
         }
+        log.debug(`All questions are ${allQuestions.length}`);
         if (allQuestions.length === 0) return [];
         //create embeddings
         const embeddings = await getEmbeddings(allQuestions);
+        log.debug('Getting embeddings');
         // cluster similar questions
         const clusters = clusterQuestions(allQuestions, embeddings, 0.8);
         const limit = pLimit(2);
@@ -543,13 +584,28 @@ export async function processUploadedFiles(folderPath: string) {
                     //use cache key
                     const key = clusterKey(cluster.slice(0, 5));
                     if (mergeCache[key]) {
-                        console.log('Using cached merged questions');
+                        log.debug('Using cached merged questions');
                         return mergeCache[key];
                     }
                     await sleep(800);
+                    // Skip merging if cluster contains garbage
+                    const hasGarbage = cluster.some((q) =>
+                        /^(Here's|Please|These are|Instructions|BACHELOR)/i.test(
+                            q.trim()
+                        )
+                    );
+                    if (hasGarbage) {
+                        // Return the longest valid question from cluster
+                        const valid = cluster.filter((q) => isValidQuestion(q));
+                        return valid.length > 0
+                            ? valid.reduce((a, b) =>
+                                  a.length > b.length ? a : b
+                              )
+                            : '';
+                    }
                     //limit prompt size
                     const trimmedCluster = cluster.slice(0, 5);
-                    //if questioins are identical pick the first one
+                    //if questions are identical pick the first one
                     const first = normalizeQuestions(cluster[0]);
                     const allSame = cluster.every(
                         (quest) => normalizeQuestions(quest) === first
@@ -569,7 +625,9 @@ export async function processUploadedFiles(folderPath: string) {
         // after processing ,cleanup temp folder
         log.highlight('finalize the processing of files');
         await cleanupByAge(folderPath, 'TEMP-CLEANUP');
-        return mergedQuestions;
+        return mergedQuestions.filter(
+            (question) => question && isValidQuestion(question)
+        );
     } catch (error) {
         log.error(`Processing failed`, {
             context: 'failed cleaning',
