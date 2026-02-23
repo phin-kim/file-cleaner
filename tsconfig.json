@@ -4,17 +4,8 @@
         { "path": "./tsconfig.app.json" },
         { "path": "./tsconfig.node.json" }
     ],
-    "compilerOptions": {
-        //"typeRoots": ["./src/types", "./node_modules/@types"],
+    /*"compilerOptions": {
         "noEmit": true,
-        "types": ["node", "express", "react", "react-dom"],
-        "typeRoots": [
-            "./types",
-            "./node_modules/@types",
-            "@types/react",
-            "@types/react-dom"
-        ]
-    },
-    "include": ["frontend/src/**/*", "frontend/src/types/**/*"],
-    "exclude": ["node_modules", "dist", "vite.config.ts"]
+        
+    },*/
 }

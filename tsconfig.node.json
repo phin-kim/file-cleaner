@@ -26,8 +26,8 @@
         "outDir": "dist",
         "rootDir": "./",
         "types": ["node"],
-        "typeRoots": ["frontend/src/types", "./node_modules/@types"]
+        "typeRoots": ["backend/src/types", "./node_modules/@types"]
     },
-    "include": ["backend/**/*", "frontend/src/types/**/*"],
+    "include": ["backend/**/*", "backend/src/types/**/*"],
     "exclude": ["node_modules", "dist"]
 }

@@ -2,8 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import 'dotenv/config';
-
+import "../src/config/envLoader.js"
 import { cleanerRoute } from './routes/fileCleaner.js';
 import { subRouter } from './routes/subscription.js';
 import { startPeriodicCleanup, cleanupOrphanedFiles } from './utils/cleanUp.js';
@@ -14,6 +13,7 @@ const log = createLogger('APP.TS');
 const PORT = process.env.PORT;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
 const app = express();
 app.use(
     cors({ origin: true, methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'] })

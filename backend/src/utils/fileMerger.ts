@@ -1,6 +1,5 @@
 import fs from 'fs-extra';
 import { PDFParse } from 'pdf-parse';
-import 'dotenv/config';
 import { GoogleGenAI } from '@google/genai';
 import mammoth from 'mammoth';
 import { InferenceClient } from '@huggingface/inference';
@@ -19,11 +18,16 @@ import {
     normalizeQuestions,
     trimEmbeddingsCache,
 } from '../helpers/miniHelpers.js';
-const huggingFace = new InferenceClient(process.env.HF_API_KEY);
-const AI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Check if .env file exists
+
+
+const huggingFace = new InferenceClient(process.env.HF_API_KEY);
+const AI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 //using absolute path instead of relive ones
 const mergeCachePath = path.join(__dirname, '../../merged-cache.json');
 const embeddingCachePath = path.join(__dirname, '../../embeddings-cache.json');

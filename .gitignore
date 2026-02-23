@@ -7,25 +7,38 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# Dependencies - This will ignore ALL node_modules folders in any subdirectory
+node_modules/
+
+# Build outputs
+dist/
+dist-ssr/
 *.local
 
 # Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
+.vscode/
+.idea/
 .DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# Environment and secrets
 .env
 serviceAccountKey.json
+
+# Cache files - using relative paths from root
 embeddings-cache.json
 merged-cache.json
-backend/routes/temp
-backend/temp
-upload
+
+# Temp directories - using relative paths from root
+backend/temp/
+backend/uploads/
+backend/src/routes/temp/
+uploads/
+upload/
+
+# Specific files you mentioned
+backend/routes/temp/  # This will be ignored if it exists

@@ -1,0 +1,44 @@
+{
+    "name": "tidy-up-backend",
+    "private": true,
+    "version": "0.0.0",
+    "type": "module",
+    "scripts": {
+        "dev": "nodemon --ignore 'backend/temp/**' --ignore 'uploads/**' --ignore '**/temp/**' --watch 'backend/src' --exec tsx backend/src/App.ts",
+        "build": "tsc ",
+        "lint": "eslint .",
+        "ignore": "temp/**/*|uploads/**/*|backend/temp/**/*|",
+        "clean": "tsx src/App.ts",
+        "build:backend": "tsc -b tsconfig.node.json --force",
+        "start": "cross-env NODE_ENV=production node  dist/backend/src/App.js"
+    },
+    "dependencies": {
+        "@google/genai": "^1.38.0",
+        "@huggingface/inference": "^4.13.10",
+        "archiver": "^7.0.1",
+        "axios": "^1.13.2",
+        "cors": "^2.8.5",
+        "dotenv": "^17.2.3",
+        "express": "^5.2.1",
+        "express-rate-limit": "^8.2.1",
+        "fs-extra": "^11.3.3",
+        "mammoth": "^1.11.0",
+        "multer": "^2.0.2",
+        "nodemon": "^3.1.11",
+        "p-limit": "^7.3.0",
+        "pdf-parse": "^2.4.5",
+        "pdfkit": "^0.17.2"
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.39.1",
+        "@types/archiver": "^7.0.0",
+        "@types/cors": "^2.8.19",
+        "@types/express": "^5.0.6",
+        "@types/fs-extra": "^11.0.4",
+        "@types/multer": "^2.0.0",
+        "@types/node": "^24.10.13",
+        "@types/pdfkit": "^0.17.4",
+        "eslint": "^9.39.1",
+        "typescript": "~5.9.3"
+    }
+}
