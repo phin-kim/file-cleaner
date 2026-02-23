@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import { fileCleanerApi } from '../library/client';
 import type { CleaningStats, UploadedFolder, Status } from '../types/types';
 import traverseDirectory from '../utils/traverser';
 import type { AnalysisResult } from '../types/types';
@@ -93,13 +93,9 @@ export default function useCleaner() {
             setStatus('processing');
             const start = Date.now();
             console.log(`[FRONTEND] sending files to backend`);
-            const response = await axios.post(
-                `http://localhost:5000/api/${path}`,
-                formData,
-                {
-                    headers: { 'Content-Type': 'multipart/form-data' },
-                }
-            );
+            const response = await fileCleanerApi.post(`/${path}`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
             console.log(
                 `[FRONTEND] backend responded in ${Date.now() - start}ms`
             );
