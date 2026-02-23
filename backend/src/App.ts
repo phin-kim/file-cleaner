@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import "../src/config/envLoader.js"
+import '../src/config/envLoader.js';
 import { cleanerRoute } from './routes/fileCleaner.js';
 import { subRouter } from './routes/subscription.js';
 import { startPeriodicCleanup, cleanupOrphanedFiles } from './utils/cleanUp.js';
@@ -16,21 +16,29 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(
-    cors({ origin: true, methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'] })
+    cors({
+        origin: ['http://localhost:5173'],
+
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    })
 );
 app.use(express.json());
 
 app.use('/api', cleanerRoute);
 app.use('/api', subRouter);
 app.use('/api', mergerRoute);
-
+//change this later on
 app.use('/downloads', express.static(path.join(process.cwd(), 'backend/temp')));
-
+app.get('/', () => {
+    console.log('Health checker');
+});
+const PROJECT_ROOT = path.resolve(__dirname, '../../');
+const BASE_DIR = path.join(PROJECT_ROOT, 'output/file-merger-temps');
+const MERGER_UPLOADS = path.join(BASE_DIR, 'uploads');
+const MERGER_OUTPUTS = path.join(BASE_DIR, 'outputs');
 const ROUTES_TEMP = path.join(__dirname, 'routes', 'temp');
 const BACKEND_TEMP = path.join(__dirname, 'temp');
 const UPLOADS = path.join(process.cwd(), 'upload');
-const MERGER_UPLOADS = path.join(process.cwd(), 'backend/temp/merger/uploads');
-const MERGER_OUTPUTS = path.join(process.cwd(), 'backend/temp/outputs');
 const TEMP_DIRS = [
     ROUTES_TEMP,
     UPLOADS,

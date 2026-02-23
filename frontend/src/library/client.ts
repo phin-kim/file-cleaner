@@ -1,6 +1,6 @@
 import axios from 'axios';
 const baseURL =
-    import.meta.url === 'development'
+    import.meta.env.MODE === 'development'
         ? 'http://localhost:5000/api'
         : 'https://tidy-up.onrender.com';
 export const fileCleanerApi = axios.create({ baseURL });

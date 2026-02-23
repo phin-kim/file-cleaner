@@ -6,11 +6,17 @@ import { processUploadedFiles } from '../utils/fileMerger.js';
 import generatePDF from '../utils/generatePDF.js';
 import uploadLimiter from '../utils/rateLimiter.js';
 import createLogger from '../utils/logger.js';
-
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const log = createLogger('Merge route');
 export const mergerRoute = Router();
-const uploadDir = path.join(process.cwd(), 'backend/temp/merger/uploads');
+const projectRoot = path.resolve(__dirname, '../../');
+const mergerBaseDir = path.join(projectRoot, 'output/file-merger-temps');
+const uploadDir = path.join(mergerBaseDir, 'uploads');
+const outputDir = path.join(mergerBaseDir, 'outputs');
 fs.mkdirSync(uploadDir, { recursive: true });
+fs.mkdirSync(outputDir, { recursive: true });
 const storage = multer.diskStorage({
     destination: async (_req, _file, cb) => {
         cb(null, uploadDir);
@@ -31,10 +37,7 @@ mergerRoute.post(
             if (!folderName) {
                 return res.status(400).json({ error: 'Folder is required' });
             }
-            const uploadDir = path.join(
-                process.cwd(),
-                'backend/temp/merger/uploads'
-            );
+
             console.log('[DEBUG] folder exists?', fs.existsSync(uploadDir));
             const mergedQuestions = await processUploadedFiles(uploadDir);
             if (!mergedQuestions || mergedQuestions.length === 0) {
@@ -48,8 +51,7 @@ mergerRoute.post(
                     downloadURL: null,
                 });
             }
-            const outputDir = path.join(process.cwd(), 'backend/temp/outputs');
-            await fs.ensureDir(outputDir); //creates the folder if missing
+            //creates the folder if missing
             const outputFile = path.join(outputDir, `merged-${Date.now()}.pdf`);
 
             await generatePDF(mergedQuestions, outputFile);
@@ -74,24 +76,14 @@ mergerRoute.post(
 mergerRoute.get('/download-merged/:filename', (req, res) => {
     try {
         const filename = req.params.filename;
-        //adjust filename to where merged pdfs are stored
-        const filePath = path.join(
-            process.cwd(),
-            'backend/temp/outputs',
-            filename
-        );
+        //adjust filename to where merged pdf's are stored
+        const filePath = path.join(outputDir, filename);
         log.debug(`[DOWNLOAD] looking for file at :${filePath} `);
-        log.debug(`[DOOWNLOAD] file exists? ${fs.exists(filePath)}`);
-        if (!fs.existsSync(filePath)) {
-            //list out what exists in this folder
-            const outputsDir = path.join(process.cwd(), 'backend/temp/outputs');
-            if (fs.existsSync(outputsDir)) {
-                const files = fs.readdir(outputsDir);
-                log.debug('Files in the output folder', { data: { files } });
-            }
-            return res.status(404).json({ error: 'File not found' });
-        }
-        //foce download
+        log.debug(`[DOWNLOAD] file exists? ${fs.exists(filePath)}`);
+        const files = fs.readdir(outputDir);
+        log.debug('Files in the output folder', { data: { files } });
+
+        //force download
         res.download(filePath, filename, (err) => {
             if (err) {
                 console.error('Error sending merged pdf', err);

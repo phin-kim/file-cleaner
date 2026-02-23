@@ -8,25 +8,33 @@ import { tidyFolder } from '../utils/tidy.js';
 
 export const cleanerRoute = Router();
 
-const upload = multer({ dest: 'upload/' }); //temporary storage
+const upload = multer({ dest: 'output/upload/' }); //temporary storage
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 cleanerRoute.post('/processFolder', upload.array('files'), async (req, res) => {
     const startTime = Date.now();
-    console.log('🟢 [BACKEND] request recieved at', new Date().toISOString());
+    console.log('🟢 [BACKEND] request received at', new Date().toISOString());
     try {
         const uploadedFiles = req.files as Express.Multer.File[];
         const uploadedFolderName = req.body.folderName; //fallback
         const safeFolderName = uploadedFolderName.replace(/[^a-z0-9_-]/gi, '_');
         console.log(`[BACKEND] ${uploadedFiles.length} files received`);
         if (!uploadedFiles || uploadedFiles.length === 0) {
-            console.warn('⚠ [BACKEND] no files recieved ');
+            console.warn('⚠ [BACKEND] no files received ');
             return res.status(400).json({ error: 'No files uploaded' });
         }
+        const backendDir = path.join(__dirname, '..', '..');
+        const temporaryBaseDir = path.join(
+            backendDir,
+            'output',
+            'folder-cleaner-temps'
+        );
+        const tempDir = path.join(temporaryBaseDir, Date.now().toString());
 
-        const tempDir = path.join(__dirname, 'temp', Date.now().toString());
         await fs.ensureDir(tempDir);
         console.log('[BACKEND] temp folder created at ', tempDir);
+        // Is equivalent to this native fs code:
+        //await fs.mkdir('output/temp/1234567890', { recursive: true });
         // move uploaded files to temp dir and in case of failure they are deleted
         try {
             for (const file of uploadedFiles) {

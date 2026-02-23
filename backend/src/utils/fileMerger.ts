@@ -19,12 +19,10 @@ import {
     trimEmbeddingsCache,
 } from '../helpers/miniHelpers.js';
 
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Check if .env file exists
-
 
 const huggingFace = new InferenceClient(process.env.HF_API_KEY);
 const AI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
@@ -214,7 +212,7 @@ export const extractTextFromFile = async (
             const result = await mammoth.extractRawText({ path: filePath });
             return result.value;
         }
-        console.warn(`[SKIP] Unsupported file type${filePath}`);
+        log.warn(`[SKIP] Unsupported file type${filePath}`);
         return '';
     } catch (error) {
         console.log(`[PARSE ERROR],${filePath}`, error);
@@ -531,7 +529,15 @@ Output only the single best merged question:
 export async function processUploadedFiles(folderPath: string) {
     try {
         log.highlight('Starting to process the files');
+        log.debug(`🔍 Processing files in: ${folderPath}`);
+        log.debug(`🔍 Directory exists? ${fs.existsSync(folderPath)}`);
+
+        if (!fs.existsSync(folderPath)) {
+            log.error(`Folder does not exist: ${folderPath}`);
+            return [];
+        }
         const oldFiles = await fs.readdir(folderPath);
+        log.debug(`Old files found:`, { data: { oldFiles } });
         for (const file of oldFiles) {
             const filePath = path.join(folderPath, file);
             const stat = await fs.stat(filePath);

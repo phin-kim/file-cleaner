@@ -97,6 +97,9 @@ export default function useCleaner() {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             console.log(
+                `[FRONTEND] this si the path being used${fileCleanerApi}/${path}`
+            );
+            console.log(
                 `[FRONTEND] backend responded in ${Date.now() - start}ms`
             );
             console.log(
@@ -107,6 +110,7 @@ export default function useCleaner() {
 
             setCleaningStats(response.data.stats);
             setDownloadURL(response.data.downloadURL);
+            console.log(`[FRONTEND] download url ${downloadURL}`);
             console.log(`status is set to complete ${status}`);
             setStatus('complete');
             if (path === 'processFolder') {
@@ -118,8 +122,6 @@ export default function useCleaner() {
             setStatus('error');
         }
     };
-
-    console.log(`[FRONTEND] download url ${downloadURL}`);
 
     const handleDownload = () => {
         if (!downloadURL) return;

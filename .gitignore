@@ -39,6 +39,6 @@ backend/uploads/
 backend/src/routes/temp/
 uploads/
 upload/
-
+backend/output/
 # Specific files you mentioned
 backend/routes/temp/  # This will be ignored if it exists
