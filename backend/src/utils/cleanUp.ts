@@ -1,7 +1,7 @@
 import fs from 'fs-extra';
 import path from 'path';
 const TWO_HOURS = 2 * 60 * 60 * 1000;
-import createLogger from './logger.ts';
+import createLogger from './logger.js';
 const log = createLogger('CLEANUP');
 export async function cleanupByAge(dir: string, label = 'CLEANUP') {
     const filePath = await fs.pathExists(dir);

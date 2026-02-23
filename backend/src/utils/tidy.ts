@@ -1,6 +1,6 @@
 import fs from 'fs-extra';
 import path from 'path';
-import { hashFile } from './hash';
+import { hashFile } from './hash.js';
 export interface TidyStats {
     finalFiles: string[];
     duplicatesRemoved: number;
@@ -39,7 +39,9 @@ export async function tidyFolder(folderPath: string): Promise<TidyStats> {
                 await fs.remove(filePath);
                 duplicatesRemoved++;
                 spaceSaved += stats.size;
-                console.log(`Removed name-duplicate: ${fileName} (normalized: ${normalized})`);
+                console.log(
+                    `Removed name-duplicate: ${fileName} (normalized: ${normalized})`
+                );
                 continue;
             }
             const hash = await hashFile(filePath);

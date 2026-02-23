@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { users } from '../../Users';
+import { users } from '../helpers/Users.js';
 export const subRouter = Router();
 subRouter.get('/subscription-status', (req, res) => {
     const userId = req.headers['x-user-id'] as string;

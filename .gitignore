@@ -24,5 +24,8 @@ dist-ssr
 *.sw?
 .env
 serviceAccountKey.json
-embeddings-cahce.json
-merged-chache.json
+embeddings-cache.json
+merged-cache.json
+backend/routes/temp
+backend/temp
+upload

@@ -1,8 +1,9 @@
 const MAX_CACHE_ENTRIES = 10000;
-import { embeddingCache } from '../utils/fileMerger';
-import createLogger from '../utils/logger';
+import { embeddingCache } from '../utils/fileMerger.js';
+import createLogger from '../utils/logger.js';
+import { saveEmbeddingsCache } from '../utils/fileMerger.js';
+
 const log = createLogger('Mini Helpers');
-import { saveEmbeddingsCache } from '../utils/fileMerger';
 export function normalizeQuestions(question: string) {
     return question.toLocaleLowerCase().replace(/\s+/g, ' ').trim();
 }

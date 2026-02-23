@@ -3,11 +3,13 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import 'dotenv/config';
-import { cleanerRoute } from './routes/fileCleaner';
-import { subRouter } from './routes/subscription';
-import { startPeriodicCleanup, cleanupOrphanedFiles } from './utils/cleanUp';
-import { mergerRoute } from './routes/mergerRoute';
-import createLogger from './utils/logger';
+
+import { cleanerRoute } from './routes/fileCleaner.js';
+import { subRouter } from './routes/subscription.js';
+import { startPeriodicCleanup, cleanupOrphanedFiles } from './utils/cleanUp.js';
+import { mergerRoute } from './routes/mergerRoute.js';
+import createLogger from './utils/logger.js';
+
 const log = createLogger('APP.TS');
 const PORT = process.env.PORT;
 const __filename = fileURLToPath(import.meta.url);

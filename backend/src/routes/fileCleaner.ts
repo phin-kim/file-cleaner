@@ -4,7 +4,7 @@ import path from 'path';
 import fs from 'fs-extra';
 import { fileURLToPath } from 'url';
 import archiver from 'archiver';
-import { tidyFolder } from '../utils/tidy';
+import { tidyFolder } from '../utils/tidy.js';
 
 export const cleanerRoute = Router();
 

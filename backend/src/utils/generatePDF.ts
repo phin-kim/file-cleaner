@@ -1,6 +1,7 @@
 import PDFDocument from 'pdfkit';
 import fs from 'fs-extra';
-import createLogger from './logger';
+import createLogger from './logger.js';
+
 const log = createLogger('Pdf generator');
 export default async function generatePDF(
     questions: string[],

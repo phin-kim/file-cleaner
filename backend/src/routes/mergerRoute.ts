@@ -2,10 +2,11 @@ import { Router } from 'express';
 import path from 'path';
 import fs from 'fs-extra';
 import multer from 'multer';
-import { processUploadedFiles } from '../utils/fileMerger';
-import generatePDF from '../utils/generatePDF';
-import uploadLimiter from '../utils/rateLimiter';
-import createLogger from '../utils/logger';
+import { processUploadedFiles } from '../utils/fileMerger.js';
+import generatePDF from '../utils/generatePDF.js';
+import uploadLimiter from '../utils/rateLimiter.js';
+import createLogger from '../utils/logger.js';
+
 const log = createLogger('Merge route');
 export const mergerRoute = Router();
 const uploadDir = path.join(process.cwd(), 'backend/temp/merger/uploads');

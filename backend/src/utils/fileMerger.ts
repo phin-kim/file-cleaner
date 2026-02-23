@@ -5,21 +5,23 @@ import { GoogleGenAI } from '@google/genai';
 import mammoth from 'mammoth';
 import { InferenceClient } from '@huggingface/inference';
 import path from 'path';
-const huggingFace = new InferenceClient(process.env.HF_API_KEY);
-const AI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 import pLimit from 'p-limit';
-import createLogger from './logger';
-import { cleanupByAge } from './cleanUp';
 import { fileURLToPath } from 'url';
-import cleanMergedQuestions from '../helpers/cleanMerged';
-import isValidQuestion from '../helpers/checkValidity';
-import cosineSimilarity from '../helpers/similarityCheck';
-import clusterKey from '../helpers/clusterKey';
+
+import createLogger from './logger.js';
+import { cleanupByAge } from './cleanUp.js';
+import cleanMergedQuestions from '../helpers/cleanMerged.js';
+import isValidQuestion from '../helpers/checkValidity.js';
+import cosineSimilarity from '../helpers/similarityCheck.js';
+import clusterKey from '../helpers/clusterKey.js';
 import {
     sleep,
     normalizeQuestions,
     trimEmbeddingsCache,
-} from '../helpers/miniHelpers';
+} from '../helpers/miniHelpers.js';
+const huggingFace = new InferenceClient(process.env.HF_API_KEY);
+const AI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 //using absolute path instead of relive ones
@@ -292,7 +294,7 @@ export async function getEmbeddings(questions: string[]): Promise<number[][]> {
     //identify which questions aren't cached
 
     const uncachedQuestions = questions.filter(
-        (question, indx) => !embeddingCache[keys[indx]]
+        (_, indx) => !embeddingCache[keys[indx]]
     );
     if (uncachedQuestions.length > 0) {
         console.log(
@@ -368,7 +370,7 @@ export function clusterQuestions(
 ): string[][] {
     log.highlight('Starting cluster');
     const clusters: { [key: string]: number[] } = {};
-    questions.forEach((quest, indx) => {
+    questions.forEach((_, indx) => {
         let added = false;
         for (const clusterID in clusters) {
             const sim = cosineSimilarity(
