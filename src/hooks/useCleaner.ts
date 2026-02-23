@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import type { CleaningStats, UploadedFolder, Status } from '../library/types';
+import type { CleaningStats, UploadedFolder, Status } from '../types/types';
 import traverseDirectory from '../utils/traverser';
-import type { AnalysisResult } from '../library/types';
+import type { AnalysisResult } from '../types/types';
 export default function useCleaner() {
     /* ---------- State ---------- */
     const [isDragging, setIsDragging] = useState<boolean>(false);

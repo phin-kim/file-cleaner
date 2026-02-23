@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { FaPaypal, FaCreditCard } from 'react-icons/fa6';
 import { MdPhoneAndroid } from 'react-icons/md';
-import type { PaymentMethod } from '../library/types';
+import type { PaymentMethod } from '../types/types';
 export default function BillingPage() {
     const [selectedPayment, setSelectedPayment] = useState<string>('mpesa');
     const [phoneNumber, setPhoneNumber] = useState<string>('');
