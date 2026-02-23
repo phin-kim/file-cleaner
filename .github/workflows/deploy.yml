@@ -1,0 +1,54 @@
+name: Test and Deploy to Render
+
+# Trigger the workflow on pushes to the main branch
+on:
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
+
+jobs:
+    # First job: TESTING
+    test:
+        name: Run Tests
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '24.11.0' # Use your Node version
+                  cache: 'npm'
+                  cache-dependency-path: backend/package-lock.json
+
+            - name: Install dependencies
+              working-directory: ./backend
+              run: npm ci
+
+            - name: Run linter
+              working-directory: ./backend
+              run: npm run lint # If you have linting
+              continue-on-error: true # Don't fail the build if linting fails
+
+            - name: Run TypeScript type check
+              working-directory: ./backend
+              run: npx tsc --noEmit
+
+            - name: Run tests
+              working-directory: ./backend
+              run: npm test # Make sure you have tests!
+
+    # Second job: DEPLOYMENT (only runs if test job succeeds AND it's on main branch)
+    deploy:
+        name: Deploy to Render
+        needs: test # This creates the dependency - deploy only runs if test passes
+        runs-on: ubuntu-latest
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+        steps:
+            - name: Trigger Render Deploy
+              run: |
+                  curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
