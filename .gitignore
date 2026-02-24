@@ -30,9 +30,9 @@ dist-ssr/
 serviceAccountKey.json
 
 # Cache files - using relative paths from root
-embeddings-cache.json
-merged-cache.json
-
+backend/embeddings-cache.json
+backend/merged-cache.json
+*.cache.json
 # Temp directories - using relative paths from root
 backend/temp/
 backend/uploads/
