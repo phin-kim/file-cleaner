@@ -69,9 +69,11 @@ cleanerRoute.post('/processFolder', upload.array('files'), async (req, res) => {
         log.info(
             `[BACKEND] duplicate removal done in ${Date.now() - tidyStart} ms`
         );
+        const zippedDir = path.join(outputDir, 'zipped');
+        await fs.ensureDir(zippedDir);
+        log.info(`Ensured zipped directory at :${zippedDir}`);
         const zipPath = path.join(
-            outputDir,
-            'zipped',
+            zippedDir,
             `${safeFolderName}_cleaned-${Date.now()}.zip`
         );
         log.highlight(`[BACKEND] Zipping folder`);
