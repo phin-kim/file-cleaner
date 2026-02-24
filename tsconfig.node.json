@@ -26,8 +26,15 @@
         "outDir": "./backend/dist", //output to backend/dist
         "rootDir": "./backend/src", //only compile files in backend/src
         "types": ["node"],
-        "typeRoots": ["backend/src/types", "./node_modules/@types"]
+        "typeRoots": ["./backend/src/Types", "./node_modules/@types"]
     },
-    "include": ["backend/**/*", "backend/src/types/**/*"],
-    "exclude": ["node_modules", "dist"]
+    "include": ["backend/src/**/*"],
+    "exclude": [
+        "node_modules",
+        "dist",
+        "backend/dist", // ✅ Explicitly exclude dist
+        "backend/temp",
+        "backend/uploads",
+        "backend/output"
+    ]
 }

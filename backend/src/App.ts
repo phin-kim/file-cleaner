@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import '../src/config/envLoader.js';
+import './config/envLoader.js';
 import { cleanerRoute } from './routes/folderCleanerRoute.js';
 import { subRouter } from './routes/subscription.js';
 import { startPeriodicCleanup, cleanupOrphanedFiles } from './utils/cleanUp.js';
