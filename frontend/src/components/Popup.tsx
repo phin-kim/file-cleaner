@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Crown, X } from 'lucide-react';
 import { CheckCircle, Sparkles, Download, ArrowRight } from 'lucide-react';
