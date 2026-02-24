@@ -23,8 +23,8 @@
         "allowSyntheticDefaultImports": true,
         "allowImportingTsExtensions": false,
         "emitDeclarationOnly": false,
-        "outDir": "dist",
-        "rootDir": "./",
+        "outDir": "./dist", //output to backend/dist
+        "rootDir": "./backend/src", //only compile files in backend/src
         "types": ["node"],
         "typeRoots": ["backend/src/types", "./node_modules/@types"]
     },

@@ -10,7 +10,7 @@
         "ignore": "temp/**/*|uploads/**/*|backend/temp/**/*|",
         "clean": "cross-env NODE_ENV=development tsx src/App.ts",
         "build:backend": "tsc -b ../tsconfig.node.json --force",
-        "start": "cross-env NODE_ENV=production node  dist/backend/src/App.js"
+        "start": " node  dist/App.js"
     },
     "dependencies": {
         "@google/genai": "^1.38.0",
