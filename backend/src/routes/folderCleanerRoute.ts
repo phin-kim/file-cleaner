@@ -111,8 +111,11 @@ cleanerRoute.post('/processFolder', upload.array('files'), async (req, res) => {
 
         log.info(`[BACKEND] response ready in ${Date.now() - startTime}ms`);
         // Build absolute download URL so frontend (different origin) can access it
-        const host = req.get('host') || 'localhost:5000';
-        const protocol = req.protocol || 'http';
+        const host = req.get('host') || 'tidy-up.onrender.com';
+        const protocol =
+            process.env.NODE_ENV === 'production'
+                ? 'https'
+                : (req.protocol ?? 'http');
         const downloadURL = `${protocol}://${host}/api/download/${path.basename(zipPath)}`;
 
         //cleanup
