@@ -5,34 +5,46 @@ import fs from 'fs-extra';
 import { fileURLToPath } from 'url';
 import archiver from 'archiver';
 import { tidyFolder } from '../utils/tidy.js';
-
+import createLogger from '../utils/logger.js';
+const log = createLogger('Folder-Cleaner');
 export const cleanerRoute = Router();
-
-const upload = multer({ dest: 'output/upload/' }); //temporary storage
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const projectRoot = path.resolve(__dirname, '../../');
+const folderCleanerBaseDir = path.join(
+    projectRoot,
+    'output/folder-cleaner-temps'
+);
+const uploadDir = path.join(folderCleanerBaseDir, 'uploads');
+const outputDir = path.join(folderCleanerBaseDir, 'outputs');
+fs.mkdirSync(uploadDir, { recursive: true });
+fs.mkdirSync(outputDir, { recursive: true });
+const upload = multer({ dest: uploadDir }); //temporary storage
+
 cleanerRoute.post('/processFolder', upload.array('files'), async (req, res) => {
     const startTime = Date.now();
-    console.log('🟢 [BACKEND] request received at', new Date().toISOString());
+    log.highlight(
+        `🟢 [BACKEND] request received at: ${new Date().toISOString()}`
+    );
     try {
         const uploadedFiles = req.files as Express.Multer.File[];
         const uploadedFolderName = req.body.folderName; //fallback
         const safeFolderName = uploadedFolderName.replace(/[^a-z0-9_-]/gi, '_');
-        console.log(`[BACKEND] ${uploadedFiles.length} files received`);
+
+        log.info(`[BACKEND] ${uploadedFiles.length} files received`);
         if (!uploadedFiles || uploadedFiles.length === 0) {
-            console.warn('⚠ [BACKEND] no files received ');
+            log.warn('⚠ [BACKEND] no files received ');
             return res.status(400).json({ error: 'No files uploaded' });
         }
-        const backendDir = path.join(__dirname, '..', '..');
+
         const temporaryBaseDir = path.join(
-            backendDir,
-            'output',
-            'folder-cleaner-temps'
+            folderCleanerBaseDir,
+            'folder-cleaner-temp-storage'
         );
         const tempDir = path.join(temporaryBaseDir, Date.now().toString());
 
         await fs.ensureDir(tempDir);
-        console.log('[BACKEND] temp folder created at ', tempDir);
+        log.info(`[BACKEND] temp folder created at ${tempDir}`);
         // Is equivalent to this native fs code:
         //await fs.mkdir('output/temp/1234567890', { recursive: true });
         // move uploaded files to temp dir and in case of failure they are deleted
@@ -40,29 +52,29 @@ cleanerRoute.post('/processFolder', upload.array('files'), async (req, res) => {
             for (const file of uploadedFiles) {
                 const destPath = path.join(tempDir, file.originalname);
                 await fs.move(file.path, destPath);
-                console.log(`[BACKEND] moved ${file.originalname} to temp`);
+                log.info(`[BACKEND] moved ${file.originalname} to temp`);
             }
         } finally {
             for (const file of uploadedFiles) {
                 if (await fs.pathExists(file.path)) {
                     await fs.remove(file.path);
-                    console.log(`[CLEANUP] removed orphan upload ${file.path}`);
+                    log.warn(`[CLEANUP] removed orphan upload ${file.path}`);
                 }
             }
         }
         //remove duplicate files based on hash
-        console.log('[BACKEND] starting duplicate removal...');
+        log.highlight('[BACKEND] starting duplicate removal...');
         const tidyStart = Date.now();
         const stats = await tidyFolder(tempDir);
-        console.log(
+        log.info(
             `[BACKEND] duplicate removal done in ${Date.now() - tidyStart} ms`
         );
         const zipPath = path.join(
-            __dirname,
-            'temp',
+            outputDir,
+            'zipped',
             `${safeFolderName}_cleaned-${Date.now()}.zip`
         );
-        console.log(`[BACKEND] Zipping folder`);
+        log.highlight(`[BACKEND] Zipping folder`);
         const zipStart = Date.now();
         const output = fs.createWriteStream(zipPath);
 
@@ -70,10 +82,10 @@ cleanerRoute.post('/processFolder', upload.array('files'), async (req, res) => {
         archive.pipe(output);
 
         archive.on('warning', (err) => {
-            console.warn('[BACKEND] Archiver warning:', err);
+            log.warn('[BACKEND] Archiver warning:', err);
         });
         archive.on('error', (err) => {
-            console.error('[BACKEND] Archiver error:', err);
+            log.error('[BACKEND] Archiver error:', err);
             throw err;
         });
         // Put files inside a folder that preserves the original uploaded folder name
@@ -84,7 +96,7 @@ cleanerRoute.post('/processFolder', upload.array('files'), async (req, res) => {
             archive.finalize(),
             new Promise<void>((resolve, reject) => {
                 output.on('close', () => {
-                    console.log(
+                    log.info(
                         `[BACKEND] ZIP stream closed, size: ${output.bytesWritten} bytes`
                     );
                     resolve();
@@ -93,9 +105,9 @@ cleanerRoute.post('/processFolder', upload.array('files'), async (req, res) => {
             }),
         ]);
 
-        console.log(`[BACKEND]zipping done in ${Date.now() - zipStart} ms`);
+        log.info(`[BACKEND]zipping done in ${Date.now() - zipStart} ms`);
 
-        console.log(`[BACKEND] response ready in ${Date.now() - startTime}ms`);
+        log.info(`[BACKEND] response ready in ${Date.now() - startTime}ms`);
         // Build absolute download URL so frontend (different origin) can access it
         const host = req.get('host') || 'localhost:5000';
         const protocol = req.protocol || 'http';
@@ -113,29 +125,29 @@ cleanerRoute.post('/processFolder', upload.array('files'), async (req, res) => {
             },
         });
     } catch (error) {
-        console.error(error);
+        log.error('Failed to process folder', { data: { error } });
         res.status(500).json({ error: 'Failed to process folder' });
     }
 });
 cleanerRoute.get('/download/:filename', (req, res) => {
     try {
-        console.log(
+        log.highlight(
             `⬇️ [BACKEND] Download requested for ${req.params.filename}`
         );
-        const zipPath = path.join(__dirname, 'temp', req.params.filename);
+        const zipPath = path.join(outputDir, 'zipped', req.params.filename);
         if (!fs.existsSync(zipPath)) {
             return res.status(404).json({ error: 'File not found' });
         }
         //force download
         res.download(zipPath, (err) => {
             if (err) {
-                console.error('Error sending file', err);
+                log.error('Error sending file', { data: { err } });
             } else {
-                console.log(`[BACKEND] sent file ${zipPath}`);
+                log.highlight(`[BACKEND] sent file ${zipPath}`);
             }
         });
     } catch (error) {
-        console.log('Error downloading the files', error);
+        log.error('Error downloading the files', { data: { error } });
         res.status(500).json({ error: 'Failed to download' });
     }
 });

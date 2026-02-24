@@ -3,10 +3,10 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import '../src/config/envLoader.js';
-import { cleanerRoute } from './routes/fileCleaner.js';
+import { cleanerRoute } from './routes/folderCleanerRoute.js';
 import { subRouter } from './routes/subscription.js';
 import { startPeriodicCleanup, cleanupOrphanedFiles } from './utils/cleanUp.js';
-import { mergerRoute } from './routes/mergerRoute.js';
+import { mergerRoute } from './routes/fileMergerRoute.js';
 import createLogger from './utils/logger.js';
 
 const log = createLogger('APP.TS');
@@ -17,7 +17,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 app.use(
     cors({
-        origin: ['http://localhost:5173'],
+        origin: ['http://localhost:5173', 'https://tidy-upp.netlify.app'],
 
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     })
