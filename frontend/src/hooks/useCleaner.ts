@@ -106,9 +106,9 @@ export default function useCleaner() {
             setDownloadURL(response.data.downloadURL);
             setStatus('complete');
 
-            if (path === 'processFolder') {
+            /*if (path === 'processFolder') {
                 setOpenPopUp(true);
-            }
+            }*/
 
             // Reset file input so same folder can be selected again
             if (fileInputRef.current) {
@@ -195,9 +195,9 @@ export default function useCleaner() {
             console.log(`[FRONTEND] download url ${downloadURL}`);
 
             setStatus('complete');
-            if (path === 'processFolder') {
+            /*if (path === 'processFolder') {
                 setOpenPopUp(true);
-            }
+            }*/
         } catch (error) {
             clearInterval(progressInterval);
             log.error('Error in processing files', { data: { error } });
