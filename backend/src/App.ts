@@ -29,9 +29,7 @@ app.use('/api', subRouter);
 app.use('/api', mergerRoute);
 //change this later on
 app.use('/downloads', express.static(path.join(process.cwd(), 'backend/temp')));
-app.get('/', () => {
-    console.log('Health checker');
-});
+
 const PROJECT_ROOT = path.resolve(__dirname, '../../');
 const BASE_DIR = path.join(PROJECT_ROOT, 'output/file-merger-temps');
 const MERGER_UPLOADS = path.join(BASE_DIR, 'uploads');

@@ -2,7 +2,7 @@ import axios from 'axios';
 const baseURL =
     import.meta.env.MODE === 'development'
         ? 'http://localhost:5000/api'
-        : 'https://tidy-up.onrender.com';
+        : 'https://tidy-up.onrender.com/api';
 export const fileCleanerApi = axios.create({ baseURL });
 export const subscriptionApi = axios.create({ baseURL });
 fileCleanerApi.interceptors.response.use(
