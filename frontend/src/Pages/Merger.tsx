@@ -7,6 +7,7 @@ import {
     Download,
     Loader2,
     CheckCircle2,
+    MousePointerClick,
 } from 'lucide-react';
 
 const FolderQuestionAnalyzer = () => {
@@ -16,6 +17,10 @@ const FolderQuestionAnalyzer = () => {
         progress,
         status,
         downloadURL,
+        fileInputRef,
+
+        handleFolderInputChange,
+        handleFolderSelectClick,
         handleDragEnter,
         handleDragLeave,
         handleDragOver,
@@ -25,13 +30,13 @@ const FolderQuestionAnalyzer = () => {
     const path = 'merge-files';
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-purple-900 via-purple-800 to-indigo-900 p-6">
+        <div className="flex items-center justify-center min-h-screen p-6 bg-linear-to-br from-purple-900 via-purple-800 to-indigo-900">
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="w-full max-w-3xl"
             >
-                <div className="rounded-3xl border border-white/20 bg-white/10 p-8 shadow-2xl backdrop-blur-lg">
+                <div className="p-8 border shadow-2xl rounded-3xl border-white/20 bg-white/10 backdrop-blur-lg">
                     {/* Header */}
                     <div className="mb-8 text-center">
                         <motion.div
@@ -42,18 +47,27 @@ const FolderQuestionAnalyzer = () => {
                                 stiffness: 200,
                                 damping: 15,
                             }}
-                            className="mb-4 inline-block rounded-2xl bg-purple-500/20 p-4"
+                            className="inline-block p-4 mb-4 rounded-2xl bg-purple-500/20"
                         >
-                            <FolderOpen className="h-12 w-12 text-purple-200" />
+                            <FolderOpen className="w-12 h-12 text-purple-200" />
                         </motion.div>
                         <h1 className="mb-2 text-4xl font-bold text-white">
-                            Question Analyzer
+                            Tidy Up Analyzer
                         </h1>
                         <p className="text-purple-200">
-                            Upload a folder to extract and analyze questions
+                            Upload a folder to extract and merge questions
                         </p>
                     </div>
-
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={(e) => handleFolderInputChange(e, path)}
+                        webkitdirectory="true"
+                        directory=""
+                        className="hidden"
+                        multiple
+                        style={{ display: 'none' }}
+                    />
                     {/* Drop Area */}
                     <AnimatePresence mode="wait">
                         {status === 'idle' && (
@@ -93,11 +107,33 @@ const FolderQuestionAnalyzer = () => {
                                             }`}
                                         />
                                     </motion.div>
+
                                     <p className="mb-3 text-2xl font-semibold text-white">
                                         {isDragging
                                             ? 'Drop your folder here'
                                             : 'Drag & Drop Folder Here'}
                                     </p>
+                                    <div className="relative mb-6">
+                                        <div className="absolute inset-0 flex items-center">
+                                            <div className="w-full border-t border-slate-700"></div>
+                                        </div>
+                                        <div className="relative flex justify-center text-sm">
+                                            <span className="px-2 bg-slate-800/60 text-slate-400">
+                                                OR
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <motion.button
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        onClick={handleFolderSelectClick}
+                                        className="inline-flex items-center gap-3 px-6 py-3 mb-6 text-purple-300 transition-all group rounded-xl bg-purple-500/20 hover:bg-purple-500/30 hover:text-purple-200"
+                                    >
+                                        <MousePointerClick className="w-12 h-12 transition-transform group-hover:rotate-12 sm:h-5 sm:w-5" />
+                                        <span className="font-medium">
+                                            Click to select a folder
+                                        </span>
+                                    </motion.button>
                                     <p className="text-purple-200">
                                         All files in the folder will be
                                         automatically analyzed
@@ -115,7 +151,7 @@ const FolderQuestionAnalyzer = () => {
                                 exit={{ opacity: 0 }}
                                 className="py-12 text-center"
                             >
-                                <Loader2 className="mx-auto mb-6 h-16 w-16 animate-spin text-purple-300" />
+                                <Loader2 className="w-16 h-16 mx-auto mb-6 text-purple-300 animate-spin" />
                                 <h3 className="mb-2 text-2xl font-semibold text-white">
                                     {status === 'uploading'
                                         ? 'Uploading files...'
@@ -126,7 +162,7 @@ const FolderQuestionAnalyzer = () => {
                                 </p>
 
                                 {status === 'uploading' && (
-                                    <div className="mx-auto max-w-md">
+                                    <div className="max-w-md mx-auto">
                                         <div className="h-3 overflow-hidden rounded-full bg-purple-900/50">
                                             <motion.div
                                                 animate={{
@@ -169,7 +205,7 @@ const FolderQuestionAnalyzer = () => {
                                             delay: 0.1,
                                         }}
                                     >
-                                        <CheckCircle2 className="mx-auto mb-4 h-20 w-20 text-green-400" />
+                                        <CheckCircle2 className="w-20 h-20 mx-auto mb-4 text-green-400" />
                                     </motion.div>
                                     <motion.h3
                                         initial={{ opacity: 0, y: 10 }}
@@ -177,7 +213,7 @@ const FolderQuestionAnalyzer = () => {
                                         transition={{ delay: 0.2 }}
                                         className="mb-2 text-3xl font-semibold text-white"
                                     >
-                                        Analysis Complete!
+                                        Merging Complete!
                                     </motion.h3>
                                 </div>
 
@@ -185,18 +221,18 @@ const FolderQuestionAnalyzer = () => {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.4 }}
-                                    className="mb-6 rounded-2xl border border-purple-400/30 bg-linear-to-r from-purple-500/30 to-indigo-500/30 p-8"
+                                    className="p-8 mb-6 border rounded-2xl border-purple-400/30 bg-linear-to-r from-purple-500/30 to-indigo-500/30"
                                 >
-                                    <div className="mb-6 flex items-center justify-center gap-4">
-                                        <div className="rounded-xl bg-white/10 p-3">
-                                            <FileText className="h-8 w-8 text-purple-200" />
+                                    <div className="flex items-center justify-center gap-4 mb-6">
+                                        <div className="p-3 rounded-xl bg-white/10">
+                                            <FileText className="w-8 h-8 text-purple-200" />
                                         </div>
                                         <div className="text-left">
                                             <h4 className="text-lg font-semibold text-white">
                                                 PDF Report Ready
                                             </h4>
                                             <p className="text-sm text-purple-200">
-                                                Your analysis report has been
+                                                Your merged questions have been
                                                 generated
                                             </p>
                                         </div>
@@ -206,9 +242,9 @@ const FolderQuestionAnalyzer = () => {
                                         whileHover={{ scale: 1.05 }}
                                         whileTap={{ scale: 0.95 }}
                                         onClick={handleDownload}
-                                        className="flex w-full items-center justify-center gap-3 rounded-xl bg-linear-to-r from-purple-500 to-indigo-500 py-4 text-lg font-semibold text-white shadow-lg transition-all hover:from-purple-600 hover:to-indigo-600"
+                                        className="flex items-center justify-center w-full gap-3 py-4 text-lg font-semibold text-white transition-all shadow-lg rounded-xl bg-linear-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600"
                                     >
-                                        <Download className="h-6 w-6" />
+                                        <Download className="w-6 h-6" />
                                         Download PDF Report
                                     </motion.button>
                                 </motion.div>
@@ -222,7 +258,7 @@ const FolderQuestionAnalyzer = () => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.5 }}
-                    className="mt-6 text-center text-sm text-purple-200/60"
+                    className="mt-6 text-sm text-center text-purple-200/60"
                 >
                     Upload folders containing documents, PDFs, or text files for
                     analysis

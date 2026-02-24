@@ -1,6 +1,6 @@
-import FolderCleanerUI from './components/Cleaner';
-import BillingPage from './components/Billing';
-import FolderQuestionAnalyzer from './components/Merger';
+import FolderCleanerUI from './Pages/Cleaner';
+import BillingPage from './Pages/Billing';
+import FolderQuestionAnalyzer from './Pages/Merger';
 import {
     BrowserRouter,
     Routes,
@@ -9,7 +9,7 @@ import {
     Navigate,
 } from 'react-router-dom';
 import { UpgradeModal } from './components/Popup';
-import WelcomeModal from './components/WelcomePage';
+import WelcomeModal from './Pages/WelcomePage';
 import Header from './components/Header';
 function App() {
     return (

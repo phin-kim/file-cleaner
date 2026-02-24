@@ -1,9 +1,14 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { fileCleanerApi } from '../library/client';
 import type { CleaningStats, UploadedFolder, Status } from '../types/types';
 import traverseDirectory from '../utils/traverser';
 import type { AnalysisResult } from '../types/types';
+import useErrorStore from '../Store/ErrorStore';
+import createClientLogger from '../utils/clientLogger';
+import handleApiError from '../utils/apiError';
+const log = createClientLogger('Use cleaner hook');
 export default function useCleaner() {
+    const { setError } = useErrorStore();
     /* ---------- State ---------- */
     const [isDragging, setIsDragging] = useState<boolean>(false);
     const [uploadedFolder, setUploadedFolder] = useState<UploadedFolder | null>(
@@ -15,10 +20,11 @@ export default function useCleaner() {
     );
     const [downloadURL, setDownloadURL] = useState<string | null>(null);
     const [openPopup, setOpenPopUp] = useState(false);
-    // MERGER.TSX
-    //const [status, setStatus] = useState<ProcessingStatus>('idle');
+
     const [result, setResult] = useState<AnalysisResult | null>(null);
     const [progress, setProgress] = useState(0);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
     /* ---------- Handlers ---------- */
     const handleDragEnter = (event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault();
@@ -37,7 +43,84 @@ export default function useCleaner() {
     const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault();
     };
+    // handle click on folder select button
+    const handleFolderSelectClick = () => {
+        //trigger the file input click
+        fileInputRef.current?.click();
+    };
+    // handle folder selection via file input
+    const handleFolderInputChange = async (
+        event: React.ChangeEvent<HTMLInputElement>,
+        path: string
+    ) => {
+        const files = event.target.files;
+        if (!files || files.length === 0) {
+            setError('No folder input');
+            return;
+        }
+        log.info(`Folder selected via input`);
+        setStatus('uploading');
+        setProgress(0);
+        const progressInterval = setInterval(() => {
+            setProgress((prev) => {
+                if (prev >= 95) return prev;
+                return prev + 3;
+            });
+        }, 100);
+        try {
+            //get folder name from the first file path
+            const firstFile = files[0];
+            log.highlight('First file', { data: firstFile });
+            //webkit relative path includes the folder name: "folderName/filename.ext"
+            const folderName = firstFile.webkitRelativePath.split('/')[0];
+            log.highlight('Folder name', { data: folderName });
+            setUploadedFolder({
+                name: folderName,
+                files: Array.from(files),
+            });
+            //convert file list to array for form data
+            const fileArray = Array.from(files);
+            const formData = new FormData();
+            formData.append('folderName', folderName);
 
+            fileArray.forEach((file) =>
+                formData.append('files', file, file.name)
+            );
+            setStatus('processing');
+            const start = Date.now();
+            log.info('Sending files to backend');
+            const response = await fileCleanerApi.post(`/${path}`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            log.highlight(
+                `[FRONTEND] backend responded in ${Date.now() - start}ms`
+            );
+            log.highlight(
+                `[LINK] download link from the backend ${response.data.downloadURL}`
+            );
+
+            clearInterval(progressInterval);
+            setProgress(100);
+
+            setCleaningStats(response.data.stats);
+            setDownloadURL(response.data.downloadURL);
+            setStatus('complete');
+
+            if (path === 'processFolder') {
+                setOpenPopUp(true);
+            }
+
+            // Reset file input so same folder can be selected again
+            if (fileInputRef.current) {
+                fileInputRef.current.value = '';
+            }
+        } catch (error) {
+            clearInterval(progressInterval);
+            log.error('Error in processing files', { data: { error } });
+            handleApiError(error, setError);
+            setStatus('error');
+        }
+    };
     const handleDrop = async (
         event: React.DragEvent<HTMLDivElement>,
         path: string
@@ -45,7 +128,7 @@ export default function useCleaner() {
         event.preventDefault();
 
         setIsDragging(false);
-        console.log('[FRONTEND] drop event triggered');
+        log.highlight('[FRONTEND] drop event triggered');
         setStatus('uploading');
         setProgress(0);
         const progressInterval = setInterval(() => {
@@ -58,7 +141,7 @@ export default function useCleaner() {
             const files: File[] = [];
             let folderName = 'folder';
             const items = event.dataTransfer.items;
-            console.log(`[FRONTEND] ${items.length} items in drop`);
+            log.info(`[FRONTEND] ${items.length} items in drop`);
             if (items && items.length > 0) {
                 for (const item of items) {
                     if (item.kind === 'file') {
@@ -71,11 +154,11 @@ export default function useCleaner() {
                                 name: dirEntry.name,
                                 files: [],
                             });
-                            console.log(
+                            log.info(
                                 `[FRONTEND] processing folder ${dirEntry.name}`
                             );
                             const dirFiles = await traverseDirectory(dirEntry);
-                            console.log(
+                            log.info(
                                 `[FRONTEND] ${dirFiles.length} found in folder`
                             );
                             files.push(...dirFiles);
@@ -96,13 +179,11 @@ export default function useCleaner() {
             const response = await fileCleanerApi.post(`/${path}`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
-            console.log(
-                `[FRONTEND] this si the path being used${fileCleanerApi}/${path}`
-            );
-            console.log(
+
+            log.highlight(
                 `[FRONTEND] backend responded in ${Date.now() - start}ms`
             );
-            console.log(
+            log.highlight(
                 `[LINK] download link from the backend ${response.data.downloadURL}`
             );
             clearInterval(progressInterval);
@@ -110,15 +191,17 @@ export default function useCleaner() {
 
             setCleaningStats(response.data.stats);
             setDownloadURL(response.data.downloadURL);
+
             console.log(`[FRONTEND] download url ${downloadURL}`);
-            console.log(`status is set to complete ${status}`);
+
             setStatus('complete');
             if (path === 'processFolder') {
                 setOpenPopUp(true);
             }
         } catch (error) {
             clearInterval(progressInterval);
-            console.error(error);
+            log.error('Error in processing files', { data: { error } });
+            handleApiError(error, setError);
             setStatus('error');
         }
     };
@@ -152,6 +235,9 @@ export default function useCleaner() {
         cleaningStats,
         downloadURL,
         openPopup,
+        fileInputRef,
+        handleFolderInputChange,
+        handleFolderSelectClick,
         setOpenPopUp,
         handleDragEnter,
         handleDragLeave,

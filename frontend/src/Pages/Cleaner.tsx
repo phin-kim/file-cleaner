@@ -8,9 +8,10 @@ import {
     CheckCircle,
     Loader2,
     X,
+    MousePointerClick,
 } from 'lucide-react';
 import useCleaner from '../hooks/useCleaner';
-import SuccessPopup from './Popup';
+import SuccessPopup from '../components/Popup';
 export default function FolderCleanerUI() {
     const {
         isDragging,
@@ -24,6 +25,9 @@ export default function FolderCleanerUI() {
         handleDragOver,
         handleDrop,
         handleDownload,
+        handleFolderInputChange,
+        handleFolderSelectClick,
+        fileInputRef,
         handleReset,
     } = useCleaner();
     const handleClose = () => {
@@ -31,7 +35,7 @@ export default function FolderCleanerUI() {
     };
     const path = 'processFolder';
     return (
-        <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-purple-600 to-violet-800 p-6">
+        <div className="flex items-center justify-center min-h-screen p-6 bg-linear-to-br from-purple-600 to-violet-800">
             <div className="w-full max-w-2xl">
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
@@ -45,7 +49,16 @@ export default function FolderCleanerUI() {
                         Remove duplicate files instantly
                     </p>
                 </motion.div>
-
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={(e) => handleFolderInputChange(e, path)}
+                    webkitdirectory="true"
+                    directory=""
+                    className="hidden"
+                    multiple
+                    style={{ display: 'none' }}
+                />
                 <AnimatePresence mode="wait">
                     {status === 'idle' && (
                         <motion.div
@@ -74,7 +87,7 @@ export default function FolderCleanerUI() {
                                         stiffness: 300,
                                     }}
                                 >
-                                    <FolderOpen className="mx-auto mb-6 h-20 w-20 text-slate-400" />
+                                    <FolderOpen className="w-20 h-20 mx-auto mb-6 text-slate-400" />
                                 </motion.div>
 
                                 <h3 className="mb-2 text-2xl font-semibold text-slate-100">
@@ -86,9 +99,29 @@ export default function FolderCleanerUI() {
                                     We'll clean it up and remove all duplicate
                                     files
                                 </p>
-
+                                <div className="relative mb-6">
+                                    <div className="absolute inset-0 flex items-center">
+                                        <div className="w-full border-t border-slate-400"></div>
+                                    </div>
+                                    <div className="relative flex justify-center text-sm">
+                                        <span className="px-2 bg-slate-500 text-slate-200">
+                                            OR
+                                        </span>
+                                    </div>
+                                </div>
+                                <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={handleFolderSelectClick}
+                                    className="inline-flex items-center gap-3 px-6 py-3 mb-6 text-purple-300 transition-all bg-purple-600 group rounded-xl hover:bg-purple-500 hover:text-purple-100"
+                                >
+                                    <MousePointerClick className="w-5 h-5 transition-transform group-hover:rotate-15" />
+                                    <span className="font-medium">
+                                        Click to select a folder
+                                    </span>
+                                </motion.button>
                                 <div className="flex items-center justify-center gap-2 text-sm text-slate-500">
-                                    <Upload className="h-4 w-4" />
+                                    <Upload className="w-4 h-4" />
                                     <span>Supported: Any folder structure</span>
                                 </div>
                             </div>
@@ -97,7 +130,7 @@ export default function FolderCleanerUI() {
                                 <motion.div
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
-                                    className="pointer-events-none absolute inset-0 bg-slate-700/30 backdrop-blur-sm"
+                                    className="absolute inset-0 pointer-events-none bg-slate-700/30 backdrop-blur-sm"
                                 />
                             )}
                         </motion.div>
@@ -109,7 +142,7 @@ export default function FolderCleanerUI() {
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.9 }}
-                            className="rounded-2xl border border-purple-300/20 bg-white/5 p-12 backdrop-blur-lg"
+                            className="p-12 border rounded-2xl border-purple-300/20 bg-white/5 backdrop-blur-lg"
                         >
                             <div className="text-center">
                                 <motion.div
@@ -119,9 +152,9 @@ export default function FolderCleanerUI() {
                                         repeat: Infinity,
                                         ease: 'linear',
                                     }}
-                                    className="mb-6 inline-block"
+                                    className="inline-block mb-6"
                                 >
-                                    <Loader2 className="h-16 w-16 text-purple-400" />
+                                    <Loader2 className="w-16 h-16 text-purple-400" />
                                 </motion.div>
 
                                 <h3 className="mb-2 text-2xl font-semibold text-white">
@@ -139,7 +172,7 @@ export default function FolderCleanerUI() {
                                         animate={{ opacity: 1 }}
                                         className="flex items-center justify-center gap-2 text-sm text-purple-300"
                                     >
-                                        <Trash2 className="h-4 w-4" />
+                                        <Trash2 className="w-4 h-4" />
                                         <span>Removing duplicate files...</span>
                                     </motion.div>
                                 )}
@@ -153,9 +186,9 @@ export default function FolderCleanerUI() {
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.9 }}
-                            className="overflow-hidden rounded-2xl border border-purple-300/20 bg-white/5 backdrop-blur-lg"
+                            className="overflow-hidden border rounded-2xl border-purple-300/20 bg-white/5 backdrop-blur-lg"
                         >
-                            <div className="border-b border-green-400/20 bg-linear-to-r from-green-500/20 to-emerald-500/20 p-6">
+                            <div className="p-6 border-b border-green-400/20 bg-linear-to-r from-green-500/20 to-emerald-500/20">
                                 <div className="flex items-center gap-3">
                                     <motion.div
                                         initial={{ scale: 0 }}
@@ -165,7 +198,7 @@ export default function FolderCleanerUI() {
                                             delay: 0.2,
                                         }}
                                     >
-                                        <CheckCircle className="h-8 w-8 text-green-400" />
+                                        <CheckCircle className="w-8 h-8 text-green-400" />
                                     </motion.div>
                                     <div>
                                         <h3 className="text-xl font-semibold text-white">
@@ -179,12 +212,12 @@ export default function FolderCleanerUI() {
                             </div>
 
                             <div className="p-8">
-                                <div className="mb-8 grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-2 gap-4 mb-8">
                                     <motion.div
                                         initial={{ opacity: 0, x: -20 }}
                                         animate={{ opacity: 1, x: 0 }}
                                         transition={{ delay: 0.3 }}
-                                        className="rounded-lg border border-purple-300/10 bg-white/5 p-4"
+                                        className="p-4 border rounded-lg border-purple-300/10 bg-white/5"
                                     >
                                         <p className="mb-1 text-base font-medium text-purple-500">
                                             Original Files
@@ -198,7 +231,7 @@ export default function FolderCleanerUI() {
                                         initial={{ opacity: 0, x: 20 }}
                                         animate={{ opacity: 1, x: 0 }}
                                         transition={{ delay: 0.4 }}
-                                        className="rounded-lg border border-purple-300/10 bg-white/5 p-4"
+                                        className="p-4 border rounded-lg border-purple-300/10 bg-white/5"
                                     >
                                         <p className="mb-1 text-base font-medium text-purple-500">
                                             Duplicates Removed
@@ -212,7 +245,7 @@ export default function FolderCleanerUI() {
                                         initial={{ opacity: 0, x: -20 }}
                                         animate={{ opacity: 1, x: 0 }}
                                         transition={{ delay: 0.5 }}
-                                        className="rounded-lg border border-purple-300/10 bg-white/5 p-4"
+                                        className="p-4 border rounded-lg border-purple-300/10 bg-white/5"
                                     >
                                         <p className="mb-1 text-base font-medium text-purple-500">
                                             Final Files
@@ -226,7 +259,7 @@ export default function FolderCleanerUI() {
                                         initial={{ opacity: 0, x: 20 }}
                                         animate={{ opacity: 1, x: 0 }}
                                         transition={{ delay: 0.6 }}
-                                        className="rounded-lg border border-purple-300/10 bg-white/5 p-4"
+                                        className="p-4 border rounded-lg border-purple-300/10 bg-white/5"
                                     >
                                         <p className="mb-1 text-base font-medium text-purple-500">
                                             Space Saved
@@ -242,9 +275,9 @@ export default function FolderCleanerUI() {
                                         whileHover={{ scale: 1.02 }}
                                         whileTap={{ scale: 0.98 }}
                                         onClick={handleDownload}
-                                        className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-linear-to-r from-purple-500 to-pink-500 px-6 py-4 font-semibold text-white transition-shadow hover:shadow-lg hover:shadow-purple-500/50"
+                                        className="flex items-center justify-center flex-1 gap-2 px-6 py-4 font-semibold text-white transition-shadow rounded-xl bg-linear-to-r from-purple-500 to-pink-500 hover:shadow-lg hover:shadow-purple-500/50"
                                     >
-                                        <Download className="h-5 w-5" />
+                                        <Download className="w-12 h-12 sm:h-5 sm:w-5" />
                                         Download Cleaned Folder
                                     </motion.button>
 
@@ -252,7 +285,7 @@ export default function FolderCleanerUI() {
                                         whileHover={{ scale: 1.02 }}
                                         whileTap={{ scale: 0.98 }}
                                         onClick={handleReset}
-                                        className="rounded-xl bg-white/10 px-6 py-4 font-semibold text-white transition-colors hover:bg-white/20"
+                                        className="px-6 py-4 font-semibold text-white transition-colors rounded-xl bg-white/10 hover:bg-white/20"
                                     >
                                         Clean Another
                                     </motion.button>
@@ -287,9 +320,9 @@ export default function FolderCleanerUI() {
                                     {/* Close Button */}
                                     <button
                                         onClick={handleClose}
-                                        className="absolute top-4 right-4 rounded-full p-2 text-blue-300 transition-colors hover:bg-white/10 hover:text-white"
+                                        className="absolute p-2 text-blue-300 transition-colors rounded-full top-4 right-4 hover:bg-white/10 hover:text-white"
                                     >
-                                        <X className="h-5 w-5" />
+                                        <X className="w-5 h-5" />
                                     </button>
                                     <SuccessPopup
                                         onDownload={handleDownload}
@@ -308,7 +341,7 @@ export default function FolderCleanerUI() {
                     className="mt-8 text-center"
                 >
                     <div className="flex items-center justify-center gap-2 text-sm text-slate-200">
-                        <AlertCircle className="h-4 w-4" />
+                        <AlertCircle className="w-4 h-4" />
                         <span>
                             Your files are processed securely and never stored
                         </span>
