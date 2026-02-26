@@ -1,3 +1,4 @@
+import ErrorToast from './components/ErrorToast';
 import FolderCleanerUI from './Pages/Cleaner';
 //import BillingPage from './Pages/Billing';
 //import FolderQuestionAnalyzer from './Pages/Merger';
@@ -14,6 +15,7 @@ import {
 function App() {
     return (
         <>
+            <ErrorToast />
             <BrowserRouter>
                 <Routes>
                     {/*<Route element={<AppLayout />}>

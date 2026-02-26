@@ -93,7 +93,7 @@ export default function FolderCleanerUI() {
                                 <h3 className="mb-2 text-2xl font-semibold text-slate-100">
                                     {isDragging
                                         ? 'Drop your folder here'
-                                        : 'Drag & Drop Folder'}
+                                        : 'Drag & Drop A Folder'}
                                 </h3>
                                 <p className="mb-6 text-slate-400">
                                     We'll clean it up and remove all duplicate

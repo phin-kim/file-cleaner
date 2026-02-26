@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import useErrorStore from '../Store/ErrorStore';
 import { motion } from 'framer-motion';
-const Errortoast = () => {
+const ErrorToast = () => {
     const { error, clearError } = useErrorStore();
     useEffect(() => {
         if (error) {
@@ -29,4 +29,4 @@ const Errortoast = () => {
         </>
     );
 };
-export default Errortoast;
+export default ErrorToast;

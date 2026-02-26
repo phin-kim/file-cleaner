@@ -5,14 +5,116 @@ import fs from 'fs-extra';
 import { fileURLToPath } from 'url';
 import { tidyFolder } from '../utils/tidy.js';
 import createLogger from '../utils/logger.js';
-
+import type { Request, Response, NextFunction } from 'express';
+import { MulterError } from 'multer';
 import createZipWithRetry from '../helpers/zipFolderRetry.js';
 import AppError from '../utils/appError.js';
+import asyncHandler from '../middleware/asyncHandler.js';
+
 const log = createLogger('Folder-Cleaner');
 export const cleanerRoute = Router();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, '../../');
+//MIDDLEWARE
+
+type UploadError =
+    | { type: 'ENOENT'; error: Error & { code: 'ENOENT'; path?: string } }
+    | { type: 'APP_ERROR'; error: AppError }
+    | { type: 'MULTER_ERROR'; error: MulterError }
+    | { type: 'STANDARD_ERROR'; error: Error }
+    | { type: 'UNKNOWN'; error: unknown };
+
+const classifyError = (err: unknown): UploadError => {
+    if (err instanceof AppError) {
+        return { type: 'APP_ERROR', error: err };
+    }
+
+    if (err instanceof MulterError) {
+        return { type: 'MULTER_ERROR', error: err };
+    }
+
+    if (err instanceof Error) {
+        if ('code' in err && (err as any).code === 'ENOENT') {
+            return {
+                type: 'ENOENT',
+                error: err as Error & { code: 'ENOENT'; path?: string },
+            };
+        }
+        return { type: 'STANDARD_ERROR', error: err };
+    }
+
+    return { type: 'UNKNOWN', error: err };
+};
+
+const handleUploadErrors = (
+    req: Request,
+    res: Response,
+    next: NextFunction
+): void => {
+    upload.array('files')(req, res, (err: unknown) => {
+        if (err) {
+            log.error('Upload middleware error:', err);
+
+            const classifiedError = classifyError(err);
+
+            switch (classifiedError.type) {
+                case 'ENOENT':
+                    return res.status(503).json({
+                        error: 'Storage system unavailable. Please try again.',
+                        type: 'StorageUnavailable',
+                        suggestion:
+                            'The upload directory may have been deleted. Our team has been notified.',
+                        path: classifiedError.error.path,
+                    });
+
+                case 'APP_ERROR':
+                    return res.status(classifiedError.error.statusCode).json({
+                        error: classifiedError.error.message,
+                        type: classifiedError.error.type,
+                    });
+
+                case 'MULTER_ERROR':
+                    const errorMessages: Record<string, string> = {
+                        LIMIT_FILE_SIZE: 'File too large. Max 200MB.',
+                        LIMIT_FILE_COUNT: 'Too many files uploaded.',
+                        LIMIT_UNEXPECTED_FILE: 'Unexpected file field.',
+                    };
+
+                    return res.status(400).json({
+                        error:
+                            errorMessages[classifiedError.error.code] ||
+                            `Upload error: ${classifiedError.error.message}`,
+                        type: 'UploadError',
+                        code: classifiedError.error.code,
+                    });
+
+                case 'STANDARD_ERROR':
+                    if (classifiedError.error.message.includes('ENOENT')) {
+                        return res.status(503).json({
+                            error: 'Storage system unavailable. Please try again.',
+                            type: 'StorageUnavailable',
+                        });
+                    }
+
+                    return res.status(500).json({
+                        error:
+                            classifiedError.error.message ||
+                            'Upload failed. Please try again.',
+                        type: 'UnknownError',
+                    });
+
+                case 'UNKNOWN':
+                default:
+                    return res.status(500).json({
+                        error: 'Upload failed. Please try again.',
+                        type: 'UnknownError',
+                    });
+            }
+        }
+        next();
+    });
+};
 const folderCleanerBaseDir = path.join(
     projectRoot,
     'output/folder-cleaner-temps'
@@ -26,17 +128,22 @@ const storage = multer.diskStorage({
     destination: async (_require, _file, cb) => {
         try {
             //ensure directory exists before each write
-            await fs.ensureDir(uploadDir);
+            //await fs.ensureDir(uploadDir);
             cb(null, uploadDir);
+            if (!uploadDir) {
+                throw AppError.notFound('Upload directory not configured');
+            }
         } catch (error) {
-            cb(
-                new AppError(
-                    `Failed to create upload directory`,
-                    500,
-                    'UploadDirError'
-                ),
-                ''
-            );
+            // Create a proper AppError
+            const appError =
+                error instanceof AppError
+                    ? error
+                    : new AppError(
+                          'Failed to prepare upload directory. Please try again.',
+                          500,
+                          'UploadDirectoryError'
+                      );
+            cb(appError, '');
         }
     },
 });
@@ -45,11 +152,15 @@ const upload = multer({
     limits: { fieldSize: 200 * 1024 * 1024 },
 }); //temporary storage with a limit of 200 mb
 
-cleanerRoute.post('/processFolder', upload.array('files'), async (req, res) => {
-    log.highlight(
-        `🟢 [BACKEND] request received at: ${new Date().toISOString()}`
-    );
-    try {
+cleanerRoute.post(
+    '/processFolder',
+    handleUploadErrors,
+    upload.array('files'),
+    asyncHandler(async (req, res) => {
+        log.highlight(
+            `🟢 [BACKEND] request received at: ${new Date().toISOString()}`
+        );
+
         const uploadedFiles = req.files as Express.Multer.File[];
         const uploadedFolderName = req.body.folderName; //fallback
         const safeFolderName = uploadedFolderName.replace(/[^a-z0-9_-]/gi, '_');
@@ -150,17 +261,8 @@ cleanerRoute.post('/processFolder', upload.array('files'), async (req, res) => {
                 },
             });
         }
-    } catch (error) {
-        log.error('Failed to process folder', { data: { error } });
-        if (error instanceof AppError) {
-            return res.status(error.statusCode).json({
-                error: error.message,
-                type: error.type,
-            });
-        }
-        res.status(500).json({ error: 'Failed to process folder' });
-    }
-});
+    })
+);
 cleanerRoute.get('/download/:filename', (req, res) => {
     try {
         log.highlight(
@@ -168,12 +270,13 @@ cleanerRoute.get('/download/:filename', (req, res) => {
         );
         const zipPath = path.join(outputDir, 'zipped', req.params.filename);
         if (!fs.existsSync(zipPath)) {
-            return res.status(404).json({ error: 'File not found' });
+            throw AppError.notFound('Download File not found');
         }
         //force download
         res.download(zipPath, (err) => {
             if (err) {
                 log.error('Error sending file', { data: { err } });
+                throw new AppError('Error sending file ', 500, 'DownloadError');
             } else {
                 log.highlight(`[BACKEND] sent file ${zipPath}`);
             }
@@ -186,6 +289,6 @@ cleanerRoute.get('/download/:filename', (req, res) => {
                 type: error.type,
             });
         }
-        res.status(500).json({ error: 'Failed to download' });
+        throw new AppError('Failed to download file', 500, 'DownloadError');
     }
 });

@@ -131,6 +131,7 @@ export default function useCleaner() {
         log.highlight('[FRONTEND] drop event triggered');
         setStatus('uploading');
         setProgress(0);
+
         const progressInterval = setInterval(() => {
             setProgress((prev) => {
                 if (prev >= 95) return prev;
@@ -142,6 +143,17 @@ export default function useCleaner() {
             let folderName = 'folder';
             const items = event.dataTransfer.items;
             log.info(`[FRONTEND] ${items.length} items in drop`);
+            if (items.length > 1) {
+                setError(
+                    `${items.length} folders detected. Kindly upload one at a time`
+                );
+                setTimeout(() => {
+                    setStatus('idle');
+                    setIsDragging(false);
+                }, 2000);
+
+                return;
+            }
             if (items && items.length > 0) {
                 for (const item of items) {
                     if (item.kind === 'file') {
