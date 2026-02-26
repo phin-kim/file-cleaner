@@ -22,7 +22,7 @@ const Errortoast = () => {
                     damping: 15,
                     stiffness: 300,
                 }}
-                className="font-plex backdrop:-blur-md h3 fixed top-6 right-2 z-9998 rounded-2xl border-2 border-red-600 bg-red-600/50 p-2 font-bold text-white shadow-[inset_0_0_24px_rgba(255,0,0,0.6),0_4px_24px_rgba(139,0,0,0.4)]"
+                className="font-display backdrop:-blur-md fixed top-6 right-2 z-9998 rounded-2xl border-2 border-red-600 bg-red-600/50 p-2 text-base font-bold text-white shadow-[inset_0_0_24px_rgba(255,0,0,0.6),0_4px_24px_rgba(139,0,0,0.4)]"
             >
                 {error}
             </motion.div>

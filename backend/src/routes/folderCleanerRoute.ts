@@ -3,9 +3,10 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs-extra';
 import { fileURLToPath } from 'url';
-import archiver from 'archiver';
 import { tidyFolder } from '../utils/tidy.js';
 import createLogger from '../utils/logger.js';
+
+import createZipWithRetry from '../helpers/zipFolderRetry.js';
 const log = createLogger('Folder-Cleaner');
 export const cleanerRoute = Router();
 const __filename = fileURLToPath(import.meta.url);
@@ -22,7 +23,6 @@ fs.mkdirSync(outputDir, { recursive: true });
 const upload = multer({ dest: uploadDir }); //temporary storage
 
 cleanerRoute.post('/processFolder', upload.array('files'), async (req, res) => {
-    const startTime = Date.now();
     log.highlight(
         `🟢 [BACKEND] request received at: ${new Date().toISOString()}`
     );
@@ -70,65 +70,58 @@ cleanerRoute.post('/processFolder', upload.array('files'), async (req, res) => {
             `[BACKEND] duplicate removal done in ${Date.now() - tidyStart} ms`
         );
         const zippedDir = path.join(outputDir, 'zipped');
-        await fs.ensureDir(zippedDir);
-        log.info(`Ensured zipped directory at :${zippedDir}`);
-        const zipPath = path.join(
-            zippedDir,
-            `${safeFolderName}_cleaned-${Date.now()}.zip`
-        );
-        log.highlight(`[BACKEND] Zipping folder`);
         const zipStart = Date.now();
-        const output = fs.createWriteStream(zipPath);
 
-        const archive = archiver('zip', { zlib: { level: 6 } });
-        archive.pipe(output);
+        try {
+            const zipPath = await createZipWithRetry(
+                tempDir,
+                zippedDir,
+                safeFolderName,
+                3,
+                1000
+            );
 
-        archive.on('warning', (err) => {
-            log.warn('[BACKEND] Archiver warning:', err);
-        });
-        archive.on('error', (err) => {
-            log.error('[BACKEND] Archiver error:', err);
-            throw err;
-        });
-        // Put files inside a folder that preserves the original uploaded folder name
-        archive.directory(tempDir, safeFolderName);
+            log.info(`Zip created successfully at :${zipPath}`);
+            log.info(`[BACKEND]zipping done in ${Date.now() - zipStart} ms`);
 
-        // Proper async completion handling
-        await Promise.all([
-            archive.finalize(),
-            new Promise<void>((resolve, reject) => {
-                output.on('close', () => {
-                    log.info(
-                        `[BACKEND] ZIP stream closed, size: ${output.bytesWritten} bytes`
-                    );
-                    resolve();
-                });
-                output.on('error', reject);
-            }),
-        ]);
+            log.info(`Ensured zipped directory at :${zippedDir}`);
 
-        log.info(`[BACKEND]zipping done in ${Date.now() - zipStart} ms`);
+            log.highlight(`[BACKEND] Zipping folder`);
 
-        log.info(`[BACKEND] response ready in ${Date.now() - startTime}ms`);
-        // Build absolute download URL so frontend (different origin) can access it
-        const host = req.get('host') || 'tidy-up.onrender.com';
-        const protocol =
-            process.env.NODE_ENV === 'production'
-                ? 'https'
-                : (req.protocol ?? 'http');
-        const downloadURL = `${protocol}://${host}/api/download/${path.basename(zipPath)}`;
+            // Build absolute download URL so frontend (different origin) can access it
+            const host = req.get('host') || 'tidy-up.onrender.com';
+            const protocol =
+                process.env.NODE_ENV === 'production'
+                    ? 'https'
+                    : (req.protocol ?? 'http');
+            const downloadURL = `${protocol}://${host}/api/download/${path.basename(zipPath)}`;
 
-        //cleanup
-        // return zip download link
-        res.json({
-            downloadURL,
-            stats: {
-                originalFiles: uploadedFiles.length,
-                finalFiles: stats.finalFiles.length,
-                duplicatesRemoved: stats.duplicatesRemoved,
-                spaceSaved: stats.spaceSaved,
-            },
-        });
+            //cleanup
+            // return zip download link
+            res.json({
+                downloadURL,
+                stats: {
+                    originalFiles: uploadedFiles.length,
+                    finalFiles: stats.finalFiles.length,
+                    duplicatesRemoved: stats.duplicatesRemoved,
+                    spaceSaved: stats.spaceSaved,
+                },
+            });
+        } catch (error) {
+            log.error(`[BACKEND] All zipping attempts failed:`, {
+                data: { error },
+            });
+
+            // Handle the complete failure - maybe return the cleaned folder without zip
+            return {
+                success: true,
+                cleaned: true,
+                zipped: false,
+                path: tempDir,
+                message:
+                    'Folder cleaned but zip creation failed after multiple attempts',
+            };
+        }
     } catch (error) {
         log.error('Failed to process folder', { data: { error } });
         res.status(500).json({ error: 'Failed to process folder' });
