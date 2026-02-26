@@ -3,6 +3,7 @@ import fs from 'fs-extra';
 import archiver from 'archiver';
 import createLogger from '../utils/logger';
 const log = createLogger('Zip create');
+import AppError from '../utils/appError';
 async function createZipWithRetry(
     tempDir: string,
     zippedDir: string,
@@ -12,16 +13,28 @@ async function createZipWithRetry(
 ): Promise<string> {
     let lastError: Error | null = null;
     const startTime = Date.now();
-
+    try {
+        await fs.ensureDir(zippedDir);
+        log.info(`[BACKEND] Ensured zipped directory exists at: ${zippedDir}`);
+    } catch (dirError) {
+        log.error(`[BACKEND] Failed to create zipped directory:`, {
+            data: { dirError },
+        });
+        throw new AppError(
+            `Cannot create output directory:${(dirError as Error).message}`,
+            500,
+            'ZipCreationError'
+        );
+    }
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
             //ensure the directory exists
 
-            await fs.ensureDir(zippedDir);
             const zipPath = path.join(
                 zippedDir,
                 `${safeFolderName}_cleaned-${Date.now()}.zip`
             );
+            await fs.ensureDir(zippedDir);
 
             //create zip
             const output = fs.createWriteStream(zipPath);
@@ -60,7 +73,13 @@ async function createZipWithRetry(
             ]);*/
             await new Promise<void>((resolve, reject) => {
                 const timeout = setTimeout(() => {
-                    reject(new Error('ZIP operation timed out'));
+                    reject(
+                        new AppError(
+                            'ZIP operation timed out',
+                            500,
+                            'ZipTimeout'
+                        )
+                    );
                 }, 30000); // 30 second timeout
 
                 output.on('close', () => {
@@ -80,34 +99,78 @@ async function createZipWithRetry(
                     reject(err);
                 });
 
-                archive.finalize().catch(reject);
+                archive.finalize().catch((err) => {
+                    clearTimeout(timeout);
+                    reject(
+                        new AppError(
+                            `Archive finalize Error:${err.message}`,
+                            500,
+                            'FinalizeError'
+                        )
+                    );
+                });
             });
             log.info(`Successfully created zip file  on attempt${attempt}`);
             log.info(`[BACKEND] response ready in ${Date.now() - startTime}ms`);
             return zipPath;
         } catch (error) {
-            lastError = error as Error;
-            log.error(`Zipping attempt${attempt} failed:`);
+            if (error instanceof AppError) {
+                lastError = error;
+            } else if (error instanceof Error) {
+                //check for enoent specifically
+                if ('code' in error && error.code === 'ENOENT') {
+                    const path = (error as any).path || '';
+                    if (path.includes(tempDir)) {
+                        lastError = new AppError(
+                            `Source file ot found ${path}`,
+                            404,
+                            'SourceFileNotFound'
+                        );
+                    } else {
+                        lastError = new AppError(
+                            `Output path error:${path}`,
+                            500,
+                            'OutputPathError'
+                        );
+                    }
+                } else {
+                    lastError = new AppError(
+                        `Zipping failed:${error.message}`,
+                        500,
+                        'ZipCreationError'
+                    );
+                }
+            } else {
+                lastError = new AppError(
+                    `Unknown error:${String(error)}`,
+                    500,
+                    'UnknownError'
+                );
+            }
+            log.error(`Zipping attempt ${attempt} failed:`, {
+                data: { lastError },
+            });
+            //clean up the failed zip file
             try {
-                //clean up the zip file if it exists
                 const failedZipPath = path.join(
                     zippedDir,
                     `${safeFolderName}_cleaned-${Date.now()}-attempt-${attempt}.zip`
                 );
                 await fs.remove(failedZipPath);
             } catch (error) {}
-            //if this wasn't the last attempt ,wait b4 retrying
+            //if this wasn't the last attempt wait before retrying
             if (attempt < maxRetries) {
                 log.info(`Retrying in ${retryDelay}ms...`);
                 await new Promise((resolve) => setTimeout(resolve, retryDelay));
-                //increase the delay (exponential backoff)
                 retryDelay *= 2;
             }
         }
     }
     //in the case that all the retries ail
-    throw new Error(
-        `Failed to zip file after${maxRetries}attempts,Last Error:${lastError?.message}`
+    throw new AppError(
+        `Failed to zip file after${maxRetries}attempts,Last Error:${lastError?.message}`,
+        500,
+        'ZipCreationError'
     );
 }
 export default createZipWithRetry;

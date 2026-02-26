@@ -7,6 +7,7 @@ import { tidyFolder } from '../utils/tidy.js';
 import createLogger from '../utils/logger.js';
 
 import createZipWithRetry from '../helpers/zipFolderRetry.js';
+import AppError from '../utils/appError.js';
 const log = createLogger('Folder-Cleaner');
 export const cleanerRoute = Router();
 const __filename = fileURLToPath(import.meta.url);
@@ -18,9 +19,31 @@ const folderCleanerBaseDir = path.join(
 );
 const uploadDir = path.join(folderCleanerBaseDir, 'uploads');
 const outputDir = path.join(folderCleanerBaseDir, 'outputs');
+/**NB: mkdirSync runs synchronously at server startup but when the server is running and the dir is deleted it will cause the enoent error */
 fs.mkdirSync(uploadDir, { recursive: true });
 fs.mkdirSync(outputDir, { recursive: true });
-const upload = multer({ dest: uploadDir }); //temporary storage
+const storage = multer.diskStorage({
+    destination: async (_require, _file, cb) => {
+        try {
+            //ensure directory exists before each write
+            await fs.ensureDir(uploadDir);
+            cb(null, uploadDir);
+        } catch (error) {
+            cb(
+                new AppError(
+                    `Failed to create upload directory`,
+                    500,
+                    'UploadDirError'
+                ),
+                ''
+            );
+        }
+    },
+});
+const upload = multer({
+    storage: storage,
+    limits: { fieldSize: 200 * 1024 * 1024 },
+}); //temporary storage with a limit of 200 mb
 
 cleanerRoute.post('/processFolder', upload.array('files'), async (req, res) => {
     log.highlight(
@@ -113,17 +136,28 @@ cleanerRoute.post('/processFolder', upload.array('files'), async (req, res) => {
             });
 
             // Handle the complete failure - maybe return the cleaned folder without zip
-            return {
+            res.json({
                 success: true,
                 cleaned: true,
                 zipped: false,
-                path: tempDir,
                 message:
                     'Folder cleaned but zip creation failed after multiple attempts',
-            };
+                stats: {
+                    originalFiles: uploadedFiles.length,
+                    finalFiles: stats.finalFiles.length,
+                    duplicatesRemoved: stats.duplicatesRemoved,
+                    spaceSaved: stats.spaceSaved,
+                },
+            });
         }
     } catch (error) {
         log.error('Failed to process folder', { data: { error } });
+        if (error instanceof AppError) {
+            return res.status(error.statusCode).json({
+                error: error.message,
+                type: error.type,
+            });
+        }
         res.status(500).json({ error: 'Failed to process folder' });
     }
 });
@@ -146,6 +180,12 @@ cleanerRoute.get('/download/:filename', (req, res) => {
         });
     } catch (error) {
         log.error('Error downloading the files', { data: { error } });
+        if (error instanceof AppError) {
+            return res.status(error.statusCode).json({
+                error: error.message,
+                type: error.type,
+            });
+        }
         res.status(500).json({ error: 'Failed to download' });
     }
 });
