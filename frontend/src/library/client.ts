@@ -3,7 +3,12 @@ const baseURL =
     import.meta.env.MODE === 'development'
         ? 'http://localhost:5000/api'
         : 'https://tidy-up.onrender.com/api';
-export const fileCleanerApi = axios.create({ baseURL });
+export const fileCleanerApi = axios.create({
+    baseURL,
+    timeout: 600000, // 10 minutes for large file uploads
+    maxContentLength: Infinity,
+    maxBodyLength: Infinity,
+});
 export const subscriptionApi = axios.create({ baseURL });
 fileCleanerApi.interceptors.response.use(
     (response) => response,

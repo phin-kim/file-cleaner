@@ -121,14 +121,15 @@ const folderCleanerBaseDir = path.join(
 );
 const uploadDir = path.join(folderCleanerBaseDir, 'uploads');
 const outputDir = path.join(folderCleanerBaseDir, 'outputs');
-/**NB: mkdirSync runs synchronously at server startup but when the server is running and the dir is deleted it will cause the enoent error */
+/**NB: mkdirSync runs synchronously at server startup but when
+ * iujh4g3f2d   the server is running and the dir is deleted it will cause the enoent error */
 fs.mkdirSync(uploadDir, { recursive: true });
 fs.mkdirSync(outputDir, { recursive: true });
 const storage = multer.diskStorage({
     destination: async (_require, _file, cb) => {
         try {
             //ensure directory exists before each write
-            //await fs.ensureDir(uploadDir);
+            await fs.ensureDir(uploadDir);
             cb(null, uploadDir);
             if (!uploadDir) {
                 throw AppError.notFound('Upload directory not configured');
@@ -149,13 +150,15 @@ const storage = multer.diskStorage({
 });
 const upload = multer({
     storage: storage,
-    limits: { fieldSize: 200 * 1024 * 1024 },
+    limits: {
+        fileSize: 200 * 1024 * 1024,
+        //fieldSize: 200 * 1024 * 1024,
+    },
 }); //temporary storage with a limit of 200 mb
 
 cleanerRoute.post(
     '/processFolder',
     handleUploadErrors,
-    upload.array('files'),
     asyncHandler(async (req, res) => {
         log.highlight(
             `🟢 [BACKEND] request received at: ${new Date().toISOString()}`

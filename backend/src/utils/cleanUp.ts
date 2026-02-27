@@ -31,9 +31,9 @@ export async function cleanupByAge(dir: string, label = 'CLEANUP') {
                             );
                             deletedCount++;
                         } else if (stat.isDirectory()) {
-                            //recirsively delete contents first
+                            //recursively delete contents first
                             log.info(
-                                `[${label}] cleanid old directory ${fullPath} (age: ${Math.round((now - stat.mtimeMs) / (60 * 60 * 1000))} hours)`
+                                `[${label}] cleaning old directory ${fullPath} (age: ${Math.round((now - stat.mtimeMs) / (60 * 60 * 1000))} hours)`
                             );
                             //get all contents of directory
                             const subEntries = await fs.readdir(fullPath);
@@ -44,7 +44,7 @@ export async function cleanupByAge(dir: string, label = 'CLEANUP') {
                                     if (subStat.isFile()) {
                                         deletedSize += subStat.size;
                                     } else if (subStat.isDirectory()) {
-                                        //for nested directories recuisively delete all contents
+                                        //for nested directories recursively delete all contents
                                         const dirSize =
                                             await getDirectorySize(subPath);
                                         deletedSize += dirSize;
@@ -70,13 +70,13 @@ export async function cleanupByAge(dir: string, label = 'CLEANUP') {
                             await fs.utimes(fullPath, new Date(), new Date());
                         }
                     } else {
-                        //if diretory is not old enough check its conents recursively
+                        //if directory is not old enough check its contents recursively
                         if (stat.isDirectory()) {
                             await cleanupContents(fullPath);
                         }
                     }
                 } catch (error) {
-                    // ignore errors for files that might have been delted in the meantime
+                    // ignore errors for files that might have been deleted in the meantime
                     if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
                         log.error(`[${label}] failed to process ${fullPath}`, {
                             data: { error },
@@ -126,14 +126,14 @@ export async function cleanupByAge(dir: string, label = 'CLEANUP') {
         await walk(dirPath, 0);
         return size;
     }
-    // startcleanup from parent direcory
+    // start cleanup from parent directory
     await cleanupContents(dir);
     if (deletedCount > 0) {
         log.info(
             `[${label}] cleanup complete: removed ${deletedCount} items (${(deletedSize / (1024 * 1024)).toFixed(2)}) MB`
         );
     } else {
-        log.info(`[${label}] no items toclean up in ${dir}`);
+        log.info(`[${label}] no items to clean up in ${dir}`);
     }
 }
 

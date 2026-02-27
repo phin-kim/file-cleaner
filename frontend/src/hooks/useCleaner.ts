@@ -143,7 +143,7 @@ export default function useCleaner() {
             let folderName = 'folder';
             const items = event.dataTransfer.items;
             log.info(`[FRONTEND] ${items.length} items in drop`);
-            if (items.length > 1) {
+            /*if (items.length > 1) {
                 setError(
                     `${items.length} folders detected. Kindly upload one at a time`
                 );
@@ -153,7 +153,7 @@ export default function useCleaner() {
                 }, 2000);
 
                 return;
-            }
+            }*/
             if (items && items.length > 0) {
                 for (const item of items) {
                     if (item.kind === 'file') {
