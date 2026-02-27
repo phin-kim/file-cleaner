@@ -89,6 +89,8 @@ export default function useCleaner() {
             setStatus('processing');
             const start = Date.now();
             log.info('Sending files to backend');
+            log.debug(`form data ${formData}`);
+            log.warn(`file count${fileArray.length}`);
             const response = await fileCleanerApi.post(`/${path}`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
@@ -119,6 +121,9 @@ export default function useCleaner() {
             log.error('Error in processing files', { data: { error } });
             handleApiError(error, setError);
             setStatus('error');
+            setTimeout(() => {
+                setStatus('idle');
+            }, 1500);
         }
     };
     const handleDrop = async (
@@ -143,7 +148,7 @@ export default function useCleaner() {
             let folderName = 'folder';
             const items = event.dataTransfer.items;
             log.info(`[FRONTEND] ${items.length} items in drop`);
-            /*if (items.length > 1) {
+            if (items.length > 1) {
                 setError(
                     `${items.length} folders detected. Kindly upload one at a time`
                 );
@@ -153,11 +158,18 @@ export default function useCleaner() {
                 }, 2000);
 
                 return;
-            }*/
+            }
             if (items && items.length > 0) {
                 for (const item of items) {
                     if (item.kind === 'file') {
                         const entry = item.webkitGetAsEntry();
+                        if (entry?.isFile) {
+                            setError('Kindly drop a folder');
+                            setTimeout(() => {
+                                setIsDragging(false);
+                                return;
+                            }, 2000);
+                        }
                         if (entry && entry.isDirectory) {
                             const dirEntry = entry as FileSystemDirectoryEntry;
                             // capture the folder name locally so we can reliably send it
@@ -215,6 +227,10 @@ export default function useCleaner() {
             log.error('Error in processing files', { data: { error } });
             handleApiError(error, setError);
             setStatus('error');
+            setStatus('processing');
+            setTimeout(() => {
+                setStatus('idle');
+            }, 1500);
         }
     };
 

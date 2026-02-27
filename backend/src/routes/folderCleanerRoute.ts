@@ -77,11 +77,12 @@ const handleUploadErrors = (
                 case 'MULTER_ERROR':
                     const errorMessages: Record<string, string> = {
                         LIMIT_FILE_SIZE: 'File too large. Max 200MB.',
-                        LIMIT_FILE_COUNT: 'Too many files uploaded.',
+                        LIMIT_FILE_COUNT: 'kindly upgrade to premium',
                         LIMIT_UNEXPECTED_FILE: 'Unexpected file field.',
                     };
 
-                    return res.status(400).json({
+                    const statusCode = classifiedError.error.code === 'LIMIT_FILE_COUNT' ? 409 : 400;
+                    return res.status(statusCode).json({
                         error:
                             errorMessages[classifiedError.error.code] ||
                             `Upload error: ${classifiedError.error.message}`,
@@ -122,7 +123,7 @@ const folderCleanerBaseDir = path.join(
 const uploadDir = path.join(folderCleanerBaseDir, 'uploads');
 const outputDir = path.join(folderCleanerBaseDir, 'outputs');
 /**NB: mkdirSync runs synchronously at server startup but when
- * iujh4g3f2d   the server is running and the dir is deleted it will cause the enoent error */
+ *   the server is running and the dir is deleted it will cause the enoent error */
 fs.mkdirSync(uploadDir, { recursive: true });
 fs.mkdirSync(outputDir, { recursive: true });
 const storage = multer.diskStorage({
@@ -152,7 +153,7 @@ const upload = multer({
     storage: storage,
     limits: {
         fileSize: 200 * 1024 * 1024,
-        //fieldSize: 200 * 1024 * 1024,
+        files: 150, // Reject upload if more than 150 files
     },
 }); //temporary storage with a limit of 200 mb
 
@@ -167,7 +168,7 @@ cleanerRoute.post(
         const uploadedFiles = req.files as Express.Multer.File[];
         const uploadedFolderName = req.body.folderName; //fallback
         const safeFolderName = uploadedFolderName.replace(/[^a-z0-9_-]/gi, '_');
-
+        log.info(`uploaded Files ${uploadedFiles.length}`);
         log.info(`[BACKEND] ${uploadedFiles.length} files received`);
         if (!uploadedFiles || uploadedFiles.length === 0) {
             log.warn('⚠ [BACKEND] no files received ');
@@ -188,7 +189,7 @@ cleanerRoute.post(
         try {
             for (const file of uploadedFiles) {
                 const destPath = path.join(tempDir, file.originalname);
-                await fs.move(file.path, destPath);
+                await fs.move(file.path, destPath, { overwrite: true });
                 log.info(`[BACKEND] moved ${file.originalname} to temp`);
             }
         } finally {

@@ -156,8 +156,13 @@ export function startPeriodicCleanup(tempDirs: string[]) {
 
 //force cleanup all files in a directory regardless of age
 export async function forceCleanup(dir: string, label = 'CLEANUP') {
-    const filePath = fs.pathExists(dir);
-    if (!filePath) return;
+    log.warn('Force cleanup triggered');
+    const exists = await fs.pathExists(dir);
+
+    if (!exists) {
+        log.error(`the desired file at ${dir} doesn't exist`);
+        return;
+    }
     let deletedCount = 0;
     let deletedSize = 0;
     async function recursiveClean(currentPath: string) {
@@ -183,6 +188,7 @@ export async function forceCleanup(dir: string, label = 'CLEANUP') {
         }
     }
     await recursiveClean(dir);
+    await fs.emptyDir(dir);
     log.error(
         `[${label}] force cleanup complete: removed ${deletedCount} items (${(deletedSize / (1024 * 1024)).toFixed(2)} MB)`
     );

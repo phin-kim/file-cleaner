@@ -219,7 +219,7 @@ export default function FolderCleanerUI() {
                                         transition={{ delay: 0.3 }}
                                         className="p-4 border rounded-lg border-purple-300/10 bg-white/5"
                                     >
-                                        <p className="mb-1 text-base font-medium text-purple-500">
+                                        <p className="mb-1 text-base font-medium text-purple-100">
                                             Original Files
                                         </p>
                                         <p className="text-3xl font-bold text-white">
@@ -233,7 +233,7 @@ export default function FolderCleanerUI() {
                                         transition={{ delay: 0.4 }}
                                         className="p-4 border rounded-lg border-purple-300/10 bg-white/5"
                                     >
-                                        <p className="mb-1 text-base font-medium text-purple-500">
+                                        <p className="mb-1 text-base font-medium text-purple-100">
                                             Duplicates Removed
                                         </p>
                                         <p className="text-3xl font-bold text-red-400">
@@ -247,7 +247,7 @@ export default function FolderCleanerUI() {
                                         transition={{ delay: 0.5 }}
                                         className="p-4 border rounded-lg border-purple-300/10 bg-white/5"
                                     >
-                                        <p className="mb-1 text-base font-medium text-purple-500">
+                                        <p className="mb-1 text-base font-medium text-purple-100">
                                             Final Files
                                         </p>
                                         <p className="text-3xl font-bold text-green-400">
@@ -261,7 +261,7 @@ export default function FolderCleanerUI() {
                                         transition={{ delay: 0.6 }}
                                         className="p-4 border rounded-lg border-purple-300/10 bg-white/5"
                                     >
-                                        <p className="mb-1 text-base font-medium text-purple-500">
+                                        <p className="mb-1 text-base font-medium text-purple-100">
                                             Space Saved
                                         </p>
                                         <p className="text-3xl font-bold text-blue-400">
