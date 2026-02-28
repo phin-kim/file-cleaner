@@ -48,11 +48,6 @@ const FOLDER_STORAGE_TEMPS = path.join(
     'folder-cleaner-temp-storage'
 );
 log.info(`Checking if the temporary storage exits${FOLDER_STORAGE_TEMPS}`);
-/*const ROUTES_TEMP = path.join(__dirname, 'routes', 'temp');
-const BACKEND_TEMP = path.join(__dirname, 'temp');
-const UPLOADS = path.join(process.cwd(), 'upload');
-C:\Users\USER\Desktop\SIDE-PROJECTS\tidy-up\backend\output\folder-cleaner-temps\folder-cleaner-temp-storage
-*/
 
 const CLEAN_UP_DIRS = [
     MERGER_OUTPUTS,

@@ -10,6 +10,7 @@ import { MulterError } from 'multer';
 import createZipWithRetry from '../helpers/zipFolderRetry.js';
 import AppError from '../utils/appError.js';
 import asyncHandler from '../middleware/asyncHandler.js';
+import uploadLimiter from '../utils/rateLimiter.js';
 
 const log = createLogger('Folder-Cleaner');
 export const cleanerRoute = Router();
@@ -253,6 +254,7 @@ const upload = multer({
 
 cleanerRoute.post(
     '/processFolder',
+    uploadLimiter,
     handleUploadErrors,
     asyncHandler(async (req, res) => {
         log.highlight(
