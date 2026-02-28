@@ -20,7 +20,7 @@ export default function useCleaner() {
     );
     const [downloadURL, setDownloadURL] = useState<string | null>(null);
     const [openPopup, setOpenPopUp] = useState(false);
-
+    const [upgradeModal, setUpgradeModal] = useState(false);
     const [result, setResult] = useState<AnalysisResult | null>(null);
     const [progress, setProgress] = useState(0);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -74,12 +74,23 @@ export default function useCleaner() {
             //webkit relative path includes the folder name: "folderName/filename.ext"
             const folderName = firstFile.webkitRelativePath.split('/')[0];
             log.highlight('Folder name', { data: folderName });
+            const fileArray = Array.from(files);
+            
+            // Check file limit before uploading
+            if (fileArray.length > 150) {
+                setError(
+                    `${fileArray.length} files. Kindly upgrade to premium`
+                );
+                setUpgradeModal(true);
+                setStatus('idle');
+                return;
+            }
+            
             setUploadedFolder({
                 name: folderName,
-                files: Array.from(files),
+                files: fileArray,
             });
             //convert file list to array for form data
-            const fileArray = Array.from(files);
             const formData = new FormData();
             formData.append('folderName', folderName);
 
@@ -182,6 +193,15 @@ export default function useCleaner() {
                                 `[FRONTEND] processing folder ${dirEntry.name}`
                             );
                             const dirFiles = await traverseDirectory(dirEntry);
+                            if (dirFiles.length > 150) {
+                                setError(
+                                    `${dirFiles.length} files. Kindly upgrade to premium`
+                                );
+                                setUpgradeModal(true);
+                                setStatus('idle');
+                                setIsDragging(false);
+                                return;
+                            }
                             log.info(
                                 `[FRONTEND] ${dirFiles.length} found in folder`
                             );
@@ -264,6 +284,8 @@ export default function useCleaner() {
         downloadURL,
         openPopup,
         fileInputRef,
+        upgradeModal,
+        setUpgradeModal,
         handleFolderInputChange,
         handleFolderSelectClick,
         setOpenPopUp,

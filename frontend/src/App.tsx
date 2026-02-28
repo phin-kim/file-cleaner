@@ -1,4 +1,5 @@
 import ErrorToast from './components/ErrorToast';
+import Pricing from './components/Pricing';
 import FolderCleanerUI from './Pages/Cleaner';
 //import BillingPage from './Pages/Billing';
 //import FolderQuestionAnalyzer from './Pages/Merger';
@@ -25,6 +26,7 @@ function App() {
                         />
                         <Route path="/welcome" element={<WelcomeModal />} />*/}
                     <Route path="/" element={<FolderCleanerUI />} />
+                    <Route path="/pricing" element={<Pricing />} />
                     {/*<Route path="/billing" element={<BillingPage />} />
                         <Route
                             path="/file-merge"

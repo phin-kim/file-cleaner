@@ -46,7 +46,40 @@ const classifyError = (err: unknown): UploadError => {
 
     return { type: 'UNKNOWN', error: err };
 };
+/**In Express, if you're inside an asynchronous callback and something goes wrong, ALWAYS use next(error), NEVER throw.
+This applies to:
+File uploads (Multer)
+Database operations
+API calls
+Any async operation with callbacks/promises 
 
+NB:THIS IS WRONG and it caused a server crash ie the server stopped working
+ case 'APP_ERROR':
+    log.error(classifiedError.error.message, {
+        data: {
+            error: classifiedError.error.message,
+            type: classifiedError.error.type,
+        },
+    });
+    throw new AppError(
+        classifiedError.error.message,
+        classifiedError.error.statusCode,
+        classifiedError.error.type
+    );
+- Instead do return next(
+    log.error(classifiedError.error.message, {
+            data: {
+                error: classifiedError.error.message,
+                type: classifiedError.error.type,
+            },
+        });
+        throw new AppError(
+            classifiedError.error.message,
+            classifiedError.error.statusCode,
+            classifiedError.error.type
+        );
+    )
+*/
 const handleUploadErrors = (
     req: Request,
     res: Response,
@@ -60,57 +93,118 @@ const handleUploadErrors = (
 
             switch (classifiedError.type) {
                 case 'ENOENT':
-                    return res.status(503).json({
-                        error: 'Storage system unavailable. Please try again.',
-                        type: 'StorageUnavailable',
-                        suggestion:
-                            'The upload directory may have been deleted. Our team has been notified.',
-                        path: classifiedError.error.path,
+                    log.error('Storage unavailable ', {
+                        data: {
+                            error: 'Storage system unavailable. Please try again.',
+                            type: 'StorageUnavailable',
+                            suggestion:
+                                'The upload directory may have been deleted. Our team has been notified.',
+                            path: classifiedError.error.path,
+                        },
                     });
+                    return next(
+                        new AppError(
+                            'Service Unavailable',
+                            503,
+                            'StorageUnavailable'
+                        )
+                    );
 
                 case 'APP_ERROR':
-                    return res.status(classifiedError.error.statusCode).json({
-                        error: classifiedError.error.message,
-                        type: classifiedError.error.type,
+                    log.error(classifiedError.error.message, {
+                        data: {
+                            error: classifiedError.error.message,
+                            type: classifiedError.error.type,
+                        },
                     });
-
+                    return next(
+                        new AppError(
+                            classifiedError.error.message,
+                            classifiedError.error.statusCode,
+                            classifiedError.error.type
+                        )
+                    );
                 case 'MULTER_ERROR':
                     const errorMessages: Record<string, string> = {
                         LIMIT_FILE_SIZE: 'File too large. Max 200MB.',
-                        LIMIT_FILE_COUNT: 'kindly upgrade to premium',
+                        LIMIT_FILE_COUNT: 'File count exceeded 150',
                         LIMIT_UNEXPECTED_FILE: 'Unexpected file field.',
                     };
 
-                    const statusCode = classifiedError.error.code === 'LIMIT_FILE_COUNT' ? 409 : 400;
-                    return res.status(statusCode).json({
-                        error:
-                            errorMessages[classifiedError.error.code] ||
-                            `Upload error: ${classifiedError.error.message}`,
-                        type: 'UploadError',
-                        code: classifiedError.error.code,
+                    const statusCode =
+                        classifiedError.error.code === 'LIMIT_FILE_COUNT'
+                            ? 409
+                            : 400;
+                    log.error(errorMessages[classifiedError.error.code], {
+                        data: {
+                            error:
+                                errorMessages[classifiedError.error.code] ||
+                                `Upload error: ${classifiedError.error.message}`,
+                            type: 'UploadError',
+                            code: classifiedError.error.code,
+                        },
                     });
+                    return next(
+                        new AppError(
+                            `Upload error: ${classifiedError.error.message}`,
+                            statusCode,
+                            'UploadError'
+                        )
+                    );
 
                 case 'STANDARD_ERROR':
                     if (classifiedError.error.message.includes('ENOENT')) {
-                        return res.status(503).json({
-                            error: 'Storage system unavailable. Please try again.',
-                            type: 'StorageUnavailable',
-                        });
+                        log.error(
+                            'Storage system unavailable. Please try again.',
+                            {
+                                data: {
+                                    error: 'Storage system unavailable. Please try again.',
+                                    type: 'StorageUnavailable',
+                                },
+                            }
+                        );
+                        return next(
+                            new AppError(
+                                'Storage system unavailable. Please try again.',
+                                503,
+                                'StorageUnavailable'
+                            )
+                        );
                     }
-
-                    return res.status(500).json({
-                        error:
-                            classifiedError.error.message ||
-                            'Upload failed. Please try again.',
-                        type: 'UnknownError',
-                    });
+                    log.error(
+                        `${classifiedError.error.message || 'Upload failed. Please try again.'}`,
+                        {
+                            data: {
+                                error:
+                                    classifiedError.error.message ||
+                                    'Upload failed. Please try again.',
+                                type: 'UnknownError',
+                            },
+                        }
+                    );
+                    return next(
+                        new AppError(
+                            `${classifiedError.error.message || 'Upload failed. Please try again.'}`,
+                            500,
+                            'UNknownError'
+                        )
+                    );
 
                 case 'UNKNOWN':
                 default:
-                    return res.status(500).json({
-                        error: 'Upload failed. Please try again.',
-                        type: 'UnknownError',
+                    log.error('Upload failed.Please try again', {
+                        data: {
+                            error: 'Upload failed. Please try again.',
+                            type: 'UnknownError',
+                        },
                     });
+                    return next(
+                        new AppError(
+                            'Upload failed.Please try again',
+                            500,
+                            'UnknownError'
+                        )
+                    );
             }
         }
         next();

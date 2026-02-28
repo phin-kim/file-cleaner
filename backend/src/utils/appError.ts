@@ -14,11 +14,14 @@ class AppError extends Error {
     static validation(message: string) {
         return new AppError(message, 400, 'ValidationError');
     }
-    static database(message: string) {
-        return new AppError(message, 500, 'DatabaseError');
-    }
     static unauthorized(message: string) {
         return new AppError(message, 401, 'Unauthorized');
+    }
+    static invalidToken(message = 'Invalid Token') {
+        return new AppError(message, 401, 'InvalidToken');
+    }
+    static tokenExpired(message = 'Token Expired') {
+        return new AppError(message, 401, 'TokenExpired');
     }
     static notFound(message: string) {
         return new AppError(message, 404, 'NotFound');
@@ -32,16 +35,13 @@ class AppError extends Error {
     static tooManyRequests(message = 'Too many requests') {
         return new AppError(message, 429, 'RateLimitExceeded');
     }
-    static invalidToken(message = 'Invalid Token') {
-        return new AppError(message, 401, 'InvalidToken');
-    }
-    static tokenExpired(message = 'Token Expired') {
-        return new AppError(message, 401, 'TokenExpired');
+    static database(message: string) {
+        return new AppError(message, 500, 'DatabaseError');
     }
     static externalService(message = 'External service error') {
         return new AppError(message, 502, 'BadGateway');
     }
-    static serviceUnavalable(message = 'Service unavailable') {
+    static serviceUnavailable(message = 'Service unavailable') {
         return new AppError(message, 503, 'ServiceUnavailable');
     }
 }
