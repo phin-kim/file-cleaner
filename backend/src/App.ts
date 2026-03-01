@@ -3,6 +3,7 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import './config/envLoader.js';
+import cookieParser from 'cookie-parser';
 import { cleanerRoute } from './routes/folderCleanerRoute.js';
 import { subRouter } from './routes/subscription.js';
 import {
@@ -12,9 +13,13 @@ import {
 } from './utils/cleanUp.js';
 import { mergerRoute } from './routes/fileMergerRoute.js';
 import createLogger from './utils/logger.js';
+import { authRoute } from './routes/auth.js';
+import errorHandler from './utils/errorHandler.js';
+import { connectDatabases } from './config/DB.js';
 
 const log = createLogger('APP.TS');
 const PORT = process.env.PORT;
+const cookieSecret = process.env.COOKIE_SECRET
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -27,11 +32,11 @@ app.use(
     })
 );
 app.use(express.json());
-
+app.use(cookieParser(cookieSecret));
 app.use('/api', cleanerRoute);
 app.use('/api', subRouter);
 app.use('/api', mergerRoute);
-//change this later on
+app.use('/api/auth', authRoute);
 app.use('/downloads', express.static(path.join(process.cwd(), 'backend/temp')));
 
 const PROJECT_ROOT = path.resolve(__dirname, '../');
@@ -69,4 +74,18 @@ cleanupOrphanedFiles(path.join(__dirname, '../'), [
     //add other patterns for temp files
 ]).catch(console.error);
 
-app.listen(PORT, () => log.highlight(`Server is running on port ${PORT}`));
+const startServer =async()=>{
+    try {
+        await connectDatabases()
+        app.listen(PORT,()=>{
+            log.highlight(`Tidy up is running on http://localhost:${PORT}`,{context:"running server"})
+        })
+    } catch (error) {
+        log.error('Failed to connect to databases and server failure', {
+            context: 'Failed to start',
+            data: {error},
+        });
+    }
+}
+startServer()
+app.use(errorHandler)
