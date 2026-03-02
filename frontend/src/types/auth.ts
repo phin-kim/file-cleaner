@@ -10,4 +10,5 @@ export interface User {
 export type AuthResponse = {
     accessToken: string;
     user: User;
+    message: string;
 };

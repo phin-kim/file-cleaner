@@ -4,7 +4,7 @@
     "version": "0.0.0",
     "type": "module",
     "scripts": {
-        "dev": "nodemon --ignore 'backend/temp/**' --ignore 'uploads/**' --ignore '**/temp/**' --watch 'backend/src' --exec tsx backend/src/App.ts",
+        "dev": "nodemon --ignore 'backend/temp/**' --ignore 'uploads/**' --ignore '**/temp/**' --watch 'src' --exec tsx src/App.ts",
         "build": "tsc ",
         "lint": "eslint .",
         "ignore": "temp/**/*|uploads/**/*|backend/temp/**/*|",

@@ -26,9 +26,10 @@ function App() {
                             element={<Navigate to="/welcome" replace />}
                         />
                         <Route path="/welcome" element={<WelcomeModal />} />*/}
+                    <Route path="/auth" element={<AuthForm />} />
+
                     <Route path="/" element={<FolderCleanerUI />} />
                     <Route path="/pricing" element={<Pricing />} />
-                    <Route path="/auth" element={<AuthForm />} />
                     {/*<Route path="/billing" element={<BillingPage />} />
                         <Route
                             path="/file-merge"

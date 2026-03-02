@@ -4,8 +4,11 @@ import AppError from '../utils/appError';
 import { comparePasswords, hashPassword } from '../utils/passwords';
 import { validateRegisterInput } from '../config/validator';
 import { hashToken, signAccessToken, signRefreshToken } from '../utils/jwt';
+import createLogger from '../utils/logger';
+const log = createLogger('AUTH CONTROLLER');
 export async function register(req: Request, res: Response) {
     const { email, password } = validateRegisterInput(req.body);
+    log.info('Data from the front end', { data: { email, password } });
     //check if user exists
     const existingUser = await UserModel.findOne({ email });
     if (existingUser) {

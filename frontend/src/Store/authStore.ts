@@ -4,6 +4,7 @@ import createClientLogger from '../utils/clientLogger';
 //remember to change is authenticated in the db and also in the routes
 import type { User, AuthResponse } from '../types/auth';
 import authApi, { setAccessToken } from '../library/authApi';
+import useSuccessStore from './SuccessStore';
 const log = createClientLogger('AUTH STORE');
 type AuthState = {
     user: User | null;
@@ -22,7 +23,9 @@ export const useAuthStore = create<AuthState>((set) => ({
     isLoading: false,
     register: async (email, password) => {
         set({ isLoading: true });
+        log.highlight('SENDING DATA TO THE BACKEND');
         try {
+            log.info('Data sent to the backend', { data: { email, password } });
             const res = await authApi.post<AuthResponse>('/auth/register', {
                 email,
                 password,
@@ -33,6 +36,9 @@ export const useAuthStore = create<AuthState>((set) => ({
                 accessToken: res.data.accessToken,
                 isAuthenticated: true,
             });
+            console.log(res.data);
+            log.info('Response from the backend', { data: { res } });
+            useSuccessStore.setState({ success: res.data.message });
         } catch (error) {
             log.error('Error in registering', {
                 data: { error },
@@ -44,6 +50,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     },
     refresh: async () => {
         set({ isLoading: true });
+        log.highlight('REFRESH IS TRIGGERED');
         try {
             const res = await authApi.post('/auth/refresh');
             setAccessToken(res.data.accessToken);
@@ -52,6 +59,7 @@ export const useAuthStore = create<AuthState>((set) => ({
                 accessToken: res.data.accessToken,
                 isAuthenticated: true,
             });
+            log.info('refresh from backend', { data: { res } });
         } catch (error) {
             // refresh failed; user stays logged out
             setAccessToken(null);

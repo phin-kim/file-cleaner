@@ -8,7 +8,7 @@ import createClientLogger from '../utils/clientLogger';
 const log = createClientLogger('Auth api');
 const baseURL =
     import.meta.env.MODE === 'development'
-        ? 'http://localhost:5100/api'
+        ? 'http://localhost:5000/api'
         : 'https://tidy-up.onrender.com/api';
 interface QueuedRequest {
     resolve: (value: string | null) => void;

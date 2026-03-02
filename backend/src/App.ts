@@ -19,7 +19,7 @@ import { connectDatabases } from './config/DB.js';
 
 const log = createLogger('APP.TS');
 const PORT = process.env.PORT;
-const cookieSecret = process.env.COOKIE_SECRET
+const cookieSecret = process.env.COOKIE_SECRET;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -74,18 +74,20 @@ cleanupOrphanedFiles(path.join(__dirname, '../'), [
     //add other patterns for temp files
 ]).catch(console.error);
 
-const startServer =async()=>{
+const startServer = async () => {
     try {
-        await connectDatabases()
-        app.listen(PORT,()=>{
-            log.highlight(`Tidy up is running on http://localhost:${PORT}`,{context:"running server"})
-        })
+        await connectDatabases();
+        app.listen(PORT, () => {
+            log.highlight(`Tidy up is running on http://localhost:${PORT}`, {
+                context: 'running server',
+            });
+        });
     } catch (error) {
         log.error('Failed to connect to databases and server failure', {
             context: 'Failed to start',
-            data: {error},
+            data: { error },
         });
     }
-}
-startServer()
-app.use(errorHandler)
+};
+startServer();
+app.use(errorHandler);
