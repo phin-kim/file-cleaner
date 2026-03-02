@@ -1,14 +1,17 @@
 import AppError from '../utils/appError';
 import createLogger from '../utils/logger.js';
-import { loginSchema, type LoginInput } from '../schema/validatorSchema.js';
+import {
+    registerSchema,
+    type RegisterInput,
+} from '../schema/validatorSchema.js';
 const log = createLogger('VALIDATOR');
 export interface Input {
     email: string;
     password: string;
 }
 
-export function validateRegisterInput(body: unknown): LoginInput {
-    const result = loginSchema.safeParse(body);
+export function validateRegisterInput(body: unknown): RegisterInput {
+    const result = registerSchema.safeParse(body);
 
     if (!result.success) {
         const message = result.error.issues

@@ -1,18 +1,31 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
+import useErrorStore from '../Store/ErrorStore';
+import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../Store/authStore';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { type RegisterInput, registerSchema } from '../library/validatorSchema';
+import handleApiError from '../utils/apiError';
 
-interface AuthFormProps {
-    onSuccess: (email: string) => void;
-    onBack: () => void;
-}
-
-const AuthForm: React.FC<AuthFormProps> = ({ onSuccess, onBack }) => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        onSuccess(email);
+const AuthForm = () => {
+    const { setError } = useErrorStore();
+    const navigate = useNavigate();
+    const registerUser = useAuthStore((state) => state.register);
+    const {
+        register,
+        handleSubmit,
+        formState: { errors, isSubmitting },
+    } = useForm<RegisterInput>({
+        resolver: zodResolver(registerSchema),
+    });
+    const handleRegister = async (data: RegisterInput) => {
+        try {
+            await registerUser(data.email, data.password);
+            navigate('/');
+        } catch (error) {
+            handleApiError(error, setError);
+        }
     };
 
     return (
@@ -82,7 +95,10 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSuccess, onBack }) => {
                             </span>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="space-y-8">
+                        <form
+                            onSubmit={handleSubmit(handleRegister)}
+                            className="space-y-8"
+                        >
                             <div className="relative">
                                 <label className="block mb-1 ml-1 text-xs font-bold tracking-wider text-purple-400 uppercase">
                                     Email Address
@@ -90,11 +106,15 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSuccess, onBack }) => {
                                 <input
                                     type="email"
                                     required
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
+                                    {...register('email')}
                                     className="w-full px-1 py-3 text-lg text-purple-900 transition-all bg-transparent border-b-2 border-purple-200 outline-none placeholder:text-purple-200 focus:border-purple-600"
                                     placeholder="name@example.com"
                                 />
+                                {errors.email && (
+                                    <p className="text-red-600 font-blod">
+                                        {errors.email.message}
+                                    </p>
+                                )}
                             </div>
 
                             <div className="relative">
@@ -104,11 +124,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSuccess, onBack }) => {
                                 <div className="relative">
                                     <input
                                         type="password"
-                                        required
-                                        value={password}
-                                        onChange={(e) =>
-                                            setPassword(e.target.value)
-                                        }
+                                        {...register('password')}
                                         className="w-full px-1 py-3 text-lg text-purple-900 transition-all bg-transparent border-b-2 border-purple-200 outline-none placeholder:text-purple-200 focus:border-purple-600"
                                         placeholder="••••••••"
                                     />
@@ -118,6 +134,11 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSuccess, onBack }) => {
                                     >
                                         <i className="fa-solid fa-eye-slash"></i>
                                     </button>
+                                    {errors.password && (
+                                        <p className="text-red-600 font-blod">
+                                            {errors.password.message}
+                                        </p>
+                                    )}
                                 </div>
                             </div>
 
@@ -144,9 +165,15 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSuccess, onBack }) => {
 
                             <button
                                 type="submit"
+                                disabled={isSubmitting}
                                 className="w-full rounded-2xl bg-purple-600 px-6 py-5 text-lg font-bold text-white shadow-xl shadow-purple-500/30 transition-all hover:scale-[1.01] hover:bg-purple-700 active:scale-[0.99]"
                             >
-                                Continue
+                                {' '}
+                                <span>
+                                    {isSubmitting
+                                        ? 'Continue ...'
+                                        : 'Registering...'}
+                                </span>
                             </button>
                         </form>
 
@@ -166,7 +193,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSuccess, onBack }) => {
                             </div>
                         </div>
 
-                        <div className="mt-10 text-center">
+                        {/*<div className="mt-10 text-center">
                             <button
                                 onClick={onBack}
                                 className="flex items-center justify-center gap-2 mx-auto text-sm font-bold text-purple-400 transition-colors hover:text-purple-600"
@@ -174,7 +201,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onSuccess, onBack }) => {
                                 <i className="text-xs fa-solid fa-arrow-left"></i>
                                 Back to Dashboard
                             </button>
-                        </div>
+                        </div>*/}
                     </div>
                 </div>
             </motion.div>
