@@ -37,6 +37,15 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
         if (!stored) {
             return next(AppError.unauthorized('Refresh token revoked'));
         }
+        if (stored.expiresAt < new Date()) {
+            //remove expired tokens
+            user.refreshTokens = user.refreshTokens.filter(
+                (token) => token.tokenHash !== tokenHash
+            );
+            await user.save();
+
+            return next(AppError.unauthorized('Refresh token has expired'));
+        }
         //rotate tokens
         user.refreshTokens = user.refreshTokens.filter(
             (token) => token.tokenHash !== tokenHash
@@ -50,7 +59,7 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
             expiresAt: new Date(Date.now() + 30 * 24 * 60860 * 1000),
         });
         await user.save();
-        res.cookie('refreshToke', newRefreshToken, {
+        res.cookie('refreshToken', newRefreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',

@@ -24,10 +24,14 @@ const AuthForm = () => {
     });
     const handleRegister = async (data: RegisterInput) => {
         try {
-            await registerUser(data.email, data.password);
+            const res = await registerUser(data.email, data.password);
             log.info('User details sent to backend from the form', {
                 data: data,
             });
+            log.info(
+                'Response from the register user function in the authstore',
+                { data: res }
+            );
             navigate('/');
         } catch (error) {
             log.error('Error sending the client info', { data: { error } });

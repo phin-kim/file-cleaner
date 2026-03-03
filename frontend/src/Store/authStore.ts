@@ -5,6 +5,8 @@ import createClientLogger from '../utils/clientLogger';
 import type { User, AuthResponse } from '../types/auth';
 import authApi, { setAccessToken } from '../library/authApi';
 import useSuccessStore from './SuccessStore';
+import useErrorStore from './ErrorStore';
+import handleApiError from '../utils/apiError';
 const log = createClientLogger('AUTH STORE');
 type AuthState = {
     user: User | null;
@@ -36,13 +38,18 @@ export const useAuthStore = create<AuthState>((set) => ({
                 accessToken: res.data.accessToken,
                 isAuthenticated: true,
             });
-            console.log(res.data);
-            log.info('Response from the backend', { data: { res } });
-            useSuccessStore.setState({ success: res.data.message });
+
+            log.info(`Response from the backend `, { data: res });
+            useSuccessStore.setState({ success: 'Registration successful' });
         } catch (error) {
+            log.warn(`Get the general error ${error}`);
             log.error('Error in registering', {
                 data: { error },
             });
+
+            const { setError } = useErrorStore.getState();
+            handleApiError(error, setError);
+
             set({ isAuthenticated: false });
         } finally {
             set({ isLoading: false });

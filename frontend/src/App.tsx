@@ -1,4 +1,5 @@
 import ErrorToast from './components/ErrorToast';
+import SuccessToast from './components/SuccessToast';
 import Pricing from './components/Pricing';
 import AuthForm from './Pages/Auth';
 import FolderCleanerUI from './Pages/Cleaner';
@@ -11,13 +12,32 @@ import {
     //Outlet,
     //Navigate,
 } from 'react-router-dom';
+import { useEffect } from 'react';
+import authApi from './library/authApi';
+import createClientLogger from './utils/clientLogger';
+import handleApiError from './utils/apiError';
+import useErrorStore from './Store/ErrorStore';
+const log = createClientLogger('App.tsx');
 //import { UpgradeModal } from './components/Popup';
 //import WelcomeModal from './Pages/WelcomePage';
 //import Header from './components/Header';
 function App() {
+    const { setError } = useErrorStore();
+    useEffect(() => {
+        const refreshSession = async () => {
+            try {
+                await authApi.post('/auth/refresh');
+                log.info('Session restored');
+            } catch (error) {
+                handleApiError(error, setError);
+            }
+        };
+        refreshSession();
+    }, []);
     return (
         <>
             <ErrorToast />
+            <SuccessToast />
             <BrowserRouter>
                 <Routes>
                     {/*<Route element={<AppLayout />}>

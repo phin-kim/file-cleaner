@@ -20,6 +20,7 @@ let accessToken: string | null = null;
 let isRefreshing = false;
 const authApi: AxiosInstance = axios.create({
     baseURL,
+    withCredentials: true,
 });
 //
 /**

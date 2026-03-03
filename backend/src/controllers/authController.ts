@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import { UserModel } from '../schema/UsersSchema';
 import AppError from '../utils/appError';
-import { comparePasswords, hashPassword } from '../utils/passwords';
+import { hashPassword } from '../utils/passwords';
 import { validateRegisterInput } from '../config/validator';
 import { hashToken, signAccessToken, signRefreshToken } from '../utils/jwt';
 import createLogger from '../utils/logger';
@@ -12,6 +12,8 @@ export async function register(req: Request, res: Response) {
     //check if user exists
     const existingUser = await UserModel.findOne({ email });
     if (existingUser) {
+        log.warn('User already exists');
+
         throw AppError.conflict('Email already in use');
     }
     //hash password
@@ -24,10 +26,13 @@ export async function register(req: Request, res: Response) {
     const refreshToken = signRefreshToken({
         uid: user._id.toString(),
     });
-    if (!refreshToken) {
+    //nb this if statement is there not necessarily for logic but coz the hash token brings an error so its either this or the non null assertion
+
+    /*if (!refreshToken) {
+        log.warn('Token has expired');
         throw AppError.tokenExpired('Kindly log in again');
-    }
-    const refreshTokenHash = hashToken(refreshToken);
+    }*/
+    const refreshTokenHash = hashToken(refreshToken!);
     user.refreshTokens.push({
         tokenHash: refreshTokenHash,
         createdAt: new Date(),
