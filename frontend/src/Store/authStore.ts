@@ -18,7 +18,7 @@ type AuthState = {
     refresh: () => Promise<void>;
     logout: () => Promise<void>;
 };
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
     user: null,
     isAuthenticated: false,
     accessToken: null,
@@ -38,8 +38,11 @@ export const useAuthStore = create<AuthState>((set) => ({
                 accessToken: res.data.accessToken,
                 isAuthenticated: true,
             });
-
-            log.info(`Response from the backend `, { data: res });
+            const currentState = get();
+            log.debug(`Current user `, {
+                data: currentState.user,
+            });
+            log.debug(`Is authenticated ${currentState.isAuthenticated}`);
             useSuccessStore.setState({ success: 'Registration successful' });
         } catch (error) {
             log.warn(`Get the general error ${error}`);
@@ -66,6 +69,9 @@ export const useAuthStore = create<AuthState>((set) => ({
                 accessToken: res.data.accessToken,
                 isAuthenticated: true,
             });
+            const currentState = get();
+            log.debug('Current user', { data: currentState.user });
+            log.debug(`Is authenticated ${currentState.isAuthenticated}`);
             log.info('refresh from backend', { data: { res } });
         } catch (error) {
             // refresh failed; user stays logged out

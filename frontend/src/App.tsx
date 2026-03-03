@@ -12,28 +12,49 @@ import {
     //Outlet,
     //Navigate,
 } from 'react-router-dom';
-import { useEffect } from 'react';
-import authApi from './library/authApi';
+import { useEffect, useRef } from 'react';
 import createClientLogger from './utils/clientLogger';
 import handleApiError from './utils/apiError';
 import useErrorStore from './Store/ErrorStore';
+import { useAuthStore } from './Store/authStore';
 const log = createClientLogger('App.tsx');
 //import { UpgradeModal } from './components/Popup';
 //import WelcomeModal from './Pages/WelcomePage';
 //import Header from './components/Header';
+/** 
+ 
+Method	Name	React-Ractive?	Use Case
+useAuthStore(selector)	Selector hooks	✅ Yes (specific)	React components - when you need reactivity
+useAuthStore()	Full store hook	✅ Yes (all)	Avoid unless necessary
+useAuthStore.getState()	Store getters	❌ No	Non-React code (interceptors, helpers, outside components)
+*/
 function App() {
     const { setError } = useErrorStore();
+    const refreshExecuted = useRef(false);
+    const user = useAuthStore((state) => state.user);
+    const authenticated = useAuthStore((state) => state.isAuthenticated);
+    const refreshAuth = useAuthStore((state) => state.refresh);
+
     useEffect(() => {
-        const refreshSession = async () => {
+        if (refreshExecuted.current) {
+            log.warn('refresh already executed skipping duplicate');
+            return;
+        }
+        const restoreSession = async () => {
+            refreshExecuted.current = true;
             try {
-                await authApi.post('/auth/refresh');
+                await refreshAuth();
                 log.info('Session restored');
+                const currentUser = useAuthStore.getState().user;
+                const currentAuth = useAuthStore.getState().isAuthenticated;
+                log.debug(`is authenticated ${currentAuth}`);
+                log.highlight(`Log in as ${currentUser?.email}`);
             } catch (error) {
                 handleApiError(error, setError);
             }
         };
-        refreshSession();
-    }, []);
+        restoreSession();
+    }, [refreshAuth, setError]);
     return (
         <>
             <ErrorToast />

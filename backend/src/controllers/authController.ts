@@ -33,6 +33,7 @@ export async function register(req: Request, res: Response) {
         throw AppError.tokenExpired('Kindly log in again');
     }*/
     const refreshTokenHash = hashToken(refreshToken!);
+    log.info('Storing refresh token hash in DB', { data: { hash: refreshTokenHash.substring(0, 20) + '...', token: refreshToken!.substring(0, 20) + '...' } });
     user.refreshTokens.push({
         tokenHash: refreshTokenHash,
         createdAt: new Date(),
@@ -42,7 +43,7 @@ export async function register(req: Request, res: Response) {
     res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        path: 'auth/refresh',
+        path: '/api/auth',
         sameSite: 'strict',
         signed: true,
         maxAge: 30 * 24 * 60 * 60 * 1000,

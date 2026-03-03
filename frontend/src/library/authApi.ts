@@ -54,7 +54,7 @@ authApi.interceptors.response.use(
         }
         if (error.response?.status === 401) {
             originalRequest._retry = true;
-            //CASE 1:refresh is  already in progress
+            //CASE 1: refresh is already in progress - queue the request
             if (isRefreshing) {
                 return new Promise<string>((resolve, reject) => {
                     failedQueue.push({
@@ -71,6 +71,7 @@ authApi.interceptors.response.use(
                     })
                     .catch((error) => Promise.reject(error));
             }
+            //CASE 2: no refresh in progress - start one
             isRefreshing = true;
             try {
                 const refreshResponse = await authApi.post<{

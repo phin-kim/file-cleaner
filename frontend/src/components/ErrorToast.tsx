@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import useErrorStore from '../Store/ErrorStore';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { AlertCircle } from 'lucide-react';
 const ErrorToast = () => {
     const { error, clearError } = useErrorStore();
     useEffect(() => {
@@ -12,20 +13,32 @@ const ErrorToast = () => {
     if (!error) return null;
     return (
         <>
-            <motion.div
-                initial={{ opacity: 0, x: 100 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 100 }}
-                transition={{
-                    duration: 1.3,
-                    type: 'spring',
-                    damping: 15,
-                    stiffness: 300,
-                }}
-                className="font-display backdrop:-blur-md fixed top-6 right-2 z-9998 rounded-2xl border-2 border-red-600 bg-red-600/50 p-2 text-base font-bold text-white shadow-[inset_0_0_24px_rgba(255,0,0,0.6),0_4px_24px_rgba(139,0,0,0.4)]"
-            >
-                {error}
-            </motion.div>
+            <AnimatePresence>
+                {error && (
+                    <motion.div
+                        initial={{ opacity: 0, x: 100, scale: 0.9 }}
+                        animate={{ opacity: 1, x: 0, scale: 1 }}
+                        exit={{ opacity: 0, x: 100, scale: 0.9 }}
+                        transition={{
+                            duration: 0.5,
+                            type: 'spring',
+                            damping: 15,
+                            stiffness: 300,
+                        }}
+                        className="fixed top-6 right-6 z-9999 flex max-w-md min-w-75 items-center gap-3 rounded-2xl border border-red-500/50 bg-red-500/20 px-6 py-4 text-white shadow-[0_8px_32px_rgba(239,68,68,0.3)] backdrop-blur-xl"
+                    >
+                        <div className="flex items-center justify-center w-10 h-10 shrink-0 rounded-xl bg-red-500/40">
+                            <AlertCircle className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                            <p className="text-sm font-bold tracking-wider uppercase opacity-70">
+                                Error
+                            </p>
+                            <p className="text-base font-medium">{error}</p>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </>
     );
 };

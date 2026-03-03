@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect } from 'react';
 import useSuccessStore from '../Store/SuccessStore';
+import { CheckCircle2 } from 'lucide-react';
 const SuccessToast = () => {
     const success = useSuccessStore((state) => state.success);
     const clearSuccess = useSuccessStore((state) => state.clearSuccess);
@@ -16,19 +17,28 @@ const SuccessToast = () => {
             <AnimatePresence>
                 {success && (
                     <motion.div
-                        initial={{ y: -20, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        exit={{ y: 20, opacity: 0 }}
+                        initial={{ opacity: 0, x: 100, scale: 0.9 }}
+                        animate={{ opacity: 1, x: 0, scale: 1 }}
+                        exit={{ opacity: 0, x: 100, scale: 0.9 }}
                         transition={{
-                            duration: 8.8,
-                            ease: 'easeInOut',
+                            duration: 0.5,
                             type: 'spring',
-                            stiffness: 150,
-                            damping: 10,
+                            damping: 15,
+                            stiffness: 300,
                         }}
-                        className="border-neon h4 fixed top-20 right-2 z-9999 rounded-2xl border-2 bg-green-600/70 p-4 font-bold text-white"
+                        // Offset from top to avoid overlapping with ErrorToast if both are present
+                        // Or we could use a container, but for now let's use a different top position
+                        className="fixed top-6 right-6 z-9999 flex max-w-md min-w-75 items-center gap-3 rounded-2xl border border-emerald-500/50 bg-emerald-500/50 px-6 py-4 text-white shadow-[0_8px_32px_rgba(16,185,129,0.3)] backdrop-blur-xl"
                     >
-                        {success}
+                        <div className="flex items-center justify-center w-10 h-10 shrink-0 rounded-xl bg-emerald-500/40">
+                            <CheckCircle2 className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                            <p className="text-sm font-bold tracking-wider uppercase opacity-70">
+                                Success
+                            </p>
+                            <p className="text-base font-medium">{success}</p>
+                        </div>
                     </motion.div>
                 )}
             </AnimatePresence>
