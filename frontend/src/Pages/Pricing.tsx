@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -7,8 +7,25 @@ import {
     FaFilePdf,
     FaCheck,
 } from 'react-icons/fa6';
+import createClientLogger from '../utils/clientLogger';
+import type { Tier } from '../types/transactions';
+import { useTransactions } from '../Store/useTransactions';
+import { useNavigate } from 'react-router-dom';
+const log = createClientLogger('Pricing.tsx');
+//selected tier and the amount are what cary everything i need
 const Pricing: React.FC = () => {
     const [isQuarterly, setIsQuarterly] = useState(false);
+
+    // Use separate selectors instead of creating a new object every render
+    const selectedPeriod = useTransactions((state) => state.selectedPeriod);
+    //const amount = useTransactions((state) => state.amount);
+    const selectedTier = useTransactions((state) => state.tier);
+    const setSelectedPeriod = useTransactions(
+        (state) => state.setSelectedPeriod
+    );
+    const setAmount = useTransactions((state) => state.setAmount);
+    const setTier = useTransactions((state) => state.setTier);
+    const navigate = useNavigate();
     const tiers = [
         {
             id: 'tier-1',
@@ -56,9 +73,44 @@ const Pricing: React.FC = () => {
             icon: <FaWandMagicSparkles />,
         },
     ];
+    const handleChangePeriod = () => {
+        const newIsQuarterly = !isQuarterly;
+        setIsQuarterly(newIsQuarterly);
+        if (newIsQuarterly) {
+            setSelectedPeriod('3 months');
+        } else {
+            setSelectedPeriod('monthly');
+        }
+    };
+    const handleTier = (tierId: string) => {
+        const selected = tiers.find((t) => t.id === tierId);
+        if (selected) {
+            setTier(selected);
+            // Use local isQuarterly state instead of selectedPeriod to avoid stale state
+            if (isQuarterly) {
+                setSelectedPeriod('3 months');
+                setAmount(selected.quarterlyPrice ?? 0);
+            } else {
+                setSelectedPeriod('monthly');
+                setAmount(selected.monthlyPrice ?? 0);
+            }
+            navigate('/billing');
+        }
+    };
+
+    // Recalculate price whenever period changes or tier changes
+    useEffect(() => {
+        if (selectedTier) {
+            if (selectedPeriod === 'monthly') {
+                setAmount(selectedTier.monthlyPrice ?? 0);
+            } else {
+                setAmount(selectedTier.quarterlyPrice ?? 0);
+            }
+        }
+    }, [selectedPeriod, selectedTier, setAmount]);
 
     return (
-        <div className="relative px-4 py-12 mx-auto overflow-hidden bg-linear-to-br from-purple-600 to-violet-800 sm:px-6 lg:px-8">
+        <div className="relative mx-auto overflow-hidden bg-linear-to-br from-purple-600 to-violet-800 px-4 py-12 sm:px-6 lg:px-8">
             {/* Decorative background elements */}
 
             <div className="mb-16 text-center">
@@ -68,23 +120,23 @@ const Pricing: React.FC = () => {
                 <p className="mt-2 text-4xl font-extrabold text-white sm:text-5xl sm:tracking-tight lg:text-6xl">
                     Choose Your Plan
                 </p>
-                <p className="max-w-xl mx-auto mt-5 text-xl text-purple-200/60">
+                <p className="mx-auto mt-5 max-w-xl text-xl text-purple-200/60">
                     Unlock the full potential of Tidy Up with our flexible
                     pricing tiers.
                 </p>
-                <div className="flex items-center justify-center gap-4 mt-10">
+                <div className="mt-10 flex items-center justify-center gap-4">
                     <span
                         className={`text-sm font-medium ${!isQuarterly ? 'text-white' : 'text-purple-200/40'}`}
                     >
                         Monthly
                     </span>
                     <button
-                        onClick={() => setIsQuarterly(!isQuarterly)}
-                        className="relative p-1 transition-colors rounded-full h-7 w-14 bg-white/10 hover:bg-white/20"
+                        onClick={handleChangePeriod}
+                        className="relative h-7 w-14 rounded-full bg-white/10 p-1 transition-colors hover:bg-white/20"
                     >
                         <motion.div
                             animate={{ x: isQuarterly ? 28 : 0 }}
-                            className="w-5 h-5 bg-purple-500 rounded-full shadow-lg"
+                            className="h-5 w-5 rounded-full bg-purple-500 shadow-lg"
                         />
                     </button>
                     <span
@@ -97,7 +149,7 @@ const Pricing: React.FC = () => {
                     </span>
                 </div>
                 <p className="mt-4 text-sm font-medium text-purple-400/80">
-                    <i className="mr-2 fa-solid fa-shield-check"></i>
+                    <i className="fa-solid fa-shield-check mr-2"></i>
                     Cancel anytime. No hidden fees.
                 </p>
             </div>
@@ -189,6 +241,7 @@ const Pricing: React.FC = () => {
                         </div>
 
                         <button
+                            onClick={() => handleTier(tier.id)}
                             className={`mt-10 block w-full rounded-2xl px-6 py-4 text-center text-sm font-bold transition-all ${
                                 tier.highlight
                                     ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/30 hover:bg-purple-700'
@@ -207,7 +260,7 @@ const Pricing: React.FC = () => {
                 </p>
                 <p className="text-purple-400 hover:underline">
                     Contact us at{' '}
-                    <span className="text-sm italic font-bold text-purple-100">
+                    <span className="text-sm font-bold text-purple-100 italic">
                         phinjugushdev@gmail.com
                     </span>
                 </p>

@@ -1,9 +1,9 @@
 import ErrorToast from './components/ErrorToast';
 import SuccessToast from './components/SuccessToast';
-import Pricing from './components/Pricing';
+import Pricing from './Pages/Pricing';
 import AuthForm from './Pages/Auth';
 import FolderCleanerUI from './Pages/Cleaner';
-//import BillingPage from './Pages/Billing';
+import BillingPage from './Pages/Billing';
 //import FolderQuestionAnalyzer from './Pages/Merger';
 import {
     BrowserRouter,
@@ -29,10 +29,7 @@ useAuthStore()	Full store hook	✅ Yes (all)	Avoid unless necessary
 useAuthStore.getState()	Store getters	❌ No	Non-React code (interceptors, helpers, outside components)
 */
 function App() {
-    const { setError } = useErrorStore();
     const refreshExecuted = useRef(false);
-
-    const refreshAuth = useAuthStore((state) => state.refresh);
 
     useEffect(() => {
         if (refreshExecuted.current) {
@@ -41,19 +38,28 @@ function App() {
         }
         const restoreSession = async () => {
             refreshExecuted.current = true;
+            // Only restore session if there was a previous session
+            const hasStoredSession = localStorage.getItem('hasSession');
+
+            if (!hasStoredSession) {
+                return;
+            }
+
             try {
-                await refreshAuth();
+                const refresh = useAuthStore.getState().refresh;
+                await refresh();
                 log.info('Session restored');
                 const currentUser = useAuthStore.getState().user;
                 const currentAuth = useAuthStore.getState().isAuthenticated;
                 log.debug(`is authenticated ${currentAuth}`);
                 log.highlight(`Log in as ${currentUser?.email}`);
             } catch (error) {
+                const { setError } = useErrorStore.getState();
                 handleApiError(error, setError);
             }
         };
         restoreSession();
-    }, [refreshAuth, setError]);
+    }, []);
     return (
         <>
             <ErrorToast />
@@ -70,7 +76,8 @@ function App() {
 
                     <Route path="/" element={<FolderCleanerUI />} />
                     <Route path="/pricing" element={<Pricing />} />
-                    {/*<Route path="/billing" element={<BillingPage />} />
+                    <Route path="/billing" element={<BillingPage />} />
+                    {/*
                         <Route
                             path="/file-merge"
                             element={<FolderQuestionAnalyzer />}
