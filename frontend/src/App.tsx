@@ -31,8 +31,7 @@ useAuthStore.getState()	Store getters	❌ No	Non-React code (interceptors, helpe
 function App() {
     const { setError } = useErrorStore();
     const refreshExecuted = useRef(false);
-    const user = useAuthStore((state) => state.user);
-    const authenticated = useAuthStore((state) => state.isAuthenticated);
+
     const refreshAuth = useAuthStore((state) => state.refresh);
 
     useEffect(() => {

@@ -1,5 +1,6 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+
+import { motion, AnimatePresence } from 'framer-motion';
 import {
     FaWandMagicSparkles,
     FaBroom,
@@ -7,11 +8,13 @@ import {
     FaCheck,
 } from 'react-icons/fa6';
 const Pricing: React.FC = () => {
+    const [isQuarterly, setIsQuarterly] = useState(false);
     const tiers = [
         {
             id: 'tier-1',
             name: 'Basic Cleanup',
-            price: 'sh 500 ',
+            monthlyPrice: 200,
+            quarterlyPrice: 550,
             description: 'Perfect for individuals needing quick organization.',
             features: [
                 'Clean multiple duplicate folders',
@@ -24,7 +27,8 @@ const Pricing: React.FC = () => {
         {
             id: 'tier-2',
             name: 'Question Master',
-            price: 'sh 600 ',
+            monthlyPrice: 270,
+            quarterlyPrice: 750,
             description: 'Ideal for educators and content creators.',
             features: [
                 'Merge multiple questions into PDF',
@@ -38,7 +42,8 @@ const Pricing: React.FC = () => {
         {
             id: 'tier-3',
             name: 'Tidy Up Pro',
-            price: 'sh 1200 ',
+            monthlyPrice: 500,
+            quarterlyPrice: 1400,
             description: 'The complete utility suite for power users.',
             features: [
                 'Merge questions into PDF',
@@ -66,6 +71,34 @@ const Pricing: React.FC = () => {
                 <p className="max-w-xl mx-auto mt-5 text-xl text-purple-200/60">
                     Unlock the full potential of Tidy Up with our flexible
                     pricing tiers.
+                </p>
+                <div className="flex items-center justify-center gap-4 mt-10">
+                    <span
+                        className={`text-sm font-medium ${!isQuarterly ? 'text-white' : 'text-purple-200/40'}`}
+                    >
+                        Monthly
+                    </span>
+                    <button
+                        onClick={() => setIsQuarterly(!isQuarterly)}
+                        className="relative p-1 transition-colors rounded-full h-7 w-14 bg-white/10 hover:bg-white/20"
+                    >
+                        <motion.div
+                            animate={{ x: isQuarterly ? 28 : 0 }}
+                            className="w-5 h-5 bg-purple-500 rounded-full shadow-lg"
+                        />
+                    </button>
+                    <span
+                        className={`text-sm font-medium ${isQuarterly ? 'text-white' : 'text-purple-200/40'}`}
+                    >
+                        3 Months{' '}
+                        <span className="ml-1 text-xs font-bold text-emerald-400">
+                            Save ~10%
+                        </span>
+                    </span>
+                </div>
+                <p className="mt-4 text-sm font-medium text-purple-400/80">
+                    <i className="mr-2 fa-solid fa-shield-check"></i>
+                    Cancel anytime. No hidden fees.
                 </p>
             </div>
 
@@ -102,18 +135,37 @@ const Pricing: React.FC = () => {
                             >
                                 {tier.description}
                             </p>
-                            <p className="mt-8">
-                                <span
-                                    className={`text-4xl font-extrabold tracking-tight ${tier.highlight ? 'text-slate-900' : 'text-white'}`}
-                                >
-                                    {tier.price}
-                                </span>
-                                <span
-                                    className={`text-base font-medium ${tier.highlight ? 'text-slate-500' : 'text-purple-200/40'}`}
-                                >
-                                    /one-time
-                                </span>
-                            </p>
+                            <div className="mt-8">
+                                <AnimatePresence mode="wait">
+                                    <motion.div
+                                        key={
+                                            isQuarterly
+                                                ? 'quarterly'
+                                                : 'monthly'
+                                        }
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -10 }}
+                                        transition={{ duration: 0.2 }}
+                                        className="flex items-baseline"
+                                    >
+                                        <span
+                                            className={`text-4xl font-extrabold tracking-tight ${tier.highlight ? 'text-slate-900' : 'text-white'}`}
+                                        >
+                                            {isQuarterly
+                                                ? tier.quarterlyPrice
+                                                : tier.monthlyPrice}
+                                            sh
+                                        </span>
+                                        <span
+                                            className={`ml-1 text-base font-medium ${tier.highlight ? 'text-slate-500' : 'text-purple-200/40'}`}
+                                        >
+                                            /
+                                            {isQuarterly ? '3 months' : 'month'}
+                                        </span>
+                                    </motion.div>
+                                </AnimatePresence>
+                            </div>
 
                             <ul className="mt-8 space-y-4">
                                 {tier.features.map((feature) => (
@@ -152,13 +204,12 @@ const Pricing: React.FC = () => {
             <div className="mt-16 text-center">
                 <p className="text-sm text-purple-200/40">
                     All prices are in Kenyan Shillings (sh){' '}
-                    <p className="text-purple-400 hover:underline">
-                        Contact us at{' '}
-                        <span className="text-sm italic font-bold text-purple-100">
-                            phinjugushdev@gmail.com
-                        </span>
-                    </p>
-                    .
+                </p>
+                <p className="text-purple-400 hover:underline">
+                    Contact us at{' '}
+                    <span className="text-sm italic font-bold text-purple-100">
+                        phinjugushdev@gmail.com
+                    </span>
                 </p>
             </div>
         </div>
