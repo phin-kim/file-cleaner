@@ -20,15 +20,22 @@ import { MdPhoneAndroid } from 'react-icons/md';
 import { useTransactions } from '../Store/useTransactions';
 import { useNavigate } from 'react-router-dom';
 import type { PaymentMethod } from '../types/transactions';
+import useErrorStore from '../Store/ErrorStore';
+import { paystackApi } from '../library/client';
+import handleApiError from '../utils/apiError';
+import createClientLogger from '../utils/clientLogger';
+const log = createClientLogger('Billing.tsx');
 
 export default function Billing() {
     const [selectedPayment, setSelectedPayment] = useState<string>('mpesa');
     const [phoneNumber, setPhoneNumber] = useState<string>('');
+    const [email, setEmail] = useState<string>('');
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
     const amount = useTransactions((state) => state.amount);
     const selectedPeriod = useTransactions((state) => state.selectedPeriod);
     const selectedTier = useTransactions((state) => state.tier);
+    const setError = useErrorStore((state) => state.setError);
     const navigate = useNavigate();
 
     // Redirect if no tier is selected
@@ -67,24 +74,58 @@ export default function Billing() {
             ),
         },
     ];
+    const formatPhoneNumber = (phone: string) => {
+        const cleaned = phone.replace(/\D/g, '');
+        //if it starts with 0 replace with 254
+        if (cleaned.startsWith('0')) {
+            return '254' + cleaned;
+        }
+        //if its 9 digits starting with 7add 254
+        if (cleaned.length === 9 && cleaned.startsWith('7')) {
+            return '254' + cleaned;
+        }
+        if (cleaned.startsWith('254')) {
+            return cleaned;
+        }
+    };
+    if (!selectedTier) {
+        setError('Please select a plan first');
+        return;
+    }
 
-    const handlePayment = () => {
+    const handlePayment = async () => {
         if (selectedPayment === 'mpesa' && !phoneNumber) {
-            alert('Please enter your M-Pesa phone number');
+            setError('Please enter your M-Pesa phone number');
             return;
         }
-
+        if (selectedPayment === 'mpesa' && !email) {
+            setError('Please enter the email you logged in with');
+            return;
+        }
         setIsProcessing(true);
-        // Backend payment processing simulation
-        setTimeout(() => {
-            setIsProcessing(false);
-            alert(
-                `Payment of ${amount}sh for ${selectedTier?.name} (${selectedPeriod}) initiated! Check your phone for the STK push.`
+        setError('');
+        const formattedPhoneNumber = formatPhoneNumber(phoneNumber);
+        try {
+            const paystackResponse = await paystackApi.post(
+                '/initialize-payment',
+                {
+                    amount,
+                    phoneNumber: formattedPhoneNumber,
+                    currency: 'KES',
+                    metadata: {
+                        period: selectedPeriod,
+                        paymentMethod: 'mpesa',
+                    },
+                }
             );
-        }, 2000);
+            const paystackData = paystackResponse.data;
+            log.info('Response from the paystack api', { data: paystackData });
+        } catch (error) {
+            handleApiError(error, setError);
+        } finally {
+            setIsProcessing(false);
+        }
     };
-
-    if (!selectedTier) return null;
 
     return (
         <div className="min-h-screen p-4 bg-linear-to-br from-purple-600 to-violet-800 md:p-8">
@@ -308,6 +349,21 @@ export default function Billing() {
                                                 }
                                                 placeholder="712345678"
                                                 className="w-full py-4 pl-16 pr-4 font-medium text-white transition-all border-2 rounded-2xl border-white/10 bg-white/5 placeholder-purple-300/30 focus:border-purple-400 focus:bg-white/10 focus:outline-none"
+                                            />
+                                        </div>
+                                        <label className="block mb-3 font-semibold text-purple-100">
+                                            Email Address
+                                        </label>
+                                        <div className="relative">
+                                            <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none"></div>
+                                            <input
+                                                type="email"
+                                                value={email}
+                                                onChange={(e) =>
+                                                    setEmail(e.target.value)
+                                                }
+                                                placeholder="janedoe@gmail.com"
+                                                className="w-full py-4 pl-4 pr-4 font-medium text-white transition-all border-2 rounded-2xl border-white/10 bg-white/5 placeholder-purple-300/30 focus:border-purple-400 focus:bg-white/10 focus:outline-none"
                                             />
                                         </div>
                                         <p className="mt-3 text-xs italic text-purple-300/60">

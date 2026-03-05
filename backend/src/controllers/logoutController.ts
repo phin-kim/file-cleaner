@@ -6,8 +6,9 @@ import { hashToken } from '../utils/jwt';
 import 'dotenv/config';
 import createLogger from '../utils/logger';
 const log = createLogger('Logout');
+const refreshSecret = process.env.JWT_REFRESH_SECRET;
+
 export async function logout(req: Request, res: Response, next: NextFunction) {
-    const refreshSecret = process.env.JWT_REFRESH_SECRET;
     if (!refreshSecret) {
         log.error('Refresh secret not configured', { data: { refreshSecret } });
         throw AppError.notFound('Refresh token not found');
@@ -32,7 +33,7 @@ export async function logout(req: Request, res: Response, next: NextFunction) {
         }
         const tokenHash = hashToken(refreshToken);
         user.refreshTokens = user.refreshTokens.filter(
-            (token) => token.tokenHash !== tokenHash
+            (token: string) => token.tokenHash !== tokenHash
         );
         await user.save();
         res.clearCookie('refreshToken', {
