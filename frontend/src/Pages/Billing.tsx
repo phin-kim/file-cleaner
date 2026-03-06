@@ -107,11 +107,12 @@ export default function Billing() {
         const formattedPhoneNumber = formatPhoneNumber(phoneNumber);
         try {
             const paystackResponse = await paystackApi.post(
-                '/initialize-payment',
+                '/payment/initialize-payment',
                 {
                     amount,
                     phoneNumber: formattedPhoneNumber,
                     currency: 'KES',
+                    email,
                     metadata: {
                         period: selectedPeriod,
                         paymentMethod: 'mpesa',
@@ -128,16 +129,16 @@ export default function Billing() {
     };
 
     return (
-        <div className="min-h-screen p-4 bg-linear-to-br from-purple-600 to-violet-800 md:p-8">
-            <div className="max-w-6xl mx-auto">
+        <div className="min-h-screen bg-linear-to-br from-purple-600 to-violet-800 p-4 md:p-8">
+            <div className="mx-auto max-w-6xl">
                 {/* Navigation */}
                 <motion.button
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     onClick={() => navigate('/pricing')}
-                    className="flex items-center gap-2 mb-8 text-purple-200 transition-colors group hover:text-white"
+                    className="group mb-8 flex items-center gap-2 text-purple-200 transition-colors hover:text-white"
                 >
-                    <ArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
+                    <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
                     <span className="font-medium">Back to Plans</span>
                 </motion.button>
 
@@ -155,15 +156,15 @@ export default function Billing() {
                             stiffness: 200,
                             delay: 0.2,
                         }}
-                        className="inline-block mb-4"
+                        className="mb-4 inline-block"
                     >
-                        <div className="p-4 shadow-lg rounded-2xl bg-linear-to-r from-purple-500 to-fuchsia-500 shadow-purple-500/20">
-                            <Sparkles className="w-12 h-12 text-white" />
+                        <div className="rounded-2xl bg-linear-to-r from-purple-500 to-fuchsia-500 p-4 shadow-lg shadow-purple-500/20">
+                            <Sparkles className="h-12 w-12 text-white" />
                         </div>
                     </motion.div>
                     <h1 className="mb-3 text-4xl font-bold text-white md:text-5xl">
                         Complete Your{' '}
-                        <span className="text-transparent bg-linear-to-r from-purple-400 to-fuchsia-400 bg-clip-text">
+                        <span className="bg-linear-to-r from-purple-400 to-fuchsia-400 bg-clip-text text-transparent">
                             Upgrade
                         </span>
                     </h1>
@@ -182,11 +183,11 @@ export default function Billing() {
                         className="space-y-6 lg:col-span-7"
                     >
                         {/* Selected Plan Card */}
-                        <div className="p-8 border rounded-3xl border-purple-400/20 bg-white/5 backdrop-blur-xl">
-                            <div className="flex items-start justify-between mb-8">
+                        <div className="rounded-3xl border border-purple-400/20 bg-white/5 p-8 backdrop-blur-xl">
+                            <div className="mb-8 flex items-start justify-between">
                                 <div>
-                                    <div className="flex items-center gap-3 mb-2">
-                                        <div className="p-2 text-purple-400 rounded-lg bg-purple-500/20">
+                                    <div className="mb-2 flex items-center gap-3">
+                                        <div className="rounded-lg bg-purple-500/20 p-2 text-purple-400">
                                             {selectedTier.icon}
                                         </div>
                                         <h2 className="text-2xl font-bold text-white">
@@ -207,10 +208,10 @@ export default function Billing() {
                                 </div>
                             </div>
 
-                            <div className="h-px mb-8 bg-purple-400/10" />
+                            <div className="mb-8 h-px bg-purple-400/10" />
 
-                            <h3 className="flex items-center gap-2 mb-6 text-lg font-semibold text-white">
-                                <Zap className="w-5 h-5 text-yellow-400" />
+                            <h3 className="mb-6 flex items-center gap-2 text-lg font-semibold text-white">
+                                <Zap className="h-5 w-5 text-yellow-400" />
                                 Included Features
                             </h3>
 
@@ -223,9 +224,9 @@ export default function Billing() {
                                         transition={{
                                             delay: 0.4 + index * 0.1,
                                         }}
-                                        className="flex items-center gap-3 p-4 transition-colors border rounded-2xl border-white/5 bg-white/5 hover:border-purple-400/30"
+                                        className="flex items-center gap-3 rounded-2xl border border-white/5 bg-white/5 p-4 transition-colors hover:border-purple-400/30"
                                     >
-                                        <div className="p-1 rounded-full shrink-0 bg-emerald-500/20 text-emerald-400">
+                                        <div className="shrink-0 rounded-full bg-emerald-500/20 p-1 text-emerald-400">
                                             <FaCheck />
                                         </div>
                                         <span className="text-sm font-medium text-purple-100">
@@ -257,12 +258,12 @@ export default function Billing() {
                             ].map((item, i) => (
                                 <div
                                     key={i}
-                                    className="flex flex-col items-center gap-2 p-4 text-center border rounded-2xl border-white/5 bg-white/5"
+                                    className="flex flex-col items-center gap-2 rounded-2xl border border-white/5 bg-white/5 p-4 text-center"
                                 >
                                     <item.icon
                                         className={`h-6 w-6 ${item.color}`}
                                     />
-                                    <span className="text-xs font-medium tracking-tighter uppercase text-purple-200/60">
+                                    <span className="text-xs font-medium tracking-tighter text-purple-200/60 uppercase">
                                         {item.label}
                                     </span>
                                 </div>
@@ -277,14 +278,14 @@ export default function Billing() {
                         transition={{ delay: 0.4 }}
                         className="lg:col-span-5"
                     >
-                        <div className="sticky p-8 border shadow-2xl top-8 rounded-3xl border-purple-400/30 bg-white/10 backdrop-blur-2xl">
+                        <div className="sticky top-8 rounded-3xl border border-purple-400/30 bg-white/10 p-8 shadow-2xl backdrop-blur-2xl">
                             <h2 className="mb-8 text-2xl font-bold text-white">
                                 Payment Details
                             </h2>
 
                             {/* Payment Method Selection */}
                             <div className="mb-8">
-                                <label className="block mb-4 text-sm font-semibold tracking-wider text-purple-200 uppercase">
+                                <label className="mb-4 block text-sm font-semibold tracking-wider text-purple-200 uppercase">
                                     Select Method
                                 </label>
                                 <div className="grid grid-cols-1 gap-3">
@@ -311,8 +312,8 @@ export default function Billing() {
                                                 {method.name}
                                             </span>
                                             {selectedPayment === method.id && (
-                                                <div className="p-1 ml-auto text-white bg-purple-400 rounded-full">
-                                                    <CheckCircle className="w-5 h-5" />
+                                                <div className="ml-auto rounded-full bg-purple-400 p-1 text-white">
+                                                    <CheckCircle className="h-5 w-5" />
                                                 </div>
                                             )}
                                         </motion.button>
@@ -330,11 +331,11 @@ export default function Billing() {
                                         exit={{ opacity: 0, y: -10 }}
                                         className="mb-8"
                                     >
-                                        <label className="block mb-3 font-semibold text-purple-100">
+                                        <label className="mb-3 block font-semibold text-purple-100">
                                             M-Pesa Phone Number
                                         </label>
                                         <div className="relative">
-                                            <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                                            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
                                                 <span className="font-bold text-purple-400">
                                                     +254
                                                 </span>
@@ -348,14 +349,14 @@ export default function Billing() {
                                                     )
                                                 }
                                                 placeholder="712345678"
-                                                className="w-full py-4 pl-16 pr-4 font-medium text-white transition-all border-2 rounded-2xl border-white/10 bg-white/5 placeholder-purple-300/30 focus:border-purple-400 focus:bg-white/10 focus:outline-none"
+                                                className="w-full rounded-2xl border-2 border-white/10 bg-white/5 py-4 pr-4 pl-16 font-medium text-white placeholder-purple-300/30 transition-all focus:border-purple-400 focus:bg-white/10 focus:outline-none"
                                             />
                                         </div>
-                                        <label className="block mb-3 font-semibold text-purple-100">
+                                        <label className="mb-3 block font-semibold text-purple-100">
                                             Email Address
                                         </label>
                                         <div className="relative">
-                                            <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none"></div>
+                                            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4"></div>
                                             <input
                                                 type="email"
                                                 value={email}
@@ -363,10 +364,10 @@ export default function Billing() {
                                                     setEmail(e.target.value)
                                                 }
                                                 placeholder="janedoe@gmail.com"
-                                                className="w-full py-4 pl-4 pr-4 font-medium text-white transition-all border-2 rounded-2xl border-white/10 bg-white/5 placeholder-purple-300/30 focus:border-purple-400 focus:bg-white/10 focus:outline-none"
+                                                className="w-full rounded-2xl border-2 border-white/10 bg-white/5 py-4 pr-4 pl-4 font-medium text-white placeholder-purple-300/30 transition-all focus:border-purple-400 focus:bg-white/10 focus:outline-none"
                                             />
                                         </div>
-                                        <p className="mt-3 text-xs italic text-purple-300/60">
+                                        <p className="mt-3 text-xs text-purple-300/60 italic">
                                             You will receive an STK push on your
                                             phone to authorize the payment.
                                         </p>
@@ -382,34 +383,34 @@ export default function Billing() {
                                         className="mb-8 space-y-4"
                                     >
                                         <div>
-                                            <label className="block mb-2 font-semibold text-purple-100">
+                                            <label className="mb-2 block font-semibold text-purple-100">
                                                 Card Number
                                             </label>
                                             <input
                                                 type="text"
                                                 placeholder="•••• •••• •••• ••••"
-                                                className="w-full px-5 py-4 text-white transition-all border-2 rounded-2xl border-white/10 bg-white/5 placeholder-purple-300/30 focus:border-purple-400 focus:outline-none"
+                                                className="w-full rounded-2xl border-2 border-white/10 bg-white/5 px-5 py-4 text-white placeholder-purple-300/30 transition-all focus:border-purple-400 focus:outline-none"
                                             />
                                         </div>
                                         <div className="grid grid-cols-2 gap-4">
                                             <div>
-                                                <label className="block mb-2 text-sm font-semibold text-purple-100">
+                                                <label className="mb-2 block text-sm font-semibold text-purple-100">
                                                     Expiry
                                                 </label>
                                                 <input
                                                     type="text"
                                                     placeholder="MM/YY"
-                                                    className="w-full px-5 py-4 text-white transition-all border-2 rounded-2xl border-white/10 bg-white/5 placeholder-purple-300/30 focus:border-purple-400 focus:outline-none"
+                                                    className="w-full rounded-2xl border-2 border-white/10 bg-white/5 px-5 py-4 text-white placeholder-purple-300/30 transition-all focus:border-purple-400 focus:outline-none"
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block mb-2 text-sm font-semibold text-purple-100">
+                                                <label className="mb-2 block text-sm font-semibold text-purple-100">
                                                     CVV
                                                 </label>
                                                 <input
                                                     type="text"
                                                     placeholder="•••"
-                                                    className="w-full px-5 py-4 text-white transition-all border-2 rounded-2xl border-white/10 bg-white/5 placeholder-purple-300/30 focus:border-purple-400 focus:outline-none"
+                                                    className="w-full rounded-2xl border-2 border-white/10 bg-white/5 px-5 py-4 text-white placeholder-purple-300/30 transition-all focus:border-purple-400 focus:outline-none"
                                                 />
                                             </div>
                                         </div>
@@ -424,13 +425,13 @@ export default function Billing() {
                                         exit={{ opacity: 0, y: -10 }}
                                         className="mb-8"
                                     >
-                                        <label className="block mb-3 font-semibold text-purple-100">
+                                        <label className="mb-3 block font-semibold text-purple-100">
                                             PayPal Email
                                         </label>
                                         <input
                                             type="email"
                                             placeholder="your@email.com"
-                                            className="w-full px-5 py-4 text-white transition-all border-2 rounded-2xl border-white/10 bg-white/5 placeholder-purple-300/30 focus:border-purple-400 focus:outline-none"
+                                            className="w-full rounded-2xl border-2 border-white/10 bg-white/5 px-5 py-4 text-white placeholder-purple-300/30 transition-all focus:border-purple-400 focus:outline-none"
                                         />
                                     </motion.div>
                                 )}
@@ -442,9 +443,9 @@ export default function Billing() {
                                 whileTap={{ scale: 0.98 }}
                                 onClick={handlePayment}
                                 disabled={isProcessing}
-                                className="relative flex items-center justify-center w-full gap-3 py-5 overflow-hidden font-bold text-white transition-all shadow-2xl group rounded-2xl bg-linear-to-r from-purple-500 to-fuchsia-500 shadow-purple-500/40 hover:from-purple-600 hover:to-fuchsia-600 disabled:cursor-not-allowed disabled:opacity-50"
+                                className="group relative flex w-full items-center justify-center gap-3 overflow-hidden rounded-2xl bg-linear-to-r from-purple-500 to-fuchsia-500 py-5 font-bold text-white shadow-2xl shadow-purple-500/40 transition-all hover:from-purple-600 hover:to-fuchsia-600 disabled:cursor-not-allowed disabled:opacity-50"
                             >
-                                <div className="absolute inset-0 w-full h-full transition-transform duration-1000 -translate-x-full bg-linear-to-r from-white/0 via-white/20 to-white/0 group-hover:translate-x-full" />
+                                <div className="absolute inset-0 h-full w-full -translate-x-full bg-linear-to-r from-white/0 via-white/20 to-white/0 transition-transform duration-1000 group-hover:translate-x-full" />
                                 {isProcessing ? (
                                     <>
                                         <motion.div
@@ -455,13 +456,13 @@ export default function Billing() {
                                                 ease: 'linear',
                                             }}
                                         >
-                                            <CreditCard className="w-6 h-6" />
+                                            <CreditCard className="h-6 w-6" />
                                         </motion.div>
                                         <span>Processing Securely...</span>
                                     </>
                                 ) : (
                                     <>
-                                        <Lock className="w-5 h-5" />
+                                        <Lock className="h-5 w-5" />
                                         <span>Pay {amount}sh Now</span>
                                     </>
                                 )}
@@ -481,7 +482,7 @@ export default function Billing() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.6 }}
-                    className="p-10 mt-16 border rounded-3xl border-purple-400/10 bg-white/5 backdrop-blur-lg"
+                    className="mt-16 rounded-3xl border border-purple-400/10 bg-white/5 p-10 backdrop-blur-lg"
                 >
                     <div className="grid grid-cols-1 gap-12 md:grid-cols-2">
                         <div>
@@ -514,7 +515,7 @@ export default function Billing() {
                                 ))}
                             </div>
                         </div>
-                        <div className="flex flex-col items-center justify-center p-8 text-center border rounded-2xl border-purple-500/20 bg-purple-500/10">
+                        <div className="flex flex-col items-center justify-center rounded-2xl border border-purple-500/20 bg-purple-500/10 p-8 text-center">
                             <h3 className="mb-2 text-xl font-bold text-white">
                                 Need Custom Help?
                             </h3>
@@ -524,7 +525,7 @@ export default function Billing() {
                             </p>
                             <a
                                 href="mailto:phinjugushdev@gmail.com"
-                                className="px-6 py-3 font-bold text-purple-900 transition-colors bg-white rounded-xl hover:bg-purple-100"
+                                className="rounded-xl bg-white px-6 py-3 font-bold text-purple-900 transition-colors hover:bg-purple-100"
                             >
                                 Contact Support
                             </a>

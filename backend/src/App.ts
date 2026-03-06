@@ -16,6 +16,7 @@ import createLogger from './utils/logger.js';
 import { authRoute } from './routes/auth.js';
 import errorHandler from './utils/errorHandler.js';
 import { connectDatabases } from './config/DB.js';
+import { paymentRoute } from './routes/paymentRoute.js';
 
 const log = createLogger('APP.TS');
 const PORT = process.env.PORT;
@@ -37,6 +38,7 @@ app.use('/api', cleanerRoute);
 app.use('/api', subRouter);
 app.use('/api', mergerRoute);
 app.use('/api/auth', authRoute);
+app.use('/api/payment', paymentRoute);
 app.use('/downloads', express.static(path.join(process.cwd(), 'backend/temp')));
 
 const PROJECT_ROOT = path.resolve(__dirname, '../');
