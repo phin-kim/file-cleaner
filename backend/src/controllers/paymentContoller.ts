@@ -13,7 +13,7 @@ import crypto from 'node:crypto';
 import axios from 'axios';
 import AppError from '../utils/appError';
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_KEY;
-const TEST_PHONE_NUMBER = +254710000000;
+const TEST_PHONE_NUMBER = '+254710000000';
 const log = createLogger('Payment.ts');
 export async function mpesaPayment(
     req: Request,
@@ -24,27 +24,50 @@ export async function mpesaPayment(
     if (!amount || !email || !phoneNumber || !metadata || !currency) {
         log.error('One of the values is missing ');
         return next(
-            AppError.badRequest("One f the necessary fields is missing'")
+            AppError.badRequest('One of the necessary fields is missing')
         );
     }
     const reference = 'MPESA_' + crypto.randomUUID();
     //check the mode that we are currently in to apply the correct phone number
-    let formattedPhone = phoneNumber.replace(/\D/g, '');
+    let formattedPhone = phoneNumber
+        .toString()
+        .replace(/\s/g, '') // Remove all spaces
+        .replace(/[^\d]/g, '') // Remove anything not a digit
+        .trim();
     const isTestMode = PAYSTACK_SECRET_KEY?.startsWith('sk_test_');
     if (isTestMode) {
         //if using real numbers in test mode, replace with test number
-        if (!formattedPhone.match(/^254710000000$/)) {
+        formattedPhone = TEST_PHONE_NUMBER;
+        log.info('Using M-Pesa test number for STK push', {
+            data: {
+                phone: formattedPhone,
+                provider: 'mpesa',
+            },
+        });
+        /*if (
+            formattedPhone.includes('710000000') ||
+            formattedPhone.endsWith('710000000') ||
+            formattedPhone === '254710000000' ||
+            formattedPhone === '710000000'
+        ) {
+            formattedPhone = '254710000000'; // Exact format Paystack expects
+            log.info('Using M-Pesa test number', {
+                data: {
+                    phone: formattedPhone,
+                },
+            });
+        } else {
+            // If they're using any other number in test mode, warn but still format it
             log.warn(
-                'Replacing the real number with test number for test mode',
+                'Using non-standard test number. Recommended: 254710000000',
                 {
                     data: {
-                        originalNumber: formattedPhone,
-                        replacement: TEST_PHONE_NUMBER,
+                        original: phoneNumber,
+                        formatted: formattedPhone,
                     },
                 }
             );
-            formattedPhone = TEST_PHONE_NUMBER;
-        }
+        }*/
     } else {
         if (formattedPhone.startsWith('0')) {
             formattedPhone = '254' + formattedPhone.substring(1);
@@ -57,6 +80,20 @@ export async function mpesaPayment(
         // Remove any double zeros
         formattedPhone = formattedPhone.replace(/^2540+/, '254');
     }
+    // Final validation - ensure it's exactly 12 digits (254 + 9 digits)
+    /* if (!/^254[0-9]{9}$/.test(formattedPhone)) {
+        log.error('Invalid phone number format after formatting', {
+            data: {
+                original: phoneNumber,
+                formatted: formattedPhone,
+            },
+        });
+        return next(
+            AppError.badRequest(
+                'Invalid phone number format. Phone number must be in format: 254XXXXXXXXX'
+            )
+        );
+    }*/
     //this is the create charge api
 
     const url = 'https://api.paystack.co/charge';
@@ -68,10 +105,24 @@ export async function mpesaPayment(
         metadata: metadata,
         mobile_money: {
             phone: formattedPhone,
-            provider: 'mpesa_offline',
+            provider: 'mpesa',
         },
     };
     log.info('Sending M-Pesa payment request to paystack', { data: payload });
+    log.info('=== INFO PAYLOAD ===');
+    log.info(
+        `Phone number being sent:${JSON.stringify(payload.mobile_money.phone)}`
+    );
+    log.info('Phone number length:', payload.mobile_money.phone.length);
+    log.info('Phone number regex test:', {
+        data: { number: /^254[0-9]{9}$/.test(payload.mobile_money.phone) },
+    });
+    log.info('Full payload:', {
+        data: { payload: JSON.stringify(payload, null, 2) },
+    });
+    log.info(`Is test mode:${isTestMode}`);
+    log.info(`Key prefix: ${PAYSTACK_SECRET_KEY?.substring(0, 8)}`);
+    log.info('===================');
     try {
         const paystackResponse = await axios.post(url, payload, {
             headers: {
@@ -79,7 +130,6 @@ export async function mpesaPayment(
                 'Content-Type': 'application/json',
             },
         });
-        console.log(`Response shape${paystackResponse}`);
 
         log.info('Data fom paystack', {
             data: {
@@ -92,7 +142,8 @@ export async function mpesaPayment(
             //pesa returns a pending state until the user has verified using their pin
             res.json({
                 status: true,
-                message: 'STK push sent successfully',
+                message:
+                    'Please complete authorization process on your mobile phone',
                 data: {
                     reference: reference,
                     paystackReference: paystackResponse.data.data.reference,

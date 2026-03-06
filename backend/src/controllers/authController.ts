@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import { UserModel } from '../schema/UsersSchema';
 import AppError from '../utils/appError';
-import { hashPassword } from '../utils/passwords';
+import { hashPassword } from '../utils/hashes';
 import { validateRegisterInput } from '../config/validator';
 import { hashToken, signAccessToken, signRefreshToken } from '../utils/jwt';
 import createLogger from '../utils/logger';
@@ -33,7 +33,12 @@ export async function register(req: Request, res: Response) {
         throw AppError.tokenExpired('Kindly log in again');
     }*/
     const refreshTokenHash = hashToken(refreshToken!);
-    log.info('Storing refresh token hash in DB', { data: { hash: refreshTokenHash.substring(0, 20) + '...', token: refreshToken!.substring(0, 20) + '...' } });
+    log.info('Storing refresh token hash in DB', {
+        data: {
+            hash: refreshTokenHash.substring(0, 20) + '...',
+            token: refreshToken!.substring(0, 20) + '...',
+        },
+    });
     user.refreshTokens.push({
         tokenHash: refreshTokenHash,
         createdAt: new Date(),

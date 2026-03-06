@@ -1,5 +1,16 @@
+import bcrypt from 'bcrypt';
 import fs from 'fs-extra';
 import crypto from 'crypto';
+const SALT_ROUNDS = 12;
+export async function hashPassword(password: string) {
+    return bcrypt.hash(password, SALT_ROUNDS);
+}
+export async function comparePasswords(
+    password: string,
+    hash: string
+): Promise<boolean> {
+    return bcrypt.compare(password, hash);
+}
 
 /**
  * Compute MD5 hash of a file using streams
@@ -16,3 +27,6 @@ export function hashFile(filePath: string): Promise<string> {
         stream.on('error', (err) => reject(err));
     });
 }
+export const hashPhoneNumber = (phoneNumber: string) => {
+    return crypto.createHash('sha256').update(phoneNumber).digest('hex');
+};

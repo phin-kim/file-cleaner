@@ -1,0 +1,62 @@
+import { Schema } from 'mongoose';
+import type { Transaction_Type, Metadata } from '../Types/TransactionSchema';
+import { TransactionsConnection } from '../config/DB';
+const MetadataSchema = new Schema<Metadata>(
+    {
+        period: {
+            type: String,
+            required: true,
+            enum: ['monthly', 'quarterly'],
+        },
+        paymentMethod: {
+            type: String,
+            required: true,
+        },
+    },
+    { _id: false }
+);
+const TransactionsSchema = new Schema<Transaction_Type>(
+    {
+        email: {
+            type: String,
+            required: true,
+
+            trim: true,
+            lowercase: true,
+            index: true,
+        },
+        phoneNumberHash: {
+            type: String,
+            required: true,
+        },
+        metadata: { type: MetadataSchema, required: true },
+        amount: {
+            type: Number,
+            required: true,
+        },
+        reference: {
+            type: String,
+            unique: true,
+        },
+        status: {
+            type: String,
+            required: true,
+            enum: ['pending', 'success', 'failed', 'processing'],
+            default: 'pending',
+        },
+        paystackReference: {
+            type: String,
+            sparse: true, // Allows null/undefined but maintains uniqueness for those that exist
+        },
+        createdAt: {
+            type: Date,
+            default: Date.now,
+            required: true,
+        },
+    },
+    { timestamps: true }
+);
+export const TransactionsModel = TransactionsConnection.model<Transaction_Type>(
+    'Transaction',
+    TransactionsSchema
+);

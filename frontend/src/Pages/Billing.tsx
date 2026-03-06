@@ -24,6 +24,7 @@ import useErrorStore from '../Store/ErrorStore';
 import { paystackApi } from '../library/client';
 import handleApiError from '../utils/apiError';
 import createClientLogger from '../utils/clientLogger';
+import useSuccessStore from '../Store/SuccessStore';
 const log = createClientLogger('Billing.tsx');
 
 export default function Billing() {
@@ -36,6 +37,7 @@ export default function Billing() {
     const selectedPeriod = useTransactions((state) => state.selectedPeriod);
     const selectedTier = useTransactions((state) => state.tier);
     const setError = useErrorStore((state) => state.setError);
+    const setSuccess = useSuccessStore((state) => state.setSuccess);
     const navigate = useNavigate();
 
     // Redirect if no tier is selected
@@ -104,13 +106,17 @@ export default function Billing() {
         }
         setIsProcessing(true);
         setError('');
-        const formattedPhoneNumber = formatPhoneNumber(phoneNumber);
+        const isTestMode = import.meta.env.MODE === 'development';
+        const phoneToSend = isTestMode
+            ? '254710000000'
+            : formatPhoneNumber(phoneNumber);
+
         try {
             const paystackResponse = await paystackApi.post(
                 '/payment/initialize-payment',
                 {
                     amount,
-                    phoneNumber: formattedPhoneNumber,
+                    phoneNumber: phoneToSend,
                     currency: 'KES',
                     email,
                     metadata: {
@@ -120,7 +126,12 @@ export default function Billing() {
                 }
             );
             const paystackData = paystackResponse.data;
-            log.info('Response from the paystack api', { data: paystackData });
+            if (paystackData.status) {
+                setSuccess(paystackData.message);
+            }
+            log.info('Response from the paystack api', {
+                data: paystackData,
+            });
         } catch (error) {
             handleApiError(error, setError);
         } finally {
