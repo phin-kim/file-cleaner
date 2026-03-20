@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { FaPaypal, FaCreditCard, FaCheck } from 'react-icons/fa6';
 import { MdPhoneAndroid } from 'react-icons/md';
-import { useTransactions } from '../Store/useTransactions';
+import { useTransactions } from '../Store/TransactionStore';
 import { useNavigate } from 'react-router-dom';
 import type { PaymentMethod } from '../types/transactions';
 import useErrorStore from '../Store/ErrorStore';
@@ -80,14 +80,14 @@ export default function Billing() {
         const cleaned = phone.replace(/\D/g, '');
         //if it starts with 0 replace with 254
         if (cleaned.startsWith('0')) {
-            return '254' + cleaned;
+            return '+254' + cleaned;
         }
         //if its 9 digits starting with 7add 254
         if (cleaned.length === 9 && cleaned.startsWith('7')) {
-            return '254' + cleaned;
+            return '+254' + cleaned;
         }
         if (cleaned.startsWith('254')) {
-            return cleaned;
+            return '+' + cleaned;
         }
     };
     if (!selectedTier) {
@@ -108,7 +108,7 @@ export default function Billing() {
         setError('');
         const isTestMode = import.meta.env.MODE === 'development';
         const phoneToSend = isTestMode
-            ? '254710000000'
+            ? '+254710000000'
             : formatPhoneNumber(phoneNumber);
 
         try {
@@ -121,6 +121,7 @@ export default function Billing() {
                     email,
                     metadata: {
                         period: selectedPeriod,
+                        tier: selectedTier,
                         paymentMethod: 'mpesa',
                     },
                 }
@@ -459,16 +460,8 @@ export default function Billing() {
                                 <div className="absolute inset-0 h-full w-full -translate-x-full bg-linear-to-r from-white/0 via-white/20 to-white/0 transition-transform duration-1000 group-hover:translate-x-full" />
                                 {isProcessing ? (
                                     <>
-                                        <motion.div
-                                            animate={{ rotate: 360 }}
-                                            transition={{
-                                                duration: 1,
-                                                repeat: Infinity,
-                                                ease: 'linear',
-                                            }}
-                                        >
-                                            <CreditCard className="h-6 w-6" />
-                                        </motion.div>
+                                        <div className="absolute top-5 left-20 h-6 w-6 animate-spin rounded-full border-b-2 border-white" />
+
                                         <span>Processing Securely...</span>
                                     </>
                                 ) : (

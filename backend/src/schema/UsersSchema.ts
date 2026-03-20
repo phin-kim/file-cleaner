@@ -1,6 +1,6 @@
 import { Schema } from 'mongoose';
 import type { User_Type } from '../Types/UserSchema';
-import { UserConnection } from '../config/DB';
+import { TidyUpConnection } from '../config/DB';
 const refreshTokenSchema = new Schema(
     {
         tokenHash: { type: String, required: true },
@@ -28,9 +28,13 @@ const UserSchema = new Schema<User_Type>(
             default: [],
         },
 
-        subscription: {
+        'subscription-plan': {
             type: String,
-            enum: ['tier-1', 'tier-2', 'tier-3'],
+            enum: ['free', 'tier-1', 'tier-2', 'tier-3'],
+        },
+        'subscription-period': {
+            type: String,
+            enum: ['monthly ', 'quarterly'],
         },
         role: {
             type: String,
@@ -40,4 +44,4 @@ const UserSchema = new Schema<User_Type>(
     },
     { timestamps: true }
 );
-export const UserModel = UserConnection.model<User_Type>('User', UserSchema);
+export const UserModel = TidyUpConnection.model<User_Type>('User', UserSchema);

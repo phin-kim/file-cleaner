@@ -9,7 +9,7 @@ import {
 } from 'react-icons/fa6';
 import createClientLogger from '../utils/clientLogger';
 import type { Tier } from '../types/transactions';
-import { useTransactions } from '../Store/useTransactions';
+import { useTransactions } from '../Store/TransactionStore';
 import { useNavigate } from 'react-router-dom';
 const log = createClientLogger('Pricing.tsx');
 //selected tier and the amount are what cary everything i need

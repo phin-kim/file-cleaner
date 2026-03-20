@@ -7,12 +7,14 @@
  * You’ll typically listen to these events on a POST endpoint called your webhook URL.
  */
 import type { Response, Request, NextFunction } from 'express';
-
 import createLogger from '../utils/logger';
 import crypto from 'node:crypto';
 import axios from 'axios';
 import AppError from '../utils/appError';
-const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_KEY;
+import type { AuthenticatedRequest } from '../Types/authenticate';
+import { TransactionsModel } from '../schema/TransactionSchema';
+import { hashPhoneNumber } from '../utils/hashes';
+const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
 const TEST_PHONE_NUMBER = '+254710000000';
 const log = createLogger('Payment.ts');
 export async function mpesaPayment(
@@ -20,13 +22,24 @@ export async function mpesaPayment(
     res: Response,
     next: NextFunction
 ) {
+    const authReq = req as AuthenticatedRequest;
+    const userId = authReq?.user?.uid;
     const { amount, phoneNumber, email, metadata, currency } = req.body;
-    if (!amount || !email || !phoneNumber || !metadata || !currency) {
+    if (!amount) {
         log.error('One of the values is missing ');
         return next(
             AppError.badRequest('One of the necessary fields is missing')
         );
     }
+    if (!email) {
+        log.error('Email is missing ');
+        return next(AppError.badRequest('Email field is necessary'));
+    }
+    if (!phoneNumber) {
+        log.error('Ph0ne number is missing');
+        return next(AppError.badRequest('Phone number  is necessary'));
+    }
+
     const reference = 'MPESA_' + crypto.randomUUID();
     //check the mode that we are currently in to apply the correct phone number
     let formattedPhone = phoneNumber
@@ -70,15 +83,15 @@ export async function mpesaPayment(
         }*/
     } else {
         if (formattedPhone.startsWith('0')) {
-            formattedPhone = '254' + formattedPhone.substring(1);
+            formattedPhone = '+254' + formattedPhone.substring(1);
         } else if (
             formattedPhone.startsWith('7') ||
             formattedPhone.startsWith('1')
         ) {
-            formattedPhone = '254' + formattedPhone;
+            formattedPhone = '+254' + formattedPhone;
         }
         // Remove any double zeros
-        formattedPhone = formattedPhone.replace(/^2540+/, '254');
+        formattedPhone = formattedPhone.replace(/^2540+/, '+254');
     }
     // Final validation - ensure it's exactly 12 digits (254 + 9 digits)
     /* if (!/^254[0-9]{9}$/.test(formattedPhone)) {
@@ -102,12 +115,17 @@ export async function mpesaPayment(
         email: email,
         currency: currency || 'KES',
         reference: reference,
-        metadata: metadata,
+        metadata: {
+            ...metadata,
+            userId: userId,
+            project: 'tidy-up',
+        },
         mobile_money: {
             phone: formattedPhone,
             provider: 'mpesa',
         },
     };
+    const phoneNumberHash = hashPhoneNumber(formattedPhone);
     log.info('Sending M-Pesa payment request to paystack', { data: payload });
     log.info('=== INFO PAYLOAD ===');
     log.info(
@@ -122,6 +140,7 @@ export async function mpesaPayment(
     });
     log.info(`Is test mode:${isTestMode}`);
     log.info(`Key prefix: ${PAYSTACK_SECRET_KEY?.substring(0, 8)}`);
+    log.info(`Checking the api key ${PAYSTACK_SECRET_KEY}`);
     log.info('===================');
     try {
         const paystackResponse = await axios.post(url, payload, {
@@ -139,6 +158,12 @@ export async function mpesaPayment(
         });
         //check if the charge was created successfully
         if (paystackResponse.data.status) {
+            await TransactionsModel.create({
+                userId,
+                email,
+                phoneNumberHash,
+                status,
+            });
             //pesa returns a pending state until the user has verified using their pin
             res.json({
                 status: true,

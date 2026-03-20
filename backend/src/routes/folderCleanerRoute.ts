@@ -13,7 +13,7 @@ import asyncHandler from '../middleware/asyncHandler.js';
 import uploadLimiter from '../utils/rateLimiter.js';
 
 const log = createLogger('Folder-Cleaner');
-export const cleanerRoute = Router();
+export const cleanerRoute: Router = Router();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, '../../');

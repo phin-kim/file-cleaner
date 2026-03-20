@@ -14,9 +14,13 @@ export interface User_Type extends Document {
     passwordHash: string;
     role: 'user' | 'admin';
     createdAt: Date;
-    subscription: Subscription_Plan;
+    'subscription-plan': Subscription_Plan;
+    'subscription-period': Subscription_Period;
     refreshTokens: RefreshToken[];
 }
 export interface Subscription_Plan {
-    enum: ['tier-1', 'tier-2', 'tier-3'];
+    enum: ['free', 'tier-1', 'tier-2', 'tier-3'];
+}
+export interface Subscription_Period {
+    enum: ['monthly', 'quarterly'];
 }

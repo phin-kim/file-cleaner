@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { accessToken } from './authApi';
+import type { InternalAxiosRequestConfig } from 'axios';
 const baseURL =
     import.meta.env.MODE === 'development'
         ? 'http://localhost:5000/api'
@@ -13,6 +15,15 @@ export const subscriptionApi = axios.create({ baseURL });
 export const paystackApi = axios.create({
     baseURL,
 });
+paystackApi.interceptors.request.use(
+    (config: InternalAxiosRequestConfig) => {
+        if (accessToken && config.headers) {
+            config.headers.Authorization = `Bearer ${accessToken} `;
+        }
+        return config;
+    },
+    (error) => Promise.reject(error)
+);
 paystackApi.interceptors.response.use(
     (response) => response,
     (error) => {

@@ -3,25 +3,25 @@ import createLogger from '../utils/logger';
 import AppError from '../utils/appError';
 const log = createLogger('Config:db');
 const isProd = process.env.NODE_ENV === 'production';
-const USERS = isProd
+const TIDY_UP = isProd
     ? process.env.USER_MONGO_URL ||
       (() => {
           throw AppError.notFound('Missing USER_MONGO_URL in production');
       })()
-    : 'mongodb://127.0.0.1:27017/TDUserDatabase';
-const TRANSACTIONS = isProd
+    : 'mongodb://127.0.0.1:27017/tidyUpDB';
+/*const TRANSACTIONS = isProd
     ? process.env.USER_MONGO_URL ||
       (() => {
           throw AppError.notFound('Missing USER_MONGO_URL in production');
       })()
-    : 'mongodb://127.0.0.1:27017/TDTransactionsDatabase';
-export const UserConnection = mongoose.createConnection(USERS);
-export const TransactionsConnection = mongoose.createConnection(TRANSACTIONS);
+    : 'mongodb://127.0.0.1:27017/tidy-up/TDTransactionsDatabase';*/
+export const TidyUpConnection = mongoose.createConnection(TIDY_UP);
+//export const TransactionsConnection = mongoose.createConnection(TRANSACTIONS);
 export const connectDatabases = async (): Promise<void> => {
     try {
         await Promise.all([
-            UserConnection.asPromise(),
-            TransactionsConnection.asPromise(),
+            TidyUpConnection.asPromise(),
+            //TransactionsConnection.asPromise(),
         ]);
 
         log.highlight('All databases are connected ', {

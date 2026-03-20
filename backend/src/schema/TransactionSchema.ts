@@ -1,6 +1,6 @@
 import { Schema } from 'mongoose';
 import type { Transaction_Type, Metadata } from '../Types/TransactionSchema';
-import { TransactionsConnection } from '../config/DB';
+import { TidyUpConnection } from '../config/DB';
 const MetadataSchema = new Schema<Metadata>(
     {
         period: {
@@ -17,6 +17,10 @@ const MetadataSchema = new Schema<Metadata>(
 );
 const TransactionsSchema = new Schema<Transaction_Type>(
     {
+        userId: {
+            type: String,
+            required: true,
+        },
         email: {
             type: String,
             required: true,
@@ -56,7 +60,7 @@ const TransactionsSchema = new Schema<Transaction_Type>(
     },
     { timestamps: true }
 );
-export const TransactionsModel = TransactionsConnection.model<Transaction_Type>(
+export const TransactionsModel = TidyUpConnection.model<Transaction_Type>(
     'Transaction',
     TransactionsSchema
 );

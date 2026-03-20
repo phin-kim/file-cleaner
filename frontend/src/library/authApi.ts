@@ -16,7 +16,7 @@ interface QueuedRequest {
     config: InternalAxiosRequestConfig;
 }
 let failedQueue: QueuedRequest[] = [];
-let accessToken: string | null = null;
+export let accessToken: string | null = null;
 let isRefreshing = false;
 const authApi: AxiosInstance = axios.create({
     baseURL,
