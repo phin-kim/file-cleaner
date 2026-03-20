@@ -10,7 +10,7 @@ import { mergerRoute } from './routes/fileMergerRoute.js';
 import createLogger from './utils/logger.js';
 
 const log = createLogger('APP.TS');
-const PORT = process.env.PORT;
+const PORT = process.env.PORT ?? 5000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
