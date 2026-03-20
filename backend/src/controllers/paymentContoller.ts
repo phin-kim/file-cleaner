@@ -162,7 +162,12 @@ export async function mpesaPayment(
                 userId,
                 email,
                 phoneNumberHash,
-                status,
+                status: 'pending',
+                paystackReference: reference,
+                metadata,
+                project: 'tidy-up',
+                provider: 'provider',
+                createdAt: new Date(),
             });
             //pesa returns a pending state until the user has verified using their pin
             res.json({

@@ -121,7 +121,8 @@ export default function Billing() {
                     email,
                     metadata: {
                         period: selectedPeriod,
-                        tier: selectedTier,
+                        tierId: selectedTier.id,
+                        tierName: selectedTier.name,
                         paymentMethod: 'mpesa',
                     },
                 }

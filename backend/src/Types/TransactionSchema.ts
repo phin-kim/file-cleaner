@@ -11,6 +11,7 @@ export interface Transaction_Type extends Document {
     paystackReference: string;
     createdAt: Date;
     project: string;
+    provider: string;
     updatedAt?: Date;
 }
 export interface Metadata {

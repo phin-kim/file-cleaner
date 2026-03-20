@@ -52,6 +52,8 @@ const TransactionsSchema = new Schema<Transaction_Type>(
             type: String,
             sparse: true, // Allows null/undefined but maintains uniqueness for those that exist
         },
+        provider: String,
+        project: String,
         createdAt: {
             type: Date,
             default: Date.now,
