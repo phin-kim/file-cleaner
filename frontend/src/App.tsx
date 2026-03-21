@@ -9,7 +9,7 @@ import {
     BrowserRouter,
     Routes,
     Route,
-    //Outlet,
+    Outlet,
     //Navigate,
 } from 'react-router-dom';
 import { useEffect, useRef } from 'react';
@@ -20,7 +20,8 @@ import { useAuthStore } from './Store/authStore';
 const log = createClientLogger('App.tsx');
 //import { UpgradeModal } from './components/Popup';
 //import WelcomeModal from './Pages/WelcomePage';
-//import Header from './components/Header';
+import Header from './components/Header';
+import ProtectedRoutes from './components/ProtectedRoutes';
 /** 
  
 Method	Name	React-Ractive?	Use Case
@@ -65,19 +66,11 @@ function App() {
             <ErrorToast />
             <SuccessToast />
             <BrowserRouter>
-                <Routes>
-                    {/*<Route element={<AppLayout />}>
-                        <Route
+                {/**<Route
                             path="/"
                             element={<Navigate to="/welcome" replace />}
                         />
-                        <Route path="/welcome" element={<WelcomeModal />} />*/}
-                    <Route path="/auth" element={<AuthForm />} />
-
-                    <Route path="/" element={<FolderCleanerUI />} />
-                    <Route path="/pricing" element={<Pricing />} />
-                    <Route path="/billing" element={<BillingPage />} />
-                    {/*
+                        <Route path="/welcome" element={<WelcomeModal />} />
                         <Route
                             path="/file-merge"
                             element={<FolderQuestionAnalyzer />}
@@ -85,7 +78,16 @@ function App() {
                         <Route
                             path="/upgrade-modal"
                             element={<UpgradeModal />}
-                        />*/}
+                        /> */}
+                <Routes>
+                    <Route path="/auth" element={<AuthForm />} />
+                    <Route element={<ProtectedRoutes />}>
+                        <Route element={<AppLayout />}>
+                            <Route path="/" element={<FolderCleanerUI />} />
+                            <Route path="/pricing" element={<Pricing />} />
+                            <Route path="/billing" element={<BillingPage />} />
+                        </Route>
+                    </Route>
                 </Routes>
             </BrowserRouter>
         </>
@@ -93,13 +95,12 @@ function App() {
 }
 
 export default App;
-{
-    /*function AppLayout() {
+
+function AppLayout() {
     return (
         <>
             <Header />
             <Outlet />
         </>
     );
-}*/
 }

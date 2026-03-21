@@ -32,7 +32,6 @@ export default function Billing() {
     const [phoneNumber, setPhoneNumber] = useState<string>('');
     const [email, setEmail] = useState<string>('');
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
-
     const amount = useTransactions((state) => state.amount);
     const selectedPeriod = useTransactions((state) => state.selectedPeriod);
     const selectedTier = useTransactions((state) => state.tier);
@@ -94,7 +93,7 @@ export default function Billing() {
         setError('Please select a plan first');
         return;
     }
-
+    //log.debug(`is authenticated ${isAuthenticated}`);
     const handlePayment = async () => {
         if (selectedPayment === 'mpesa' && !phoneNumber) {
             setError('Please enter your M-Pesa phone number');

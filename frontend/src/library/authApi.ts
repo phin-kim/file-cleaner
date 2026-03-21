@@ -5,6 +5,7 @@ import type {
 } from 'axios';
 import axios from 'axios';
 import createClientLogger from '../utils/clientLogger';
+import { useAuthStore } from '../Store/authStore';
 const log = createClientLogger('Auth api');
 const baseURL =
     import.meta.env.MODE === 'development'
@@ -31,12 +32,13 @@ const authApi: AxiosInstance = axios.create({
 authApi.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
         if (accessToken && config.headers) {
-            config.headers.Authorization = `Bearer ${accessToken} `;
+            config.headers.Authorization = `Bearer ${accessToken}`;
         }
         return config;
     },
     (error) => Promise.reject(error)
 );
+console.log(`Access token read from authAPI.ts ${accessToken}`);
 authApi.interceptors.response.use(
     (response) => response,
     async (error: AxiosError) => {
@@ -102,7 +104,9 @@ authApi.interceptors.response.use(
 //setAccess token used by auth context{zustand}
 export function setAccessToken(token: string | null) {
     accessToken = token;
+    //useAuthStore.getState().setAccessToken(token);
 }
+//export const getAccessToken = () => accessToken;
 function processQueue(error: AxiosError | null, token: string | null = null) {
     failedQueue.forEach(({ resolve, reject, config }) => {
         if (error) {

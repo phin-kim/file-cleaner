@@ -14,6 +14,7 @@ import AppError from '../utils/appError';
 import type { AuthenticatedRequest } from '../Types/authenticate';
 import { TransactionsModel } from '../schema/TransactionSchema';
 import { hashPhoneNumber } from '../utils/hashes';
+import { UserModel } from '../schema/UsersSchema';
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
 const TEST_PHONE_NUMBER = '+254710000000';
 const log = createLogger('Payment.ts');
@@ -36,7 +37,7 @@ export async function mpesaPayment(
         return next(AppError.badRequest('Email field is necessary'));
     }
     if (!phoneNumber) {
-        log.error('Ph0ne number is missing');
+        log.error('Phone number is missing');
         return next(AppError.badRequest('Phone number  is necessary'));
     }
 
@@ -157,18 +158,41 @@ export async function mpesaPayment(
             },
         });
         //check if the charge was created successfully
+        const paystackMetadata = paystackResponse.data.data.metadata;
         if (paystackResponse.data.status) {
             await TransactionsModel.create({
                 userId,
+                amount,
                 email,
                 phoneNumberHash,
                 status: 'pending',
-                paystackReference: reference,
-                metadata,
+                reference,
+
+                paystackReference: paystackResponse.data.data.reference,
+                metadata: {
+                    period: paystackMetadata.period,
+                    paymentMethod: paystackMetadata.paymentMethod,
+                    tierName: paystackMetadata.tierName, // Ensure these match schema keys
+                    tierId: paystackMetadata.tierId,
+                },
                 project: 'tidy-up',
-                provider: 'provider',
+                provider: 'mpesa',
                 createdAt: new Date(),
             });
+            await UserModel.findOneAndUpdate(
+                {
+                    _id: userId,
+                },
+                {
+                    $set: {
+                        'subscription-period': paystackMetadata.period,
+                        'subscription-plan': paystackMetadata.tierName,
+                        'subscription-status': 'pending',
+                    }, // Good idea to track this,
+                },
+                { returnDocument: 'after', runValidators: true } // Returns the updated document
+            );
+            //Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
             //pesa returns a pending state until the user has verified using their pin
             res.json({
                 status: true,
@@ -250,7 +274,7 @@ export async function mpesaPayment(
                     )
                 );
             } else {
-                //something happended in setting up the request that triggered the error
+                //something happened in setting up the request that triggered the error
                 log.error('Error insetting up paystack request', {
                     data: {
                         message: error.message,

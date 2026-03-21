@@ -6,6 +6,8 @@ export interface Transaction_Type extends Document {
     amount: number;
     email: string;
     phoneNumberHash: string;
+    tierId: string;
+    tierName: string;
     metadata: Metadata;
     status: 'pending' | 'success' | 'failed' | 'processing';
     paystackReference: string;
@@ -18,6 +20,6 @@ export interface Metadata {
     period: 'monthly' | 'quarterly';
     paymentMethod: string;
     //optional fields
-    tieId?: string;
+    tierId?: string;
     tierName: string;
 }

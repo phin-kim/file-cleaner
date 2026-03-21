@@ -25,6 +25,13 @@ const Header = () => {
                     <FaArrowLeftLong className="transition-all duration-150 group-hover:-translate-x-3" />
                     Switch Tool
                 </button>
+                <button
+                    onClick={() => navigate('/pricing')}
+                    className="group flex w-[10em] items-center justify-center gap-1 rounded-4xl bg-slate-200 p-2 text-sm font-medium text-slate-900 transition-colors hover:text-indigo-600"
+                >
+                    <FaArrowLeftLong className="transition-all duration-150 group-hover:-translate-x-3" />
+                    go to pricing
+                </button>
             </div>
         </header>
     );

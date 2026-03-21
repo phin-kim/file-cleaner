@@ -18,7 +18,9 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
             log.error('Invalid refresh token in payload', { data: token });
             return next(AppError.unauthorized('Unauthorized user'));
         }
-        log.info('Refresh token received from cookie', { data: { token: token.substring(0, 20) + '...' } });
+        log.info('Refresh token received from cookie', {
+            data: { token: token.substring(0, 20) + '...' },
+        });
         const payload = jwt.verify(token, refreshSecret) as JwtPayload;
         //extract the uid
         const userId = payload.uid as string;
@@ -32,14 +34,30 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
             return next(AppError.unauthorized('User not found '));
         }
         const tokenHash = hashToken(token);
-        log.info('Token hash calculated', { data: { hash: tokenHash.substring(0, 20) + '...' } });
-        log.info('Stored tokens in DB', { data: { count: user.refreshTokens.length, hashes: user.refreshTokens.map(t => t.tokenHash.substring(0, 20) + '...') } });
+        log.info('Token hash calculated', {
+            data: { hash: tokenHash.substring(0, 20) + '...' },
+        });
+        log.info('Stored tokens in DB', {
+            data: {
+                count: user.refreshTokens.length,
+                hashes: user.refreshTokens.map(
+                    (t) => t.tokenHash.substring(0, 20) + '...'
+                ),
+            },
+        });
         const stored = user.refreshTokens.find(
             (token) => token.tokenHash === tokenHash
         );
         if (!stored) {
-            log.error('No matching token found - REVOKED', { data: { incomingHash: tokenHash.substring(0, 20) + '...', storedHashes: user.refreshTokens.map(t => t.tokenHash.substring(0, 20) + '...') } });
-            return next(AppError.unauthorized('Refresh token revoked')); 
+            log.error('No matching token found - REVOKED', {
+                data: {
+                    incomingHash: tokenHash.substring(0, 20) + '...',
+                    storedHashes: user.refreshTokens.map(
+                        (t) => t.tokenHash.substring(0, 20) + '...'
+                    ),
+                },
+            });
+            return next(AppError.unauthorized('Refresh token revoked'));
         }
         if (stored.expiresAt < new Date()) {
             //remove expired tokens
@@ -70,7 +88,8 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
-            path: '/api/auth',
+            //set to general path coz i need payment to access the cookie change later due to security issues
+            path: '/api',
             maxAge: 30 * 24 * 60 * 60 * 1000,
             signed: true,
         });

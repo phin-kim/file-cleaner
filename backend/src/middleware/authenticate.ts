@@ -37,11 +37,12 @@ const authenticate: RequestHandler = async (req, _res, next) => {
             authHeader && authHeader.startsWith('Bearer ')
                 ? authHeader.split(' ')[1]
                 : undefined;
-        log.debug('Token from header', {
+        log.warn('Token from header', {
             requestId,
             context: 'authenticate',
             data: { token: token ? `${token.slice(0, 30)}...` : 'undefined' },
         });
+        log.info(`is there token from body ${req.body.idToken ? 'yes' : 'no'}`);
         if (!token && req.body?.idToken) {
             token = req.body.idToken;
             log.debug('Token from body', {
@@ -58,7 +59,9 @@ const authenticate: RequestHandler = async (req, _res, next) => {
         const secret = process.env.JWT_ACCESS_SECRET;
         if (!secret) {
             log.error('JWT_SECRET not configured');
-            return;
+            return next(
+                new AppError('Internal Server Configuration Error', 500)
+            );
         }
         const decoded = jwt.verify(token, secret) as JwtPayload;
         if (typeof decoded !== 'object' || decoded === null) {

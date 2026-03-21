@@ -12,6 +12,14 @@ const MetadataSchema = new Schema<Metadata>(
             type: String,
             required: true,
         },
+        tierName: {
+            type: String,
+            required: true,
+        },
+        tierId: {
+            type: String,
+            required: true,
+        },
     },
     { _id: false }
 );
@@ -41,6 +49,8 @@ const TransactionsSchema = new Schema<Transaction_Type>(
         reference: {
             type: String,
             unique: true,
+            required: true,
+            sparse: true,
         },
         status: {
             type: String,

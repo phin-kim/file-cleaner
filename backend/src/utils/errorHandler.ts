@@ -1,7 +1,8 @@
 import type { Request, Response, NextFunction } from 'express';
 import AppError from './appError.js';
 import type { ErrorType } from '../Types/ErrorHandler.js';
-
+import mongoose from 'mongoose';
+import { MongoServerError } from 'mongodb';
 import crypto from 'node:crypto';
 
 const errorHandler = (
@@ -21,6 +22,18 @@ const errorHandler = (
     let appError: AppError;
     if (err instanceof AppError) {
         appError = err;
+    } else if (err instanceof mongoose.Error.ValidationError) {
+        const detail = Object.values(err.errors)
+            .map((er) => er.message)
+            .join(', ');
+        appError = AppError.validation(`Validation Failed ${detail}`);
+    } else if (err instanceof mongoose.Error.CastError) {
+        appError = AppError.badRequest(`Invalid value for ${err.path}`);
+    } else if (err instanceof MongoServerError && err.code === 11000) {
+        const field = Object.keys(err.keyValue)[0];
+        appError = AppError.conflict(`${field} already exists`);
+    } else if (err instanceof MongoServerError) {
+        appError = AppError.database('Database Error');
     } else {
         appError = AppError.database('Internal server error');
     }

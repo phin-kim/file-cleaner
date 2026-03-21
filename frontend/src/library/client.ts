@@ -1,6 +1,7 @@
 import axios from 'axios';
+/**importing this access token like this wont be ideal coz it will be stale in the case of an update so we use a getter function defined in the auth api.ts */
 import { accessToken } from './authApi';
-import type { InternalAxiosRequestConfig } from 'axios';
+import type { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 const baseURL =
     import.meta.env.MODE === 'development'
         ? 'http://localhost:5000/api'
@@ -15,15 +16,18 @@ export const subscriptionApi = axios.create({ baseURL });
 export const paystackApi = axios.create({
     baseURL,
 });
-paystackApi.interceptors.request.use(
-    (config: InternalAxiosRequestConfig) => {
+const attachAuth = (instance: AxiosInstance) => {
+    instance.interceptors.request.use((config) => {
+        // We use the live 'accessToken' exported from authApi.ts
         if (accessToken && config.headers) {
-            config.headers.Authorization = `Bearer ${accessToken} `;
+            config.headers.Authorization = `Bearer ${accessToken}`;
         }
+
         return config;
-    },
-    (error) => Promise.reject(error)
-);
+    });
+};
+attachAuth(paystackApi);
+attachAuth(subscriptionApi);
 paystackApi.interceptors.response.use(
     (response) => response,
     (error) => {
