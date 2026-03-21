@@ -17,6 +17,7 @@ import { authRoute } from './routes/auth.js';
 import errorHandler from './utils/errorHandler.js';
 import { connectDatabases } from './config/DB.js';
 import { paymentRoute } from './routes/paymentRoute.js';
+import { webhook } from './routes/webhookRoute.js';
 
 const log = createLogger('APP.TS');
 const PORT = process.env.PORT;
@@ -38,6 +39,7 @@ app.use('/api', cleanerRoute);
 app.use('/api', subRouter);
 app.use('/api', mergerRoute);
 app.use('/api/auth', authRoute);
+app.use('/api/payment', webhook);
 app.use('/api/payment', paymentRoute);
 app.use('/downloads', express.static(path.join(process.cwd(), 'backend/temp')));
 

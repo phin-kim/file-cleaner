@@ -34,7 +34,16 @@ const UserSchema = new Schema<User_Type>(
         },
         'subscription-period': {
             type: String,
-            enum: ['monthly ', 'quarterly'],
+            enum: ['monthly', '3 months'],
+        },
+        'subscription-status': {
+            type: String,
+            enum: ['active', 'suspended', 'banned', 'pending'],
+        },
+        'last-payment-date': {
+            type: Date,
+            required: true,
+            default: Date.now,
         },
         role: {
             type: String,

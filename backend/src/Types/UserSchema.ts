@@ -16,11 +16,17 @@ export interface User_Type extends Document {
     createdAt: Date;
     'subscription-plan': Subscription_Plan;
     'subscription-period': Subscription_Period;
+    'subscription-status': Subscription_Status;
+    'last-payment-date': Date;
+
     refreshTokens: RefreshToken[];
 }
 export interface Subscription_Plan {
     enum: ['free', 'tier-1', 'tier-2', 'tier-3'];
 }
 export interface Subscription_Period {
-    enum: ['monthly', 'quarterly'];
+    enum: ['monthly', '3 months'];
+}
+export interface Subscription_Status {
+    enum: ['active', 'suspended', 'banned'];
 }

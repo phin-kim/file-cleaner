@@ -14,7 +14,6 @@ import AppError from '../utils/appError';
 import type { AuthenticatedRequest } from '../Types/authenticate';
 import { TransactionsModel } from '../schema/TransactionSchema';
 import { hashPhoneNumber } from '../utils/hashes';
-import { UserModel } from '../schema/UsersSchema';
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
 const TEST_PHONE_NUMBER = '+254710000000';
 const log = createLogger('Payment.ts');
@@ -179,19 +178,7 @@ export async function mpesaPayment(
                 provider: 'mpesa',
                 createdAt: new Date(),
             });
-            await UserModel.findOneAndUpdate(
-                {
-                    _id: userId,
-                },
-                {
-                    $set: {
-                        'subscription-period': paystackMetadata.period,
-                        'subscription-plan': paystackMetadata.tierName,
-                        'subscription-status': 'pending',
-                    }, // Good idea to track this,
-                },
-                { returnDocument: 'after', runValidators: true } // Returns the updated document
-            );
+
             //Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
             //pesa returns a pending state until the user has verified using their pin
             res.json({

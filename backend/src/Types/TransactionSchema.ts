@@ -17,7 +17,7 @@ export interface Transaction_Type extends Document {
     updatedAt?: Date;
 }
 export interface Metadata {
-    period: 'monthly' | 'quarterly';
+    period: 'monthly' | '3 months';
     paymentMethod: string;
     //optional fields
     tierId?: string;

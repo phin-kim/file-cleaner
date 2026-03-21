@@ -6,7 +6,7 @@ const MetadataSchema = new Schema<Metadata>(
         period: {
             type: String,
             required: true,
-            enum: ['monthly', 'quarterly'],
+            enum: ['monthly', '3 months'],
         },
         paymentMethod: {
             type: String,
