@@ -93,13 +93,14 @@ export default function LoadingScreen() {
                         Scanning directories and indexing files...
                     </p>
 
-                    <div className="mb-4 h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
+                    <div className="relative mb-4 h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
                         <motion.div
-                            className="h-full rounded-full bg-blue-600"
-                            initial={{ width: '0%' }}
-                            animate={{ width: '100%' }}
+                            className="absolute top-0 bottom-0 w-1/3 rounded-full bg-blue-600"
+                            animate={{
+                                x: ['-100%', '300%'],
+                            }}
                             transition={{
-                                duration: 3,
+                                duration: 1.8,
                                 repeat: Infinity,
                                 ease: 'easeInOut',
                             }}

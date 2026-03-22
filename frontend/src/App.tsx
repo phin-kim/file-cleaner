@@ -39,21 +39,25 @@ function App() {
         }
         const restoreSession = async () => {
             refreshExecuted.current = true;
-            // Only restore session if there was a previous session
-            const hasStoredSession = localStorage.getItem('hasSession');
-
-            if (!hasStoredSession) {
-                return;
-            }
+            /**
+             *  Only restore session if there was a previous session
+             * this return caused the refresh endpoint to being hit hence i had to log in every time
+             * if (!hasStoredSession) {
+                return; }
+            */
 
             try {
                 const refresh = useAuthStore.getState().refresh;
                 await refresh();
-                log.info('Session restored');
                 const currentUser = useAuthStore.getState().user;
                 const currentAuth = useAuthStore.getState().isAuthenticated;
+                if (currentAuth) {
+                    log.info('Session restored');
+                } else {
+                    log.warn('Session restoration failed no valid session');
+                }
                 log.debug(`is authenticated ${currentAuth}`);
-                log.highlight(`Log in as ${currentUser?.email}`);
+                log.highlight(`Logged in as ${currentUser?.email}`);
             } catch (error) {
                 const { setError } = useErrorStore.getState();
                 handleApiError(error, setError);

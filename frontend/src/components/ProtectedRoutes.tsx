@@ -6,8 +6,9 @@ const log = createClientLogger('ProtectedRoutes');
 function ProtectedRoutes() {
     const hasHydrated = useAuthStore((state) => state._hasHydrated);
     const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+    const isLoading = useAuthStore((state) => state.isLoading);
     const user = useAuthStore((state) => state.user);
-    if (!hasHydrated) {
+    if (!hasHydrated || isLoading) {
         return <LoadingScreen />;
     }
     if (!isAuthenticated) {

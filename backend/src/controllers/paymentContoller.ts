@@ -251,8 +251,12 @@ export async function mpesaPayment(
 
                 log.error('No response from paystack', {
                     data: {
-                        request: error.request,
+                        // DO NOT log error.request directly
                         message: error.message,
+                        method: error.config?.method,
+                        url: error.config?.url,
+                        // If you need request details, pick specific fields
+                        path: error.request._path || error.request.path,
                     },
                 });
                 return next(

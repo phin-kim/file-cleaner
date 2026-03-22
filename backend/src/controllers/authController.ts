@@ -48,7 +48,7 @@ export async function register(req: Request, res: Response) {
     res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        path: '/api',
+        path: '/',
         sameSite: 'strict',
         signed: true,
         maxAge: 30 * 24 * 60 * 60 * 1000,

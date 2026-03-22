@@ -27,7 +27,7 @@ export const useAuthStore = create<AuthState>()(
             user: null,
             isAuthenticated: false,
             accessToken: null,
-            isLoading: false,
+            isLoading: true,
             _hasHydrated: false,
             setHasHydrated: (state) => set({ _hasHydrated: state }),
             setAccessToken: (token: string | null) => {
@@ -54,6 +54,7 @@ export const useAuthStore = create<AuthState>()(
                         isAuthenticated: true,
                     });
                     setApiToken(res.data.accessToken);
+                    localStorage.setItem('hasSession', 'true');
                     const currentState = get();
                     log.debug(`Current user `, {
                         data: currentState.user,
@@ -100,6 +101,7 @@ export const useAuthStore = create<AuthState>()(
                     log.info('refresh from backend', { data: { res } });
                 } catch (error) {
                     // refresh failed; user stays logged out
+                    localStorage.removeItem('hasSession');
                     setAccessToken(null);
                     set({
                         user: null,
@@ -134,9 +136,10 @@ export const useAuthStore = create<AuthState>()(
             //triggered when local storage is finished loading
             onRehydrateStorage: () => (state) => {
                 // When the page loads, immediately try to get a fresh token using the cookie
-                if (state?.isAuthenticated) {
+                /**this approach caused a race condition between the ap.tsx and this store as both want the .refresh()   if (state?.isAuthenticated) {
                     state.refresh();
-                }
+                }*/
+
                 state?.setHasHydrated(true);
             },
         }

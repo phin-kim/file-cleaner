@@ -49,6 +49,18 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
             (token) => token.tokenHash === tokenHash
         );
         if (!stored) {
+            /* SECURITY CHECK: Did this token exist very recently?
+             * If user.refreshTokens has a token created in the last 10 seconds,
+             * it's likely a double-render. Just return the current valid one.*/
+            const recentToken = user.refreshTokens.find(
+                (token) =>
+                    new Date().getTime() - new Date(token.createdAt).getTime() <
+                    10000
+            );
+            if (recentToken) {
+                log.warn('Double render detected, ignoring revoked error');
+                return res.status(200).json({ success: true });
+            }
             log.error('No matching token found - REVOKED', {
                 data: {
                     incomingHash: tokenHash.substring(0, 20) + '...',
@@ -89,7 +101,7 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
             //set to general path coz i need payment to access the cookie change later due to security issues
-            path: '/api',
+            path: '/',
             maxAge: 30 * 24 * 60 * 60 * 1000,
             signed: true,
         });
