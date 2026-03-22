@@ -144,15 +144,6 @@ export default function Billing() {
         <div className="min-h-screen bg-linear-to-br from-purple-600 to-violet-800 p-4 md:p-8">
             <div className="mx-auto max-w-6xl">
                 {/* Navigation */}
-                <motion.button
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    onClick={() => navigate('/pricing')}
-                    className="group mb-8 flex items-center gap-2 text-purple-200 transition-colors hover:text-white"
-                >
-                    <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
-                    <span className="font-medium">Back to Plans</span>
-                </motion.button>
 
                 {/* Header */}
                 <motion.div

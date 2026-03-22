@@ -20,11 +20,11 @@ import { useAuthStore } from './Store/authStore';
 const log = createClientLogger('App.tsx');
 //import { UpgradeModal } from './components/Popup';
 //import WelcomeModal from './Pages/WelcomePage';
-import Header from './components/Header';
+import Breadcrumb from './components/Navbar';
 import ProtectedRoutes from './components/ProtectedRoutes';
 /** 
  
-Method	Name	React-Ractive?	Use Case
+Method	Name	React-Reactive?	Use Case
 useAuthStore(selector)	Selector hooks	✅ Yes (specific)	React components - when you need reactivity
 useAuthStore()	Full store hook	✅ Yes (all)	Avoid unless necessary
 useAuthStore.getState()	Store getters	❌ No	Non-React code (interceptors, helpers, outside components)
@@ -89,7 +89,10 @@ function App() {
                         <Route element={<AppLayout />}>
                             <Route path="/" element={<FolderCleanerUI />} />
                             <Route path="/pricing" element={<Pricing />} />
-                            <Route path="/billing" element={<BillingPage />} />
+                            <Route
+                                path="/pricing/billing"
+                                element={<BillingPage />}
+                            />
                         </Route>
                     </Route>
                 </Routes>
@@ -103,7 +106,7 @@ export default App;
 function AppLayout() {
     return (
         <>
-            <Header />
+            <Breadcrumb />
             <Outlet />
         </>
     );

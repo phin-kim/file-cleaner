@@ -94,7 +94,7 @@ const Pricing: React.FC = () => {
                 setSelectedPeriod('monthly');
                 setAmount(selected.monthlyPrice ?? 0);
             }
-            navigate('/billing');
+            navigate('/pricing/billing');
         }
     };
 
