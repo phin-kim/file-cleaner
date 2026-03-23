@@ -28,8 +28,10 @@ const UserSchema = new Schema<User_Type>(
             default: [],
         },
 
-        'subscription-plan': {
+        tierId: {
             type: String,
+            required: true,
+            default: 'free',
             enum: ['free', 'tier-1', 'tier-2', 'tier-3'],
         },
         'subscription-period': {

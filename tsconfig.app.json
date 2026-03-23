@@ -36,6 +36,6 @@
         // "types": ["react", "react-dom"],
         "typeRoots": ["./src/types", "./node_modules/@types"]
     },
-    "include": ["frontend/src/**/*", "frontend/src/types/**/*"],
+    "include": ["frontend/src/**/*", "frontend/src/types/**/*", "shared"],
     "exclude": ["node_modules", "dist", "frontend/vite.config.ts"]
 }

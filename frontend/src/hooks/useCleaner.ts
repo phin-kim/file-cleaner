@@ -6,6 +6,8 @@ import type { AnalysisResult } from '../types/types';
 import useErrorStore from '../Store/ErrorStore';
 import createClientLogger from '../utils/clientLogger';
 import handleApiError from '../utils/apiError';
+import { useTierStore } from '../Store/tierStore';
+import { TIER_CONFIG } from '../../../shared/tiers';
 const log = createClientLogger('Use cleaner hook');
 export default function useCleaner() {
     const { setError } = useErrorStore();
@@ -25,6 +27,8 @@ export default function useCleaner() {
     const [progress, setProgress] = useState(0);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
+    const tierId = useTierStore((state) => state.tierId);
+    log.info(`confirming the tier id ${tierId}`);
     /* ---------- Handlers ---------- */
     const handleDragEnter = (event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault();
@@ -67,6 +71,11 @@ export default function useCleaner() {
                 return prev + 3;
             });
         }, 100);
+        // get the max uploads for the user and use that as a gate
+
+        const MAX_UPLOADS =
+            TIER_CONFIG[tierId as keyof typeof TIER_CONFIG].maxUploads;
+        log.info(`Confirming the max uploads based on the tier ${MAX_UPLOADS}`);
         try {
             //get folder name from the first file path
             const firstFile = files[0];
@@ -75,9 +84,9 @@ export default function useCleaner() {
             const folderName = firstFile.webkitRelativePath.split('/')[0];
             log.highlight('Folder name', { data: folderName });
             const fileArray = Array.from(files);
-            
+
             // Check file limit before uploading
-            if (fileArray.length > 150) {
+            if (fileArray.length > MAX_UPLOADS) {
                 setError(
                     `${fileArray.length} files. Kindly upgrade to premium`
                 );
@@ -85,7 +94,7 @@ export default function useCleaner() {
                 setStatus('idle');
                 return;
             }
-            
+
             setUploadedFolder({
                 name: folderName,
                 files: fileArray,
@@ -102,9 +111,13 @@ export default function useCleaner() {
             log.info('Sending files to backend');
             log.debug(`form data ${formData}`);
             log.warn(`file count${fileArray.length}`);
-            const response = await fileCleanerApi.post(`/${path}`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-            });
+            const response = await fileCleanerApi.post(
+                `/${path}`,
+                { formData, tierId },
+                {
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                }
+            );
             log.highlight(
                 `[FRONTEND] backend responded in ${Date.now() - start}ms`
             );

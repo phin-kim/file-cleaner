@@ -2,9 +2,29 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { FaMagic } from 'react-icons/fa';
-import { FaBroom, FaFilePdf } from 'react-icons/fa6';
+import { FaBroom, FaFilePdf, FaLayerGroup } from 'react-icons/fa6';
+import { welcomePageApi } from '../library/client';
+import { useTierStore } from '../Store/tierStore';
+import createClientLogger from '../utils/clientLogger';
+import handleApiError from '../utils/apiError';
+import useErrorStore from '../Store/ErrorStore';
+const log = createClientLogger('Welcome page.tsx');
 const WelcomeModal: React.FC = () => {
     const navigate = useNavigate();
+    const setTierId = useTierStore((state) => state.setTierId);
+    const tierId = useTierStore((state) => state.tierId);
+    const { setError } = useErrorStore();
+    const getTier = async (path: string) => {
+        try {
+            log.info('Fetching the tier');
+            navigate(path);
+            const response = await welcomePageApi.get('/get-tier');
+            setTierId(response.data.tierId);
+            log.info(`this is the tier id ${tierId}`);
+        } catch (error) {
+            handleApiError(error, setError);
+        }
+    };
     return (
         <AnimatePresence>
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -13,7 +33,6 @@ const WelcomeModal: React.FC = () => {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
-                    //onClick={onClose}
                 />
                 <motion.div
                     initial={{ scale: 0.9, opacity: 0, y: 20 }}
@@ -33,42 +52,69 @@ const WelcomeModal: React.FC = () => {
                         </p>
 
                         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                            <button
-                                onClick={() => navigate('/folder-cleanup')}
-                                className="group relative flex flex-col items-center rounded-3xl bg-[#3939391a] p-8 backdrop-blur-3xl transition-all duration-300 hover:border-indigo-200 hover:bg-[#17171770] hover:shadow-xl hover:shadow-indigo-500/10"
-                            >
-                                <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-100 text-2xl text-indigo-600 transition-all duration-300 group-hover:scale-110 group-hover:bg-indigo-600 group-hover:text-white">
-                                    <FaBroom />
-                                </div>
-                                <h3 className="mb-1 font-bold text-slate-100">
-                                    Clean up files
-                                </h3>
-                                <p className="text-center text-xs text-slate-100">
-                                    AI-powered folder organization and renaming
-                                    strategies.
-                                </p>
-                            </button>
+                            {/* Feature 1: Folder Cleanup */}
+                            <div className="group relative flex flex-col items-center rounded-3xl border border-white/5 bg-[#3939391a] p-8 backdrop-blur-3xl transition-all duration-300 hover:border-indigo-200/30 hover:bg-[#17171770] hover:shadow-xl hover:shadow-indigo-500/10">
+                                <button
+                                    onClick={() => getTier('/folder-cleaner')}
+                                    className="flex w-full flex-col items-center"
+                                >
+                                    <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-100 text-2xl text-indigo-600 transition-all duration-300 group-hover:scale-110 group-hover:bg-indigo-600 group-hover:text-white">
+                                        <FaBroom />
+                                    </div>
+                                    <h3 className="mb-1 font-bold text-slate-100">
+                                        Clean up files
+                                    </h3>
+                                    <p className="text-center text-xs text-slate-100/80">
+                                        AI-powered folder organization and
+                                        renaming strategies.
+                                    </p>
+                                </button>
+                            </div>
 
+                            {/* Feature 2: File Merge */}
+                            <div className="group relative flex flex-col items-center rounded-3xl border border-white/5 bg-[#3939391a] p-8 backdrop-blur-3xl transition-all duration-300 hover:border-purple-200/30 hover:bg-[#17171770] hover:shadow-xl hover:shadow-purple-500/10">
+                                <button
+                                    onClick={() => getTier('/file-merger')}
+                                    className="flex w-full flex-col items-center"
+                                >
+                                    <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-purple-100 text-2xl text-purple-600 transition-all duration-300 group-hover:scale-110 group-hover:bg-purple-600 group-hover:text-white">
+                                        <FaFilePdf />
+                                    </div>
+                                    <h3 className="mb-1 font-bold text-slate-100">
+                                        Merge Questions
+                                    </h3>
+                                    <p className="text-center text-xs text-slate-100/80">
+                                        Compile multiple text questions into a
+                                        single clean PDF.
+                                    </p>
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* New All-in-One Action */}
+                        <div className="mt-8">
                             <button
-                                onClick={() => navigate('/file-merge')}
-                                className="group relative flex flex-col items-center rounded-3xl bg-[#3939391a] p-8 backdrop-blur-3xl transition-all duration-300 hover:border-purple-200 hover:bg-[#17171770] hover:shadow-xl hover:shadow-purple-500/10"
+                                onClick={() => getTier('/all-tools')}
+                                className="group relative flex w-full items-center justify-center gap-4 rounded-3xl border border-white/10 bg-linear-to-r from-indigo-600/20 to-purple-600/20 p-6 backdrop-blur-3xl transition-all duration-300 hover:border-white/20 hover:from-indigo-600/40 hover:to-purple-600/40 hover:shadow-2xl hover:shadow-indigo-500/20"
                             >
-                                <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-purple-100 text-2xl text-purple-600 transition-all duration-300 group-hover:scale-110 group-hover:bg-purple-600 group-hover:text-white">
-                                    <FaFilePdf />
+                                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-xl text-white transition-all duration-300 group-hover:scale-110 group-hover:bg-white group-hover:text-indigo-600">
+                                    <FaLayerGroup />
                                 </div>
-                                <h3 className="mb-1 font-bold text-slate-100">
-                                    Merge Questions
-                                </h3>
-                                <p className="text-center text-xs text-slate-100">
-                                    Compile multiple text questions into a
-                                    single clean PDF.
-                                </p>
+                                <div className="text-left">
+                                    <h3 className="font-bold text-slate-100">
+                                        Combined Workflow
+                                    </h3>
+                                    <p className="text-xs text-slate-300">
+                                        Access both organization and merging
+                                        tools in one view.
+                                    </p>
+                                </div>
                             </button>
                         </div>
                     </div>
 
-                    <div className="bg-linear-tobr border-t border-slate-100 from-purple-300 to-violet-500 p-4 text-center">
-                        <p className="text-xs text-white italic">
+                    <div className="border-t border-white/10 bg-linear-to-br from-purple-500/20 to-violet-700/20 p-4 text-center">
+                        <p className="text-xs text-white/60 italic">
                             Efficiency meets simplicity.
                         </p>
                     </div>

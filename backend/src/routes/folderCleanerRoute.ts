@@ -88,7 +88,7 @@ const handleUploadErrors = (
 ): void => {
     upload.array('files')(req, res, (err: unknown) => {
         if (err) {
-            log.error('Upload middleware error:', err);
+            log.error('Upload middleware error:', { data: { err } });
 
             const classifiedError = classifyError(err);
 
@@ -187,7 +187,7 @@ const handleUploadErrors = (
                         new AppError(
                             `${classifiedError.error.message || 'Upload failed. Please try again.'}`,
                             500,
-                            'UNknownError'
+                            'UnknownError'
                         )
                     );
 
@@ -260,10 +260,11 @@ cleanerRoute.post(
         log.highlight(
             `🟢 [BACKEND] request received at: ${new Date().toISOString()}`
         );
-
         const uploadedFiles = req.files as Express.Multer.File[];
         const uploadedFolderName = req.body.folderName; //fallback
+        const tierId = req.body;
         const safeFolderName = uploadedFolderName.replace(/[^a-z0-9_-]/gi, '_');
+
         log.info(`uploaded Files ${uploadedFiles.length}`);
         log.info(`[BACKEND] ${uploadedFiles.length} files received`);
         if (!uploadedFiles || uploadedFiles.length === 0) {

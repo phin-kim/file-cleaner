@@ -42,7 +42,9 @@ const authenticate: RequestHandler = async (req, _res, next) => {
             context: 'authenticate',
             data: { token: token ? `${token.slice(0, 30)}...` : 'undefined' },
         });
-        log.info(`is there token from body ${req.body.idToken ? 'yes' : 'no'}`);
+        log.info(
+            `is there token from body ${req.body?.idToken ? 'yes' : 'no'}`
+        );
         if (!token && req.body?.idToken) {
             token = req.body.idToken;
             log.debug('Token from body', {

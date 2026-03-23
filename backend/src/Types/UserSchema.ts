@@ -2,7 +2,7 @@ import { Document } from 'mongoose';
 
 export interface User {
     id: string;
-    plan: Subscription_Plan;
+    tierId: tierId;
 }
 export interface RefreshToken {
     tokenHash: string;
@@ -14,14 +14,14 @@ export interface User_Type extends Document {
     passwordHash: string;
     role: 'user' | 'admin';
     createdAt: Date;
-    'subscription-plan': Subscription_Plan;
+    tierId: 'free' | 'tier-1' | 'tier-2' | 'tier-3';
     'subscription-period': Subscription_Period;
     'subscription-status': Subscription_Status;
     'last-payment-date': Date;
 
     refreshTokens: RefreshToken[];
 }
-export interface Subscription_Plan {
+export interface tierId {
     enum: ['free', 'tier-1', 'tier-2', 'tier-3'];
 }
 export interface Subscription_Period {
