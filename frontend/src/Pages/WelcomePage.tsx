@@ -12,7 +12,7 @@ const log = createClientLogger('Welcome page.tsx');
 const WelcomeModal: React.FC = () => {
     const navigate = useNavigate();
     const setTierId = useTierStore((state) => state.setTierId);
-    const tierId = useTierStore((state) => state.tierId);
+    const tierId = useTierStore.getState().tierId;
     const { setError } = useErrorStore();
     const getTier = async (path: string) => {
         try {
@@ -20,7 +20,7 @@ const WelcomeModal: React.FC = () => {
             navigate(path);
             const response = await welcomePageApi.get('/get-tier');
             setTierId(response.data.tierId);
-            log.info(`this is the tier id ${tierId}`);
+            log.info(`this is the tier id as set by "{setTierId}" ${tierId}`);
         } catch (error) {
             handleApiError(error, setError);
         }

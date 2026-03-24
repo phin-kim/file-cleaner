@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { fileCleanerApi } from '../library/client';
+import { fileCleanerApi, subscriptionApi } from '../library/client';
 import type { CleaningStats, UploadedFolder, Status } from '../types/types';
 import traverseDirectory from '../utils/traverser';
 import type { AnalysisResult } from '../types/types';
@@ -8,7 +8,7 @@ import createClientLogger from '../utils/clientLogger';
 import handleApiError from '../utils/apiError';
 import { useTierStore } from '../Store/tierStore';
 import { TIER_CONFIG } from '../../../shared/tiers';
-const log = createClientLogger('Use cleaner hook');
+const log = createClientLogger('UseCleaner.tsx');
 export default function useCleaner() {
     const { setError } = useErrorStore();
     /* ---------- State ---------- */
@@ -27,8 +27,7 @@ export default function useCleaner() {
     const [progress, setProgress] = useState(0);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const tierId = useTierStore((state) => state.tierId);
-    log.info(`confirming the tier id ${tierId}`);
+    const tierId = useTierStore.getState().tierId;
     /* ---------- Handlers ---------- */
     const handleDragEnter = (event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault();
@@ -76,6 +75,7 @@ export default function useCleaner() {
         const MAX_UPLOADS =
             TIER_CONFIG[tierId as keyof typeof TIER_CONFIG].maxUploads;
         log.info(`Confirming the max uploads based on the tier ${MAX_UPLOADS}`);
+
         try {
             //get folder name from the first file path
             const firstFile = files[0];
@@ -86,14 +86,14 @@ export default function useCleaner() {
             const fileArray = Array.from(files);
 
             // Check file limit before uploading
-            if (fileArray.length > MAX_UPLOADS) {
+            /*if (fileArray.length > MAX_UPLOADS) {
                 setError(
                     `${fileArray.length} files. Kindly upgrade to premium`
                 );
                 setUpgradeModal(true);
                 setStatus('idle');
                 return;
-            }
+            }*/
 
             setUploadedFolder({
                 name: folderName,
@@ -112,12 +112,20 @@ export default function useCleaner() {
             log.debug(`form data ${formData}`);
             log.warn(`file count${fileArray.length}`);
             const response = await fileCleanerApi.post(
-                `/${path}`,
-                { formData, tierId },
+                `/${path}?tierId=${tierId}`,
+                formData,
                 {
                     headers: { 'Content-Type': 'multipart/form-data' },
                 }
             );
+            if (response.data.subscription) {
+                log.info(
+                    `Checking if the subscription is there ${response.data.subscription ? 'yes' : 'no'}`
+                );
+                setUpgradeModal(true);
+                setStatus('idle');
+                return;
+            }
             log.highlight(
                 `[FRONTEND] backend responded in ${Date.now() - start}ms`
             );
@@ -206,7 +214,7 @@ export default function useCleaner() {
                                 `[FRONTEND] processing folder ${dirEntry.name}`
                             );
                             const dirFiles = await traverseDirectory(dirEntry);
-                            if (dirFiles.length > 150) {
+                            /*if (dirFiles.length > 150) {
                                 setError(
                                     `${dirFiles.length} files. Kindly upgrade to premium`
                                 );
@@ -214,7 +222,8 @@ export default function useCleaner() {
                                 setStatus('idle');
                                 setIsDragging(false);
                                 return;
-                            }
+                            }*/
+
                             log.info(
                                 `[FRONTEND] ${dirFiles.length} found in folder`
                             );
@@ -233,9 +242,21 @@ export default function useCleaner() {
             setStatus('processing');
             const start = Date.now();
             console.log(`[FRONTEND] sending files to backend`);
-            const response = await fileCleanerApi.post(`/${path}`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-            });
+            const response = await fileCleanerApi.post(
+                `/${path}?tierId=${tierId}`,
+                formData,
+                {
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                }
+            );
+            if (response.data.subscription) {
+                log.info(
+                    `Checking if the subscription is there ${response.data.subscription ? 'yes' : 'no'}`
+                );
+                setUpgradeModal(true);
+                setStatus('idle');
+                return;
+            }
 
             log.highlight(
                 `[FRONTEND] backend responded in ${Date.now() - start}ms`

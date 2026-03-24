@@ -47,8 +47,8 @@ export async function paystackWebhook(
 
                 {
                     $set: {
+                        tierId: metadata.tierId,
                         'subscription-period': metadata.period,
-                        'subscription-plan': metadata.tierId,
                         'subscription-status': 'active',
                         'last-payment-date': new Date(),
                     },

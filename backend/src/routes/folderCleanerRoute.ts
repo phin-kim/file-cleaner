@@ -11,8 +11,8 @@ import createZipWithRetry from '../helpers/zipFolderRetry.js';
 import AppError from '../utils/appError.js';
 import asyncHandler from '../middleware/asyncHandler.js';
 import uploadLimiter from '../utils/rateLimiter.js';
-
-const log = createLogger('Folder-Cleaner');
+import { TIER_CONFIG } from '../config/tiers.js';
+const log = createLogger('FolderCleaner.ts');
 export const cleanerRoute: Router = Router();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -81,17 +81,46 @@ NB:THIS IS WRONG and it caused a server crash ie the server stopped working
         );
     )
 */
+let MAX_UPLOADS: number = TIER_CONFIG.free.maxUploads;
 const handleUploadErrors = (
     req: Request,
     res: Response,
     next: NextFunction
 ): void => {
-    upload.array('files')(req, res, (err: unknown) => {
+    /**
+     * determining the tier id (Ideally from he auth middleware of the decoded user)
+     * I was to sed it via the body but since multer runs prior even b4 the body is loaded, we have to use query parameter
+     *
+     */
+    const tierId = (req.query.tierId as keyof typeof TIER_CONFIG) || 'free';
+    //safely get config (fallback to free if user sends a fake tier name)
+
+    const DYNAMIC_LIMIT =
+        TIER_CONFIG[tierId as keyof typeof TIER_CONFIG]?.maxUploads;
+    log.warn(
+        `Processing for upload tier ${tierId} with limit: ${DYNAMIC_LIMIT}`
+    );
+    const uploadMiddleware = multer({
+        storage: storage,
+        limits: {
+            fileSize: 200 * 1024 * 1024,
+            files: DYNAMIC_LIMIT,
+        },
+    }).array('files');
+    uploadMiddleware(req, res, (err: unknown) => {
         if (err) {
             log.error('Upload middleware error:', { data: { err } });
 
             const classifiedError = classifyError(err);
-
+            if (err instanceof MulterError && err.code === 'LIMIT_FILE_COUNT') {
+                return next(
+                    new AppError(
+                        `FIle count exceeded. Your limit is ${DYNAMIC_LIMIT} `,
+                        409,
+                        'UploadError'
+                    )
+                );
+            }
             switch (classifiedError.type) {
                 case 'ENOENT':
                     log.error('Storage unavailable ', {
@@ -110,7 +139,6 @@ const handleUploadErrors = (
                             'StorageUnavailable'
                         )
                     );
-
                 case 'APP_ERROR':
                     log.error(classifiedError.error.message, {
                         data: {
@@ -128,7 +156,7 @@ const handleUploadErrors = (
                 case 'MULTER_ERROR':
                     const errorMessages: Record<string, string> = {
                         LIMIT_FILE_SIZE: 'File too large. Max 200MB.',
-                        LIMIT_FILE_COUNT: 'File count exceeded 150',
+                        LIMIT_FILE_COUNT: `File count exceeded ${DYNAMIC_LIMIT}`,
                         LIMIT_UNEXPECTED_FILE: 'Unexpected file field.',
                     };
 
@@ -244,13 +272,6 @@ const storage = multer.diskStorage({
         }
     },
 });
-const upload = multer({
-    storage: storage,
-    limits: {
-        fileSize: 200 * 1024 * 1024,
-        files: 150, // Reject upload if more than 150 files
-    },
-}); //temporary storage with a limit of 200 mb
 
 cleanerRoute.post(
     '/processFolder',
@@ -260,9 +281,21 @@ cleanerRoute.post(
         log.highlight(
             `🟢 [BACKEND] request received at: ${new Date().toISOString()}`
         );
+
         const uploadedFiles = req.files as Express.Multer.File[];
         const uploadedFolderName = req.body.folderName; //fallback
-        const tierId = req.body;
+
+        const tierId = (req.query.tierId as keyof typeof TIER_CONFIG) || 'free';
+        log.info(` the body has this tier ${tierId}`);
+        MAX_UPLOADS = TIER_CONFIG[tierId].maxUploads;
+
+        if (uploadedFiles.length > 150 && tierId === 'free') {
+            res.status(403).json({
+                subscription: true,
+                message: `This feature is only available In Question Master Tier 2 or tidy up pro `,
+            });
+            return;
+        }
         const safeFolderName = uploadedFolderName.replace(/[^a-z0-9_-]/gi, '_');
 
         log.info(`uploaded Files ${uploadedFiles.length}`);
