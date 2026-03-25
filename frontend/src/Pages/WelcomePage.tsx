@@ -20,6 +20,7 @@ const WelcomeModal: React.FC = () => {
             navigate(path);
             const response = await welcomePageApi.get('/get-tier');
             setTierId(response.data.tierId);
+
             log.info(`this is the tier id as set by "{setTierId}" ${tierId}`);
         } catch (error) {
             handleApiError(error, setError);

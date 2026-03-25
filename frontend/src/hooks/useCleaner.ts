@@ -8,6 +8,7 @@ import createClientLogger from '../utils/clientLogger';
 import handleApiError from '../utils/apiError';
 import { useTierStore } from '../Store/tierStore';
 import { TIER_CONFIG } from '../../../shared/tiers';
+import axios from 'axios';
 const log = createClientLogger('UseCleaner.tsx');
 export default function useCleaner() {
     const { setError } = useErrorStore();
@@ -118,14 +119,14 @@ export default function useCleaner() {
                     headers: { 'Content-Type': 'multipart/form-data' },
                 }
             );
-            if (response.data.subscription) {
+            /*if (response.data.subscription) {
                 log.info(
                     `Checking if the subscription is there ${response.data.subscription ? 'yes' : 'no'}`
                 );
                 setUpgradeModal(true);
                 setStatus('idle');
                 return;
-            }
+            }*/
             log.highlight(
                 `[FRONTEND] backend responded in ${Date.now() - start}ms`
             );
@@ -249,14 +250,6 @@ export default function useCleaner() {
                     headers: { 'Content-Type': 'multipart/form-data' },
                 }
             );
-            if (response.data.subscription) {
-                log.info(
-                    `Checking if the subscription is there ${response.data.subscription ? 'yes' : 'no'}`
-                );
-                setUpgradeModal(true);
-                setStatus('idle');
-                return;
-            }
 
             log.highlight(
                 `[FRONTEND] backend responded in ${Date.now() - start}ms`
@@ -279,6 +272,25 @@ export default function useCleaner() {
         } catch (error) {
             clearInterval(progressInterval);
             log.error('Error in processing files', { data: { error } });
+            log.error(
+                `Is the error  instance of the Error  ${error instanceof Error ? 'yes' : 'no'}`
+            );
+            log.error(
+                `Is the error an axios error ${axios.isAxiosError(error) ? 'yes' : 'no'}`
+            );
+            log.error(
+                `Is the error an object ${typeof error === 'object' ? 'its an object' : 'its not an object'}`
+            );
+            log.debug('This is the structure of the error object ', {
+                data: { error },
+            });
+
+            if (typeof error === 'object' && 'message' in error!) {
+                setUpgradeModal(true);
+                setStatus('idle');
+                return;
+            }
+
             handleApiError(error, setError);
             setStatus('error');
             setStatus('processing');

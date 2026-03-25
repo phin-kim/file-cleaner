@@ -115,7 +115,7 @@ const handleUploadErrors = (
             if (err instanceof MulterError && err.code === 'LIMIT_FILE_COUNT') {
                 return next(
                     new AppError(
-                        `FIle count exceeded. Your limit is ${DYNAMIC_LIMIT} `,
+                        `File count exceeded. Your limit is ${DYNAMIC_LIMIT} `,
                         409,
                         'UploadError'
                     )

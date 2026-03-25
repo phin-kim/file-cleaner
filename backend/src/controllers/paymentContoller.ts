@@ -260,8 +260,10 @@ export async function mpesaPayment(
                     },
                 });
                 return next(
-                    AppError.serviceUnavailable(
-                        'Payment service is currently unavailable.Please try again later'
+                    new AppError(
+                        'Payment service is currently unavailable.Please try again later',
+                        503,
+                        'PaymentError'
                     )
                 );
             } else {
