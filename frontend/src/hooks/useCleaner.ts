@@ -288,6 +288,7 @@ export default function useCleaner() {
             if (typeof error === 'object' && 'message' in error!) {
                 setUpgradeModal(true);
                 setStatus('idle');
+                handleApiError(error, setError);
                 return;
             }
 

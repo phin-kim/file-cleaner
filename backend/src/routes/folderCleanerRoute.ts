@@ -81,7 +81,7 @@ NB:THIS IS WRONG and it caused a server crash ie the server stopped working
         );
     )
 */
-let MAX_UPLOADS: number = TIER_CONFIG.free.maxUploads;
+//let MAX_UPLOADS: number = TIER_CONFIG.free.maxUploads;
 const handleUploadErrors = (
     req: Request,
     res: Response,
@@ -100,6 +100,22 @@ const handleUploadErrors = (
     log.warn(
         `Processing for upload tier ${tierId} with limit: ${DYNAMIC_LIMIT}`
     );
+    const CAN_CLEAN = TIER_CONFIG[tierId].canClean;
+    if (!CAN_CLEAN) {
+        log.info(
+            `Identifying whether the user can clean ${CAN_CLEAN ? 'YES' : 'NO'}`
+        );
+        log.info(`The current tier that the user is in ${tierId}`);
+
+        return next(
+            new AppError(
+                'This feature is unavailable in your current subscription plan',
+                503,
+                'ServiceUnavailable'
+            )
+        );
+    }
+
     const uploadMiddleware = multer({
         storage: storage,
         limits: {
@@ -285,17 +301,10 @@ cleanerRoute.post(
         const uploadedFiles = req.files as Express.Multer.File[];
         const uploadedFolderName = req.body.folderName; //fallback
 
-        const tierId = (req.query.tierId as keyof typeof TIER_CONFIG) || 'free';
-        log.info(` the body has this tier ${tierId}`);
-        MAX_UPLOADS = TIER_CONFIG[tierId].maxUploads;
+        //const tierId = (req.query.tierId as keyof typeof TIER_CONFIG) || 'free';
 
-        if (uploadedFiles.length > 150 && tierId === 'free') {
-            res.status(403).json({
-                subscription: true,
-                message: `This feature is only available In Question Master Tier 2 or tidy up pro `,
-            });
-            return;
-        }
+        //MAX_UPLOADS = TIER_CONFIG[tierId].maxUploads;
+
         const safeFolderName = uploadedFolderName.replace(/[^a-z0-9_-]/gi, '_');
 
         log.info(`uploaded Files ${uploadedFiles.length}`);

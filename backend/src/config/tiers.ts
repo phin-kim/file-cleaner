@@ -4,6 +4,7 @@ export const TIER_CONFIG = {
         maxUploads: 150,
         features: ['basic_cleanup'],
         canMerge: false,
+        canClean: true,
         priority: false,
     },
     'tier-1': {
@@ -11,6 +12,8 @@ export const TIER_CONFIG = {
         maxUploads: 500, // Increased
         features: ['basic_cleanup', 'subfolder_org', 'detailed_breakdown'],
         canMerge: false,
+        canClean: true,
+
         priority: false,
     },
     'tier-2': {
@@ -22,6 +25,8 @@ export const TIER_CONFIG = {
             'unlimited_entries',
         ],
         canMerge: true,
+        canClean: false,
+
         priority: false,
     },
     'tier-3': {
@@ -29,6 +34,8 @@ export const TIER_CONFIG = {
         maxUploads: 2000,
         features: ['all_features', 'priority_ai', 'advanced_strategy'],
         canMerge: true,
+        canClean: true,
+
         priority: true,
     },
 };

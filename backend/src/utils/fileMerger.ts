@@ -18,6 +18,7 @@ import {
     normalizeQuestions,
     trimEmbeddingsCache,
 } from '../helpers/miniHelpers.js';
+import AppError from './appError.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -522,6 +523,7 @@ Output only the single best merged question:
                 preview: questions.slice(0, 2),
             },
         });
+        throw new AppError(`${errorDetails.name}`);
 
         return questions[0];
     }

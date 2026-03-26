@@ -6,11 +6,7 @@ import './config/envLoader.js';
 import cookieParser from 'cookie-parser';
 import { cleanerRoute } from './routes/folderCleanerRoute.js';
 import { subRouter } from './routes/subscription.js';
-import {
-    startPeriodicCleanup,
-    cleanupOrphanedFiles,
-    forceCleanup,
-} from './utils/cleanUp.js';
+import { startPeriodicCleanup, cleanupOrphanedFiles } from './utils/cleanUp.js';
 import { mergerRoute } from './routes/fileMergerRoute.js';
 import createLogger from './utils/logger.js';
 import { authRoute } from './routes/auth.js';

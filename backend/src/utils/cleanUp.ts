@@ -1,6 +1,6 @@
 import fs from 'fs-extra';
 import path from 'path';
-const TWO_HOURS = 2 * 60 * 60 * 1000;
+const ONE_HOUR = 1 * 60 * 60 * 1000;
 import createLogger from './logger.js';
 const log = createLogger('CLEANUP');
 export async function cleanupByAge(dir: string, label = 'CLEANUP') {
@@ -21,7 +21,7 @@ export async function cleanupByAge(dir: string, label = 'CLEANUP') {
                 try {
                     const stat = await fs.stat(fullPath);
                     //check if its older than one hour
-                    if (now - stat.mtimeMs > TWO_HOURS) {
+                    if (now - stat.mtimeMs > ONE_HOUR) {
                         //track size b4 deletion
                         if (stat.isFile()) {
                             deletedSize += stat.size;
