@@ -1,6 +1,6 @@
 import fs from 'fs-extra';
 import path from 'path';
-import { hashFile } from './hash.js';
+import { hashFile } from './hashes.js';
 export interface TidyStats {
     finalFiles: string[];
     duplicatesRemoved: number;

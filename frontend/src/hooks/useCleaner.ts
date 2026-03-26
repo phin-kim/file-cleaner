@@ -1,12 +1,15 @@
 import React, { useRef, useState } from 'react';
-import { fileCleanerApi } from '../library/client';
+import { fileCleanerApi, subscriptionApi } from '../library/client';
 import type { CleaningStats, UploadedFolder, Status } from '../types/types';
 import traverseDirectory from '../utils/traverser';
 import type { AnalysisResult } from '../types/types';
 import useErrorStore from '../Store/ErrorStore';
 import createClientLogger from '../utils/clientLogger';
 import handleApiError from '../utils/apiError';
-const log = createClientLogger('Use cleaner hook');
+import { useTierStore } from '../Store/tierStore';
+import { TIER_CONFIG } from '../../../shared/tiers';
+import axios from 'axios';
+const log = createClientLogger('UseCleaner.tsx');
 export default function useCleaner() {
     const { setError } = useErrorStore();
     /* ---------- State ---------- */
@@ -20,11 +23,12 @@ export default function useCleaner() {
     );
     const [downloadURL, setDownloadURL] = useState<string | null>(null);
     const [openPopup, setOpenPopUp] = useState(false);
-
+    const [upgradeModal, setUpgradeModal] = useState(false);
     const [result, setResult] = useState<AnalysisResult | null>(null);
     const [progress, setProgress] = useState(0);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
+    const tierId = useTierStore.getState().tierId;
     /* ---------- Handlers ---------- */
     const handleDragEnter = (event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault();
@@ -67,6 +71,12 @@ export default function useCleaner() {
                 return prev + 3;
             });
         }, 100);
+        // get the max uploads for the user and use that as a gate
+
+        const MAX_UPLOADS =
+            TIER_CONFIG[tierId as keyof typeof TIER_CONFIG].maxUploads;
+        log.info(`Confirming the max uploads based on the tier ${MAX_UPLOADS}`);
+
         try {
             //get folder name from the first file path
             const firstFile = files[0];
@@ -74,12 +84,23 @@ export default function useCleaner() {
             //webkit relative path includes the folder name: "folderName/filename.ext"
             const folderName = firstFile.webkitRelativePath.split('/')[0];
             log.highlight('Folder name', { data: folderName });
+            const fileArray = Array.from(files);
+
+            // Check file limit before uploading
+            /*if (fileArray.length > MAX_UPLOADS) {
+                setError(
+                    `${fileArray.length} files. Kindly upgrade to premium`
+                );
+                setUpgradeModal(true);
+                setStatus('idle');
+                return;
+            }*/
+
             setUploadedFolder({
                 name: folderName,
-                files: Array.from(files),
+                files: fileArray,
             });
             //convert file list to array for form data
-            const fileArray = Array.from(files);
             const formData = new FormData();
             formData.append('folderName', folderName);
 
@@ -89,9 +110,23 @@ export default function useCleaner() {
             setStatus('processing');
             const start = Date.now();
             log.info('Sending files to backend');
-            const response = await fileCleanerApi.post(`/${path}`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-            });
+            log.debug(`form data ${formData}`);
+            log.warn(`file count${fileArray.length}`);
+            const response = await fileCleanerApi.post(
+                `/${path}?tierId=${tierId}`,
+                formData,
+                {
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                }
+            );
+            /*if (response.data.subscription) {
+                log.info(
+                    `Checking if the subscription is there ${response.data.subscription ? 'yes' : 'no'}`
+                );
+                setUpgradeModal(true);
+                setStatus('idle');
+                return;
+            }*/
             log.highlight(
                 `[FRONTEND] backend responded in ${Date.now() - start}ms`
             );
@@ -119,6 +154,9 @@ export default function useCleaner() {
             log.error('Error in processing files', { data: { error } });
             handleApiError(error, setError);
             setStatus('error');
+            setTimeout(() => {
+                setStatus('idle');
+            }, 1500);
         }
     };
     const handleDrop = async (
@@ -143,7 +181,7 @@ export default function useCleaner() {
             let folderName = 'folder';
             const items = event.dataTransfer.items;
             log.info(`[FRONTEND] ${items.length} items in drop`);
-            /*if (items.length > 1) {
+            if (items.length > 1) {
                 setError(
                     `${items.length} folders detected. Kindly upload one at a time`
                 );
@@ -153,11 +191,18 @@ export default function useCleaner() {
                 }, 2000);
 
                 return;
-            }*/
+            }
             if (items && items.length > 0) {
                 for (const item of items) {
                     if (item.kind === 'file') {
                         const entry = item.webkitGetAsEntry();
+                        if (entry?.isFile) {
+                            setError('Kindly drop a folder');
+                            setTimeout(() => {
+                                setIsDragging(false);
+                                return;
+                            }, 2000);
+                        }
                         if (entry && entry.isDirectory) {
                             const dirEntry = entry as FileSystemDirectoryEntry;
                             // capture the folder name locally so we can reliably send it
@@ -170,6 +215,16 @@ export default function useCleaner() {
                                 `[FRONTEND] processing folder ${dirEntry.name}`
                             );
                             const dirFiles = await traverseDirectory(dirEntry);
+                            /*if (dirFiles.length > 150) {
+                                setError(
+                                    `${dirFiles.length} files. Kindly upgrade to premium`
+                                );
+                                setUpgradeModal(true);
+                                setStatus('idle');
+                                setIsDragging(false);
+                                return;
+                            }*/
+
                             log.info(
                                 `[FRONTEND] ${dirFiles.length} found in folder`
                             );
@@ -188,9 +243,13 @@ export default function useCleaner() {
             setStatus('processing');
             const start = Date.now();
             console.log(`[FRONTEND] sending files to backend`);
-            const response = await fileCleanerApi.post(`/${path}`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-            });
+            const response = await fileCleanerApi.post(
+                `/${path}?tierId=${tierId}`,
+                formData,
+                {
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                }
+            );
 
             log.highlight(
                 `[FRONTEND] backend responded in ${Date.now() - start}ms`
@@ -213,8 +272,32 @@ export default function useCleaner() {
         } catch (error) {
             clearInterval(progressInterval);
             log.error('Error in processing files', { data: { error } });
+            log.error(
+                `Is the error  instance of the Error  ${error instanceof Error ? 'yes' : 'no'}`
+            );
+            log.error(
+                `Is the error an axios error ${axios.isAxiosError(error) ? 'yes' : 'no'}`
+            );
+            log.error(
+                `Is the error an object ${typeof error === 'object' ? 'its an object' : 'its not an object'}`
+            );
+            log.debug('This is the structure of the error object ', {
+                data: { error },
+            });
+
+            if (typeof error === 'object' && 'message' in error!) {
+                setUpgradeModal(true);
+                setStatus('idle');
+                handleApiError(error, setError);
+                return;
+            }
+
             handleApiError(error, setError);
             setStatus('error');
+            setStatus('processing');
+            setTimeout(() => {
+                setStatus('idle');
+            }, 1500);
         }
     };
 
@@ -248,6 +331,8 @@ export default function useCleaner() {
         downloadURL,
         openPopup,
         fileInputRef,
+        upgradeModal,
+        setUpgradeModal,
         handleFolderInputChange,
         handleFolderSelectClick,
         setOpenPopUp,

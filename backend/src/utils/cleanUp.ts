@@ -1,6 +1,6 @@
 import fs from 'fs-extra';
 import path from 'path';
-const TWO_HOURS = 2 * 60 * 60 * 1000;
+const ONE_HOUR = 1 * 60 * 60 * 1000;
 import createLogger from './logger.js';
 const log = createLogger('CLEANUP');
 export async function cleanupByAge(dir: string, label = 'CLEANUP') {
@@ -21,7 +21,7 @@ export async function cleanupByAge(dir: string, label = 'CLEANUP') {
                 try {
                     const stat = await fs.stat(fullPath);
                     //check if its older than one hour
-                    if (now - stat.mtimeMs > TWO_HOURS) {
+                    if (now - stat.mtimeMs > ONE_HOUR) {
                         //track size b4 deletion
                         if (stat.isFile()) {
                             deletedSize += stat.size;
@@ -156,8 +156,13 @@ export function startPeriodicCleanup(tempDirs: string[]) {
 
 //force cleanup all files in a directory regardless of age
 export async function forceCleanup(dir: string, label = 'CLEANUP') {
-    const filePath = fs.pathExists(dir);
-    if (!filePath) return;
+    log.warn('Force cleanup triggered');
+    const exists = await fs.pathExists(dir);
+
+    if (!exists) {
+        log.error(`the desired file at ${dir} doesn't exist`);
+        return;
+    }
     let deletedCount = 0;
     let deletedSize = 0;
     async function recursiveClean(currentPath: string) {
@@ -183,6 +188,7 @@ export async function forceCleanup(dir: string, label = 'CLEANUP') {
         }
     }
     await recursiveClean(dir);
+    await fs.emptyDir(dir);
     log.error(
         `[${label}] force cleanup complete: removed ${deletedCount} items (${(deletedSize / (1024 * 1024)).toFixed(2)} MB)`
     );

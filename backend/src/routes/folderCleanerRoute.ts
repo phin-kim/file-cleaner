@@ -10,9 +10,10 @@ import { MulterError } from 'multer';
 import createZipWithRetry from '../helpers/zipFolderRetry.js';
 import AppError from '../utils/appError.js';
 import asyncHandler from '../middleware/asyncHandler.js';
-
-const log = createLogger('Folder-Cleaner');
-export const cleanerRoute = Router();
+import uploadLimiter from '../utils/rateLimiter.js';
+import { TIER_CONFIG } from '../config/tiers.js';
+const log = createLogger('FolderCleaner.ts');
+export const cleanerRoute: Router = Router();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, '../../');
@@ -46,70 +47,209 @@ const classifyError = (err: unknown): UploadError => {
 
     return { type: 'UNKNOWN', error: err };
 };
+/**In Express, if you're inside an asynchronous callback and something goes wrong, ALWAYS use next(error), NEVER throw.
+This applies to:
+File uploads (Multer)
+Database operations
+API calls
+Any async operation with callbacks/promises 
 
+NB:THIS IS WRONG and it caused a server crash ie the server stopped working
+ case 'APP_ERROR':
+    log.error(classifiedError.error.message, {
+        data: {
+            error: classifiedError.error.message,
+            type: classifiedError.error.type,
+        },
+    });
+    throw new AppError(
+        classifiedError.error.message,
+        classifiedError.error.statusCode,
+        classifiedError.error.type
+    );
+- Instead do return next(
+    log.error(classifiedError.error.message, {
+            data: {
+                error: classifiedError.error.message,
+                type: classifiedError.error.type,
+            },
+        });
+        throw new AppError(
+            classifiedError.error.message,
+            classifiedError.error.statusCode,
+            classifiedError.error.type
+        );
+    )
+*/
+//let MAX_UPLOADS: number = TIER_CONFIG.free.maxUploads;
 const handleUploadErrors = (
     req: Request,
     res: Response,
     next: NextFunction
 ): void => {
-    upload.array('files')(req, res, (err: unknown) => {
+    /**
+     * determining the tier id (Ideally from he auth middleware of the decoded user)
+     * I was to sed it via the body but since multer runs prior even b4 the body is loaded, we have to use query parameter
+     *
+     */
+    const tierId = (req.query.tierId as keyof typeof TIER_CONFIG) || 'free';
+    //safely get config (fallback to free if user sends a fake tier name)
+
+    const DYNAMIC_LIMIT =
+        TIER_CONFIG[tierId as keyof typeof TIER_CONFIG]?.maxUploads;
+    log.warn(
+        `Processing for upload tier ${tierId} with limit: ${DYNAMIC_LIMIT}`
+    );
+    const CAN_CLEAN = TIER_CONFIG[tierId].canClean;
+    if (!CAN_CLEAN) {
+        log.info(
+            `Identifying whether the user can clean ${CAN_CLEAN ? 'YES' : 'NO'}`
+        );
+        log.info(`The current tier that the user is in ${tierId}`);
+
+        return next(
+            new AppError(
+                'This feature is unavailable in your current subscription plan',
+                503,
+                'ServiceUnavailable'
+            )
+        );
+    }
+
+    const uploadMiddleware = multer({
+        storage: storage,
+        limits: {
+            fileSize: 200 * 1024 * 1024,
+            files: DYNAMIC_LIMIT,
+        },
+    }).array('files');
+    uploadMiddleware(req, res, (err: unknown) => {
         if (err) {
-            log.error('Upload middleware error:', err);
+            log.error('Upload middleware error:', { data: { err } });
 
             const classifiedError = classifyError(err);
-
+            if (err instanceof MulterError && err.code === 'LIMIT_FILE_COUNT') {
+                return next(
+                    new AppError(
+                        `File count exceeded. Your limit is ${DYNAMIC_LIMIT} `,
+                        409,
+                        'UploadError'
+                    )
+                );
+            }
             switch (classifiedError.type) {
                 case 'ENOENT':
-                    return res.status(503).json({
-                        error: 'Storage system unavailable. Please try again.',
-                        type: 'StorageUnavailable',
-                        suggestion:
-                            'The upload directory may have been deleted. Our team has been notified.',
-                        path: classifiedError.error.path,
+                    log.error('Storage unavailable ', {
+                        data: {
+                            error: 'Storage system unavailable. Please try again.',
+                            type: 'StorageUnavailable',
+                            suggestion:
+                                'The upload directory may have been deleted. Our team has been notified.',
+                            path: classifiedError.error.path,
+                        },
                     });
-
+                    return next(
+                        new AppError(
+                            'Service Unavailable',
+                            503,
+                            'StorageUnavailable'
+                        )
+                    );
                 case 'APP_ERROR':
-                    return res.status(classifiedError.error.statusCode).json({
-                        error: classifiedError.error.message,
-                        type: classifiedError.error.type,
+                    log.error(classifiedError.error.message, {
+                        data: {
+                            error: classifiedError.error.message,
+                            type: classifiedError.error.type,
+                        },
                     });
-
+                    return next(
+                        new AppError(
+                            classifiedError.error.message,
+                            classifiedError.error.statusCode,
+                            classifiedError.error.type
+                        )
+                    );
                 case 'MULTER_ERROR':
                     const errorMessages: Record<string, string> = {
                         LIMIT_FILE_SIZE: 'File too large. Max 200MB.',
-                        LIMIT_FILE_COUNT: 'Too many files uploaded.',
+                        LIMIT_FILE_COUNT: `File count exceeded ${DYNAMIC_LIMIT}`,
                         LIMIT_UNEXPECTED_FILE: 'Unexpected file field.',
                     };
 
-                    return res.status(400).json({
-                        error:
-                            errorMessages[classifiedError.error.code] ||
-                            `Upload error: ${classifiedError.error.message}`,
-                        type: 'UploadError',
-                        code: classifiedError.error.code,
+                    const statusCode =
+                        classifiedError.error.code === 'LIMIT_FILE_COUNT'
+                            ? 409
+                            : 400;
+                    log.error(errorMessages[classifiedError.error.code], {
+                        data: {
+                            error:
+                                errorMessages[classifiedError.error.code] ||
+                                `Upload error: ${classifiedError.error.message}`,
+                            type: 'UploadError',
+                            code: classifiedError.error.code,
+                        },
                     });
+                    return next(
+                        new AppError(
+                            `Upload error: ${classifiedError.error.message}`,
+                            statusCode,
+                            'UploadError'
+                        )
+                    );
 
                 case 'STANDARD_ERROR':
                     if (classifiedError.error.message.includes('ENOENT')) {
-                        return res.status(503).json({
-                            error: 'Storage system unavailable. Please try again.',
-                            type: 'StorageUnavailable',
-                        });
+                        log.error(
+                            'Storage system unavailable. Please try again.',
+                            {
+                                data: {
+                                    error: 'Storage system unavailable. Please try again.',
+                                    type: 'StorageUnavailable',
+                                },
+                            }
+                        );
+                        return next(
+                            new AppError(
+                                'Storage system unavailable. Please try again.',
+                                503,
+                                'StorageUnavailable'
+                            )
+                        );
                     }
-
-                    return res.status(500).json({
-                        error:
-                            classifiedError.error.message ||
-                            'Upload failed. Please try again.',
-                        type: 'UnknownError',
-                    });
+                    log.error(
+                        `${classifiedError.error.message || 'Upload failed. Please try again.'}`,
+                        {
+                            data: {
+                                error:
+                                    classifiedError.error.message ||
+                                    'Upload failed. Please try again.',
+                                type: 'UnknownError',
+                            },
+                        }
+                    );
+                    return next(
+                        new AppError(
+                            `${classifiedError.error.message || 'Upload failed. Please try again.'}`,
+                            500,
+                            'UnknownError'
+                        )
+                    );
 
                 case 'UNKNOWN':
                 default:
-                    return res.status(500).json({
-                        error: 'Upload failed. Please try again.',
-                        type: 'UnknownError',
+                    log.error('Upload failed.Please try again', {
+                        data: {
+                            error: 'Upload failed. Please try again.',
+                            type: 'UnknownError',
+                        },
                     });
+                    return next(
+                        new AppError(
+                            'Upload failed.Please try again',
+                            500,
+                            'UnknownError'
+                        )
+                    );
             }
         }
         next();
@@ -122,7 +262,7 @@ const folderCleanerBaseDir = path.join(
 const uploadDir = path.join(folderCleanerBaseDir, 'uploads');
 const outputDir = path.join(folderCleanerBaseDir, 'outputs');
 /**NB: mkdirSync runs synchronously at server startup but when
- * iujh4g3f2d   the server is running and the dir is deleted it will cause the enoent error */
+ *   the server is running and the dir is deleted it will cause the enoent error */
 fs.mkdirSync(uploadDir, { recursive: true });
 fs.mkdirSync(outputDir, { recursive: true });
 const storage = multer.diskStorage({
@@ -148,16 +288,10 @@ const storage = multer.diskStorage({
         }
     },
 });
-const upload = multer({
-    storage: storage,
-    limits: {
-        fileSize: 200 * 1024 * 1024,
-        //fieldSize: 200 * 1024 * 1024,
-    },
-}); //temporary storage with a limit of 200 mb
 
 cleanerRoute.post(
     '/processFolder',
+    uploadLimiter,
     handleUploadErrors,
     asyncHandler(async (req, res) => {
         log.highlight(
@@ -166,8 +300,14 @@ cleanerRoute.post(
 
         const uploadedFiles = req.files as Express.Multer.File[];
         const uploadedFolderName = req.body.folderName; //fallback
+
+        //const tierId = (req.query.tierId as keyof typeof TIER_CONFIG) || 'free';
+
+        //MAX_UPLOADS = TIER_CONFIG[tierId].maxUploads;
+
         const safeFolderName = uploadedFolderName.replace(/[^a-z0-9_-]/gi, '_');
 
+        log.info(`uploaded Files ${uploadedFiles.length}`);
         log.info(`[BACKEND] ${uploadedFiles.length} files received`);
         if (!uploadedFiles || uploadedFiles.length === 0) {
             log.warn('⚠ [BACKEND] no files received ');
@@ -188,7 +328,7 @@ cleanerRoute.post(
         try {
             for (const file of uploadedFiles) {
                 const destPath = path.join(tempDir, file.originalname);
-                await fs.move(file.path, destPath);
+                await fs.move(file.path, destPath, { overwrite: true });
                 log.info(`[BACKEND] moved ${file.originalname} to temp`);
             }
         } finally {
