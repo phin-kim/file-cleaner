@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import useCleaner from '../hooks/useCleaner';
 import SuccessPopup, { UpgradeModal } from '../components/Popup';
+import BreakdownPie from '../components/FilePie';
 export default function FolderCleanerUI() {
     const {
         isDragging,
@@ -270,6 +271,12 @@ export default function FolderCleanerUI() {
                                             {cleaningStats.spaceSaved}
                                         </p>
                                     </motion.div>
+                                </div>
+                                <div>
+                                    <h3 className="text-3xl font-bold text-red-500">
+                                        this si the pie
+                                    </h3>
+                                    <BreakdownPie />
                                 </div>
 
                                 <div className="flex gap-3">

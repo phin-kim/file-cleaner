@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { fileCleanerApi, subscriptionApi } from '../library/client';
+import { fileCleanerApi } from '../library/client';
 import type { CleaningStats, UploadedFolder, Status } from '../types/types';
 import traverseDirectory from '../utils/traverser';
 import type { AnalysisResult } from '../types/types';

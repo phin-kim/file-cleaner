@@ -5,6 +5,7 @@ export const TIER_CONFIG = {
         features: ['basic_cleanup'],
         canMerge: false,
         canClean: true,
+        canOrganize: false,
         priority: false,
     },
     'tier-1': {
@@ -13,6 +14,7 @@ export const TIER_CONFIG = {
         features: ['basic_cleanup', 'subfolder_org', 'detailed_breakdown'],
         canMerge: false,
         canClean: true,
+        canOrganize: true,
 
         priority: false,
     },
@@ -26,6 +28,7 @@ export const TIER_CONFIG = {
         ],
         canMerge: true,
         canClean: false,
+        canOrganize: true,
 
         priority: false,
     },
@@ -35,6 +38,7 @@ export const TIER_CONFIG = {
         features: ['all_features', 'priority_ai', 'advanced_strategy'],
         canMerge: true,
         canClean: true,
+        canOrganize: true,
 
         priority: true,
     },

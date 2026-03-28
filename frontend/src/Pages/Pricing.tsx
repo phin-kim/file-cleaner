@@ -7,11 +7,8 @@ import {
     FaFilePdf,
     FaCheck,
 } from 'react-icons/fa6';
-import createClientLogger from '../utils/clientLogger';
-import type { Tier } from '../types/transactions';
 import { useTransactions } from '../Store/TransactionStore';
 import { useNavigate } from 'react-router-dom';
-const log = createClientLogger('Pricing.tsx');
 //selected tier and the amount are what cary everything i need
 const Pricing: React.FC = () => {
     const [isQuarterly, setIsQuarterly] = useState(false);
@@ -34,13 +31,14 @@ const Pricing: React.FC = () => {
             quarterlyPrice: 550,
             description: 'Perfect for individuals needing quick organization.',
             features: [
-                'Clean multiple duplicate folders',
-
+                'Organized files into their respective folders',
+                'Better distinction of your folder contents',
                 'Increased number of uploads',
             ],
             highlight: false,
             icon: <FaBroom />,
         },
+        //have one free trial of tier 2
         {
             id: 'tier-2',
             name: 'Question Master',

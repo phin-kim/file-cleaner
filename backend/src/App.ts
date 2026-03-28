@@ -47,12 +47,13 @@ const MERGER_UPLOADS = path.join(MERGER_BASE_DIR, 'uploads');
 const MERGER_OUTPUTS = path.join(MERGER_BASE_DIR, 'outputs');
 const FOLDER_UPLOADS = path.join(CLEANER_BASE_DIR, 'uploads');
 const FOLDER_OUTPUTS = path.join(CLEANER_BASE_DIR, 'outputs');
-
 const FOLDER_STORAGE_TEMPS = path.join(
     CLEANER_BASE_DIR,
     'folder-cleaner-temp-storage'
 );
-log.info(`Checking if the temporary storage exits${FOLDER_STORAGE_TEMPS}`);
+log.info(
+    `Checking if the temporary storage exits ${FOLDER_STORAGE_TEMPS ? 'YES' : 'NO'}`
+);
 
 const CLEAN_UP_DIRS = [
     MERGER_OUTPUTS,

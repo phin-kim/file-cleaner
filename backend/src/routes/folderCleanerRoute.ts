@@ -12,6 +12,10 @@ import AppError from '../utils/appError.js';
 import asyncHandler from '../middleware/asyncHandler.js';
 import uploadLimiter from '../utils/rateLimiter.js';
 import { TIER_CONFIG } from '../config/tiers.js';
+import {
+    organizeByExtension,
+    type ExtensionStats,
+} from '../utils/organizeFolder.js';
 const log = createLogger('FolderCleaner.ts');
 export const cleanerRoute: Router = Router();
 const __filename = fileURLToPath(import.meta.url);
@@ -297,7 +301,8 @@ cleanerRoute.post(
         log.highlight(
             `🟢 [BACKEND] request received at: ${new Date().toISOString()}`
         );
-
+        const tierId = (req.query.tierId as keyof typeof TIER_CONFIG) || 'free';
+        const CAN_ORGANIZE = TIER_CONFIG[tierId].canOrganize;
         const uploadedFiles = req.files as Express.Multer.File[];
         const uploadedFolderName = req.body.folderName; //fallback
 
@@ -342,10 +347,15 @@ cleanerRoute.post(
         //remove duplicate files based on hash
         log.highlight('[BACKEND] starting duplicate removal...');
         const tidyStart = Date.now();
-        const stats = await tidyFolder(tempDir);
+        const tidyStats = await tidyFolder(tempDir);
+        //setup logic to check if they are in tier 1 to enable the folder organization
         log.info(
             `[BACKEND] duplicate removal done in ${Date.now() - tidyStart} ms`
         );
+        let fileOrgStats: ExtensionStats | null = null;
+        if (CAN_ORGANIZE) {
+            fileOrgStats = await organizeByExtension(tempDir);
+        }
         const zippedDir = path.join(outputDir, 'zipped');
         const zipStart = Date.now();
 
@@ -379,9 +389,10 @@ cleanerRoute.post(
                 downloadURL,
                 stats: {
                     originalFiles: uploadedFiles.length,
-                    finalFiles: stats.finalFiles.length,
-                    duplicatesRemoved: stats.duplicatesRemoved,
-                    spaceSaved: stats.spaceSaved,
+                    finalFiles: tidyStats.finalFiles.length,
+                    duplicatesRemoved: tidyStats.duplicatesRemoved,
+                    spaceSaved: tidyStats.spaceSaved,
+                    breakdown: fileOrgStats,
                 },
             });
         } catch (error) {
@@ -398,9 +409,9 @@ cleanerRoute.post(
                     'Folder cleaned but zip creation failed after multiple attempts',
                 stats: {
                     originalFiles: uploadedFiles.length,
-                    finalFiles: stats.finalFiles.length,
-                    duplicatesRemoved: stats.duplicatesRemoved,
-                    spaceSaved: stats.spaceSaved,
+                    finalFiles: tidyStats.finalFiles.length,
+                    duplicatesRemoved: tidyStats.duplicatesRemoved,
+                    spaceSaved: tidyStats.spaceSaved,
                 },
             });
         }

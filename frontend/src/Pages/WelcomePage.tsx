@@ -13,6 +13,11 @@ const WelcomeModal: React.FC = () => {
     const navigate = useNavigate();
     const setTierId = useTierStore((state) => state.setTierId);
     const tierId = useTierStore.getState().tierId;
+    const dynamicTierId = useTierStore((state) => state.tierId);
+    log.highlight('=========identifying the correct tier id==========');
+    log.debug(`This is the static tier id: "${tierId}"`);
+    log.debug(`This is the dynamic tier id: "${dynamicTierId}"`);
+
     const { setError } = useErrorStore();
     const getTier = async (path: string) => {
         try {
