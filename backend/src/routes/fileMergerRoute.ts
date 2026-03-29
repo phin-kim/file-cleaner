@@ -36,6 +36,7 @@ mergerRoute.post(
     async (req, res, next) => {
         try {
             const tierId = req.query.tierId as keyof typeof TIER_CONFIG;
+            const isWorkSheet = req.query.isWorkSheet === 'true';
             const CAN_MERGE = TIER_CONFIG[tierId].canMerge;
             if (!CAN_MERGE) {
                 return next(
@@ -67,7 +68,7 @@ mergerRoute.post(
             //creates the folder if missing
             const outputFile = path.join(outputDir, `merged-${Date.now()}.pdf`);
 
-            await generatePDF(mergedQuestions, outputFile);
+            await generatePDF(mergedQuestions, outputFile, isWorkSheet);
             log.warn('The pdf generator is done');
             // Build absolute download URL so frontend (different origin) can access it
             const host = req.get('host') || 'localhost:5000';

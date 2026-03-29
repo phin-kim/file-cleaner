@@ -24,7 +24,7 @@ export default function useCleaner() {
         null
     );
     const [status, setStatus] = useState<Status>('idle'); // idle, uploading, processing, complete, error
-
+    const [isWorkSheet, setIsWorkSheet] = useState(false);
     const [downloadURL, setDownloadURL] = useState<string | null>(null);
     const [openPopup, setOpenPopUp] = useState(false);
     const [upgradeModal, setUpgradeModal] = useState(false);
@@ -245,10 +245,11 @@ export default function useCleaner() {
             );
             files.forEach((file) => formData.append('files', file, file.name));
             setStatus('processing');
+
             const start = Date.now();
             console.log(`[FRONTEND] sending files to backend`);
             const response = await fileCleanerApi.post(
-                `/${path}?tierId=${tierId}`,
+                `/${path}?tierId=${tierId}&isWorkSheet=${isWorkSheet}`,
                 formData,
                 {
                     headers: { 'Content-Type': 'multipart/form-data' },
@@ -343,7 +344,9 @@ export default function useCleaner() {
         openPopup,
         fileInputRef,
         upgradeModal,
+        isWorkSheet,
         setUpgradeModal,
+        setIsWorkSheet,
         handleFolderInputChange,
         handleFolderSelectClick,
         setOpenPopUp,

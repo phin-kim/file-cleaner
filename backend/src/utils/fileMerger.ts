@@ -366,14 +366,14 @@ export async function getEmbeddings(questions: string[]): Promise<number[][]> {
     );
 }
 
-export function clusterQuestions(
-    questions: string[],
+export function clusterQuestions<T>(
+    items: T[],
     embeddings: number[][],
     threshold = 0.8
-): string[][] {
+): T[][] {
     log.highlight('Starting cluster');
     const clusters: { [key: string]: number[] } = {};
-    questions.forEach((_, indx) => {
+    items.forEach((_, indx) => {
         let added = false;
         for (const clusterID in clusters) {
             const sim = cosineSimilarity(
@@ -394,7 +394,7 @@ export function clusterQuestions(
     //convert index clusters to actual questions
     log.highlight('Ending clustering');
     return Object.values(clusters).map((indices) =>
-        indices.map((ind) => questions[ind])
+        indices.map((ind) => items[ind])
     );
 }
 /*retry Wrapper for gemini api calls
@@ -572,76 +572,105 @@ export async function processUploadedFiles(folderPath: string) {
         files = uniqueFiles;
 
         //extract all questions
-        const allQuestions: string[] = [];
+        const allQuestionsObjects: { text: string; source: string }[] = [];
         for (const file of files) {
             const fullPath = path.join(folderPath, file);
+            const cleanSource = file
+                .replace(/^\d+-/, '')
+                .replace(/^\d{13,14}/, '');
+
             log.debug(`[PROCESSING FILE] `, { data: { fullPath } });
             const text = await extractTextFromFile(fullPath);
             log.info('Extracting texts from files ');
+
             const questions = extractQuestion(text);
             log.debug('Extracting questions');
-            allQuestions.push(...questions);
+            questions.forEach((quest) => {
+                allQuestionsObjects.push({
+                    text: quest,
+                    source: cleanSource,
+                });
+            });
         }
-        log.debug(`All questions are ${allQuestions.length}`);
-        if (allQuestions.length === 0) return [];
+        if (allQuestionsObjects.length === 0) return [];
+
         //create embeddings
-        const embeddings = await getEmbeddings(allQuestions);
+        const rawText = allQuestionsObjects.map((obj) => obj.text);
+        const embeddings = await getEmbeddings(rawText);
+
         log.debug('Getting embeddings');
         // cluster similar questions
-        const clusters = clusterQuestions(allQuestions, embeddings, 0.8);
+        const clusters = clusterQuestions(allQuestionsObjects, embeddings, 0.8);
+
         const limit = pLimit(2);
         const mergedQuestions = await Promise.all(
             clusters.map((cluster) =>
                 limit(async () => {
-                    //unique questions return as-is
-                    if (cluster.length === 1) return cluster[0];
+                    const clusterSource = [
+                        ...new Set(cluster.map((item) => item.source)),
+                    ].join(', ');
+                    const clusterTexts = cluster.map((c) => c.text);
                     //use cache key
-                    const key = clusterKey(cluster.slice(0, 5));
+                    const key = clusterKey(clusterTexts.slice(0, 5));
                     if (mergeCache[key]) {
                         log.debug('Using cached merged questions');
-                        return mergeCache[key];
+                        return { text: mergeCache[key], source: clusterSource };
                     }
                     await sleep(800);
                     // Skip merging if cluster contains garbage
-                    const hasGarbage = cluster.some((q) =>
+                    const hasGarbage = cluster.some((item) =>
                         /^(Here's|Please|These are|Instructions|BACHELOR)/i.test(
-                            q.trim()
+                            item.text.trim()
                         )
                     );
                     if (hasGarbage) {
-                        // Return the longest valid question from cluster
-                        const valid = cluster.filter((q) => isValidQuestion(q));
-                        return valid.length > 0
-                            ? valid.reduce((a, b) =>
-                                  a.length > b.length ? a : b
-                              )
-                            : '';
+                        const valid = cluster.filter((item) =>
+                            isValidQuestion(item.text)
+                        );
+                        const longest =
+                            valid.length > 0
+                                ? valid.reduce((a, b) =>
+                                      a.text.length > b.text.length ? a : b
+                                  ).text
+                                : '';
+                        return { text: longest, source: clusterSource };
                     }
                     //limit prompt size
-                    const trimmedCluster = cluster.slice(0, 5);
-                    //if questions are identical pick the first one
-                    const first = normalizeQuestions(cluster[0]);
-                    const allSame = cluster.every(
-                        (quest) => normalizeQuestions(quest) === first
+                    const firstTextNormalized = normalizeQuestions(
+                        cluster[0].text
                     );
-
+                    const allSame = cluster.every(
+                        (item) =>
+                            normalizeQuestions(item.text) ===
+                            firstTextNormalized
+                    );
                     if (allSame) {
-                        return cluster[0];
+                        return { text: cluster[0].text, source: clusterSource };
                     }
-                    //otherwise call gemini
-                    const merged = await mergeCluster(trimmedCluster);
-                    mergeCache[key] = merged;
+                    let finalPathText = '';
+
+                    if (cluster.length === 1) {
+                        finalPathText = cluster[0].text;
+                    } else {
+                        // Call Gemini with the text array
+                        finalPathText = await mergeCluster(
+                            clusterTexts.slice(0, 5)
+                        );
+                    }
+
+                    // Save to cache
+                    mergeCache[key] = finalPathText;
                     saveMergeCache();
-                    return merged;
+
+                    // ALWAYS return the object structure
+                    return { text: finalPathText, source: clusterSource };
                 })
             )
         );
         // after processing ,cleanup temp folder
         log.highlight('finalize the processing of files');
         await cleanupByAge(folderPath, 'TEMP-CLEANUP');
-        return mergedQuestions.filter(
-            (question) => question && isValidQuestion(question)
-        );
+        return mergedQuestions.filter((q) => q.text && isValidQuestion(q.text));
     } catch (error) {
         log.error(`Processing failed`, {
             context: 'failed cleaning',
