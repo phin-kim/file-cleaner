@@ -68,7 +68,7 @@ mergerRoute.post(
             const outputFile = path.join(outputDir, `merged-${Date.now()}.pdf`);
 
             await generatePDF(mergedQuestions, outputFile);
-
+            log.warn('The pdf generator is done');
             // Build absolute download URL so frontend (different origin) can access it
             const host = req.get('host') || 'localhost:5000';
             const protocol = req.protocol || 'http';

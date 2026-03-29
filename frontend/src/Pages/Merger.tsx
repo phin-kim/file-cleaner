@@ -9,7 +9,7 @@ import {
     CheckCircle2,
     MousePointerClick,
 } from 'lucide-react';
-
+import { UpgradeModal } from '../components/Popup';
 const FolderQuestionAnalyzer = () => {
     const {
         handleDrop,
@@ -18,6 +18,8 @@ const FolderQuestionAnalyzer = () => {
         status,
         downloadURL,
         fileInputRef,
+        setUpgradeModal,
+        upgradeModal,
 
         handleFolderInputChange,
         handleFolderSelectClick,
@@ -252,7 +254,9 @@ const FolderQuestionAnalyzer = () => {
                         )}
                     </AnimatePresence>
                 </div>
-
+                {upgradeModal && (
+                    <UpgradeModal onClose={() => setUpgradeModal(false)} />
+                )}
                 {/* Footer */}
                 <motion.p
                     initial={{ opacity: 0 }}

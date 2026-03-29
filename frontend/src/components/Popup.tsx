@@ -37,7 +37,7 @@ const SuccessPopup = ({ onDownload, onClose }: SuccessPopupProps) => {
         console.log('Closing up');
     };
     return (
-        <div className="w-full max-w-md overflow-hidden border-2 shadow-2xl rounded-3xl border-blue-400/30 bg-linear-to-br from-blue-900 via-blue-800 to-cyan-900">
+        <div className="w-full max-w-md overflow-hidden rounded-3xl border-2 border-blue-400/30 bg-linear-to-br from-blue-900 via-blue-800 to-cyan-900 shadow-2xl">
             {/* Success Icon */}
             <div className="flex justify-center pt-8 pb-4">
                 <motion.div
@@ -50,9 +50,9 @@ const SuccessPopup = ({ onDownload, onClose }: SuccessPopupProps) => {
                     }}
                     className="relative"
                 >
-                    <div className="absolute inset-0 rounded-full opacity-50 bg-linear-to-r from-blue-500 to-cyan-500 blur-xl" />
-                    <div className="relative p-4 rounded-full bg-linear-to-br from-blue-500 to-cyan-500">
-                        <CheckCircle className="w-16 h-16 text-white" />
+                    <div className="absolute inset-0 rounded-full bg-linear-to-r from-blue-500 to-cyan-500 opacity-50 blur-xl" />
+                    <div className="relative rounded-full bg-linear-to-br from-blue-500 to-cyan-500 p-4">
+                        <CheckCircle className="h-16 w-16 text-white" />
                     </div>
                 </motion.div>
             </div>
@@ -63,7 +63,7 @@ const SuccessPopup = ({ onDownload, onClose }: SuccessPopupProps) => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
-                    className="flex items-center justify-center gap-2 mb-3 text-3xl font-bold text-white"
+                    className="mb-3 flex items-center justify-center gap-2 text-3xl font-bold text-white"
                 >
                     Success!
                     <span className="text-2xl">🎉</span>
@@ -82,11 +82,11 @@ const SuccessPopup = ({ onDownload, onClose }: SuccessPopupProps) => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5 }}
-                    className="p-4 mt-6 mb-8 border rounded-xl border-blue-400/20 bg-white/10 backdrop-blur-sm"
+                    className="mt-6 mb-8 rounded-xl border border-blue-400/20 bg-white/10 p-4 backdrop-blur-sm"
                 >
                     <div className="flex items-start gap-3">
-                        <Sparkles className="w-6 h-6 mt-1 shrink-0 text-cyan-400" />
-                        <p className="leading-relaxed text-left text-white">
+                        <Sparkles className="mt-1 h-6 w-6 shrink-0 text-cyan-400" />
+                        <p className="text-left leading-relaxed text-white">
                             Would you like to{' '}
                             <span className="font-semibold text-cyan-300">
                                 sanitize & combine
@@ -105,10 +105,10 @@ const SuccessPopup = ({ onDownload, onClose }: SuccessPopupProps) => {
                         whileHover={{ scale: 1.03 }}
                         whileTap={{ scale: 0.97 }}
                         onClick={handleContinue}
-                        className="flex items-center justify-center w-full gap-2 px-6 py-4 font-bold text-white transition-all shadow-lg rounded-xl bg-linear-to-r from-blue-500 to-cyan-500 shadow-blue-500/50 hover:from-blue-600 hover:to-cyan-600"
+                        className="flex w-full items-center justify-center gap-2 rounded-xl bg-linear-to-r from-blue-500 to-cyan-500 px-6 py-4 font-bold text-white shadow-lg shadow-blue-500/50 transition-all hover:from-blue-600 hover:to-cyan-600"
                     >
                         <span>Yes, Continue</span>
-                        <ArrowRight className="w-5 h-5" />
+                        <ArrowRight className="h-5 w-5" />
                     </motion.button>
 
                     <motion.button
@@ -118,16 +118,16 @@ const SuccessPopup = ({ onDownload, onClose }: SuccessPopupProps) => {
                         whileHover={{ scale: 1.03 }}
                         whileTap={{ scale: 0.97 }}
                         onClick={handlepdfDownload}
-                        className="flex items-center justify-center w-full gap-2 px-6 py-4 font-semibold text-white transition-all border rounded-xl border-blue-400/30 bg-white/10 hover:border-blue-400/50 hover:bg-white/20"
+                        className="flex w-full items-center justify-center gap-2 rounded-xl border border-blue-400/30 bg-white/10 px-6 py-4 font-semibold text-white transition-all hover:border-blue-400/50 hover:bg-white/20"
                     >
-                        <Download className="w-5 h-5" />
+                        <Download className="h-5 w-5" />
                         <span>No, Download Cleaned Folder</span>
                     </motion.button>
                 </div>
             </div>
 
             {/* Decorative Elements */}
-            <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-blue-500 via-cyan-500 to-blue-500" />
+            <div className="absolute top-0 left-0 h-1 w-full bg-linear-to-r from-blue-500 via-cyan-500 to-blue-500" />
         </div>
     );
 };
@@ -167,19 +167,19 @@ export const UpgradeModal = ({ onClose }: { onClose: () => void }) => {
                     transition={{ type: 'spring', stiffness: 300, damping: 25 }}
                     className="fixed inset-0 z-50 flex items-center justify-center p-4"
                 >
-                    <div className="relative w-full max-w-md p-8 border shadow-2xl rounded-2xl border-purple-400/30 bg-linear-to-br from-purple-900 via-blue-900 to-purple-900">
+                    <div className="relative w-full max-w-md rounded-2xl border border-purple-400/30 bg-linear-to-br from-purple-900 via-blue-900 to-purple-900 p-8 shadow-2xl">
                         {/* Close Button */}
                         <button
                             onClick={handleCloseButton}
-                            className="absolute text-purple-300 transition-colors top-4 right-4 hover:text-white"
+                            className="absolute top-4 right-4 text-purple-300 transition-colors hover:text-white"
                         >
-                            <X className="w-5 h-5" />
+                            <X className="h-5 w-5" />
                         </button>
 
                         {/* Icon */}
-                        <div className="flex justify-center mb-6">
-                            <div className="p-4 rounded-full bg-linear-to-br from-purple-500 to-blue-500">
-                                <Crown className="w-12 h-12 text-white" />
+                        <div className="mb-6 flex justify-center">
+                            <div className="rounded-full bg-linear-to-br from-purple-500 to-blue-500 p-4">
+                                <Crown className="h-12 w-12 text-white" />
                             </div>
                         </div>
 
@@ -199,7 +199,7 @@ export const UpgradeModal = ({ onClose }: { onClose: () => void }) => {
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                                 onClick={handleUpgrade}
-                                className="w-full py-4 font-bold text-white transition-all shadow-lg rounded-xl bg-linear-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
+                                className="w-full rounded-xl bg-linear-to-r from-purple-500 to-blue-500 py-4 font-bold text-white shadow-lg transition-all hover:from-purple-600 hover:to-blue-600"
                             >
                                 Yes, Upgrade Now
                             </motion.button>
@@ -208,7 +208,7 @@ export const UpgradeModal = ({ onClose }: { onClose: () => void }) => {
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                                 onClick={handleDecline}
-                                className="w-full py-4 font-semibold text-white transition-all border rounded-xl border-purple-400/30 bg-white/10 hover:bg-white/20"
+                                className="w-full rounded-xl border border-purple-400/30 bg-white/10 py-4 font-semibold text-white transition-all hover:bg-white/20"
                             >
                                 No, Thanks
                             </motion.button>

@@ -8,9 +8,14 @@ import createClientLogger from '../utils/clientLogger';
 import handleApiError from '../utils/apiError';
 import { useTierStore } from '../Store/tierStore';
 import { TIER_CONFIG } from '../../../shared/tiers';
-import axios from 'axios';
+import { AxiosError } from 'axios';
 import { useGeneralStore } from '../Store/generalStore';
 const log = createClientLogger('UseCleaner.tsx');
+interface BackendError {
+    message: string;
+    status: number;
+    type: string;
+}
 export default function useCleaner() {
     const { setError } = useErrorStore();
     /* ---------- State ---------- */
@@ -272,29 +277,36 @@ export default function useCleaner() {
         } catch (error) {
             clearInterval(progressInterval);
             log.error('Error in processing files', { data: { error } });
-            log.error(
-                `Is the error  instance of the Error  ${error instanceof Error ? 'yes' : 'no'}`
-            );
-            log.error(
-                `Is the error an axios error ${axios.isAxiosError(error) ? 'yes' : 'no'}`
-            );
-            log.error(
-                `Is the error an object ${typeof error === 'object' ? 'its an object' : 'its not an object'}`
-            );
-            log.debug('This is the structure of the error object ', {
-                data: { error },
+            const apiError = error as AxiosError<BackendError>;
+            const serverStatus = apiError.response?.status || apiError.status;
+            const serverData = apiError.response?.data || apiError;
+
+            log.error('Error in processing files', {
+                data: { serverStatus, serverData },
             });
 
-            if (typeof error === 'object' && 'message' in error!) {
-                setUpgradeModal(true);
+            // Check for both the 409 (Multer/File Count) and 503 (Tier/Subscription)
+            // 1. Handle Tier-Limited Features (503)
+            if (serverStatus === 503) {
                 setStatus('idle');
+                setProgress(0);
+                setUpgradeModal(true);
+
                 handleApiError(error, setError);
-                return;
+
+                return; // Exit immediately
             }
 
+            // 2. Handle Resource Conflicts/Limits (409)
+            if (serverStatus === 409) {
+                setStatus('idle');
+                setUpgradeModal(true);
+                handleApiError(serverData, setError);
+                return; // Exit immediately
+            }
             handleApiError(error, setError);
             setStatus('error');
-            setStatus('processing');
+            //setStatus('processing');
             setTimeout(() => {
                 setStatus('idle');
             }, 1500);

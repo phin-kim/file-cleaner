@@ -7,7 +7,7 @@ export default async function generatePDF(
     questions: string[],
     outputPath: string
 ) {
-    return new Promise<void>((resolve) => {
+    return new Promise<void>((resolve, reject) => {
         log.highlight('generating pdf');
         const doc = new PDFDocument({
             size: 'A4',
@@ -51,11 +51,14 @@ export default async function generatePDF(
 
         doc.end();
         stream.on('finish', () => {
-            log.highlight('Done generating pdf sent url to front end');
-            resolve;
+            log.highlight(
+                'Done generating pdf for backend to send url to frontend'
+            );
+            resolve();
         });
         stream.on('error', (streamError) => {
             log.error('PDF stream error', { data: { streamError } });
+            reject(streamError);
         });
     });
 }
