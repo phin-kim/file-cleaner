@@ -3,13 +3,19 @@ import path from 'path';
 const ONE_HOUR = 1 * 60 * 60 * 1000;
 import createLogger from './logger.js';
 const log = createLogger('CLEANUP');
-export async function cleanupByAge(dir: string, label = 'CLEANUP') {
+//the delete toplevel dirs is to help delete folders in folder-cleaner-temp-storage as the folders there weren't being deleted and it was too mush
+export async function cleanupByAge(
+    dir: string,
+    label = 'CLEANUP',
+    deleteTopLevelDirs = false
+) {
     const filePath = await fs.pathExists(dir);
     if (!filePath) return;
+
     let deletedCount = 0;
     let deletedSize = 0;
     const now = Date.now();
-    async function cleanupContents(currentPath: string) {
+    async function cleanupContents(currentPath: string, isRoot = true) {
         try {
             const entries = await fs.readdir(currentPath);
             log.info('Entries present ', {
@@ -31,10 +37,18 @@ export async function cleanupByAge(dir: string, label = 'CLEANUP') {
                             );
                             deletedCount++;
                         } else if (stat.isDirectory()) {
-                            //recursively delete contents first
-                            log.info(
-                                `[${label}] cleaning old directory ${fullPath} (age: ${Math.round((now - stat.mtimeMs) / (60 * 60 * 1000))} hours)`
-                            );
+                            //if deleteTOpLevelDirs is true and we are in the root, of the temp folder,delete the whole subfolder
+                            if (deleteTopLevelDirs && isRoot) {
+                                const dirSize =
+                                    await getDirectorySize(fullPath);
+                                deletedSize += dirSize;
+                                await fs.remove(fullPath);
+                                log.info(
+                                    `[${label}] removed entire sub-directory ${fullPath}`
+                                );
+                                deletedCount++;
+                                continue;
+                            }
                             //get all contents of directory
                             const subEntries = await fs.readdir(fullPath);
                             for (const subEntry of subEntries) {
@@ -68,11 +82,16 @@ export async function cleanupByAge(dir: string, label = 'CLEANUP') {
                             }
                             //update the directory modification time to now since we cleaned it
                             await fs.utimes(fullPath, new Date(), new Date());
+
+                            //recursively delete contents first
+                            log.info(
+                                `[${label}] cleaning old directory ${fullPath} (age: ${Math.round((now - stat.mtimeMs) / (60 * 60 * 1000))} hours)`
+                            );
                         }
                     } else {
                         //if directory is not old enough check its contents recursively
                         if (stat.isDirectory()) {
-                            await cleanupContents(fullPath);
+                            await cleanupContents(fullPath, false);
                         }
                     }
                 } catch (error) {
@@ -127,7 +146,7 @@ export async function cleanupByAge(dir: string, label = 'CLEANUP') {
         return size;
     }
     // start cleanup from parent directory
-    await cleanupContents(dir);
+    await cleanupContents(dir, true);
     if (deletedCount > 0) {
         log.info(
             `[${label}] cleanup complete: removed ${deletedCount} items (${(deletedSize / (1024 * 1024)).toFixed(2)}) MB`
@@ -139,19 +158,25 @@ export async function cleanupByAge(dir: string, label = 'CLEANUP') {
 
 //set up periodic cleanup (run every hour)
 export function startPeriodicCleanup(tempDirs: string[]) {
-    //run immediately on startup
-    for (const dir of tempDirs) {
-        cleanupByAge(dir, 'PERIODIC-CLEANUP').catch(console.error);
-    }
-    //then run every hour
-    setInterval(
-        () => {
-            for (const dir of tempDirs) {
-                cleanupByAge(dir, 'PERIODIC-CLEANUP').catch(console.error);
-            }
-        },
-        60 * 60 * 1000
-    );
+    const runCleanup = () => {
+        for (const dir of tempDirs) {
+            // Check if this is the specific folder that gets too cluttered
+            const shouldDeleteFolders = dir.includes(
+                'folder-cleaner-temp-storage'
+            );
+
+            cleanupByAge(dir, 'PERIODIC-CLEANUP', shouldDeleteFolders).catch(
+                (err) =>
+                    log.error(`Cleanup failed for ${dir}`, { data: { err } })
+            );
+        }
+    };
+
+    // Run once on startup
+    runCleanup();
+
+    // Then run every hour
+    setInterval(runCleanup, ONE_HOUR);
 }
 
 //force cleanup all files in a directory regardless of age

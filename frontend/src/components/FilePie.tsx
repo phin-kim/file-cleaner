@@ -1,5 +1,4 @@
 import { PieChart, Pie, Cell, Tooltip } from 'recharts';
-import useCleaner from '../hooks/useCleaner';
 import {
     FileText,
     ImageIcon,
@@ -8,10 +7,8 @@ import {
     Zap,
     type LucideIcon,
 } from 'lucide-react';
-import createClientLogger from '../utils/clientLogger';
 import { useMemo } from 'react';
 import { useGeneralStore } from '../Store/generalStore';
-const log = createClientLogger('FilePie.tsx');
 // A bit deeper, more professional contrast
 /*const COLORS = [
     '#D946EF', // Deep Fuchsia (instead of soft Pink)
@@ -28,10 +25,12 @@ const ICON_MAP: Record<FileCategory, LucideIcon> = {
     Others: HardDrive,
 };
 
-export default function BreakdownPie() {
+export default function BreakdownPie({
+    CAN_ORGANIZE,
+}: {
+    CAN_ORGANIZE: boolean;
+}) {
     const cleaningStats = useGeneralStore((state) => state.cleaningStats);
-    const breakdown = cleaningStats?.breakdown;
-    log.debug('THis is the breakdown shape', { data: { breakdown } });
 
     const FILE_TYPE_DATA = useMemo(() => {
         if (!cleaningStats?.breakdown) return [];
@@ -42,7 +41,7 @@ export default function BreakdownPie() {
             icon: ICON_MAP[key as keyof typeof ICON_MAP] || HardDrive,
         }));
     }, [cleaningStats]);
-    if (FILE_TYPE_DATA.length === 0) {
+    if (FILE_TYPE_DATA.length === 0 && CAN_ORGANIZE) {
         return <div>Loading chart ...</div>;
     }
 

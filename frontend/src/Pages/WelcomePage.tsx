@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { FaMagic } from 'react-icons/fa';
@@ -6,31 +6,32 @@ import { FaBroom, FaFilePdf, FaLayerGroup } from 'react-icons/fa6';
 import { welcomePageApi } from '../library/client';
 import { useTierStore } from '../Store/tierStore';
 import createClientLogger from '../utils/clientLogger';
-import handleApiError from '../utils/apiError';
-import useErrorStore from '../Store/ErrorStore';
+//import handleApiError from '../utils/apiError';
+//import useErrorStore from '../Store/ErrorStore';
 const log = createClientLogger('Welcome page.tsx');
 const WelcomeModal: React.FC = () => {
     const navigate = useNavigate();
     const setTierId = useTierStore((state) => state.setTierId);
-    const tierId = useTierStore.getState().tierId;
-    const dynamicTierId = useTierStore((state) => state.tierId);
-    log.highlight('=========identifying the correct tier id==========');
-    log.debug(`This is the static tier id: "${tierId}"`);
-    log.debug(`This is the dynamic tier id: "${dynamicTierId}"`);
 
-    const { setError } = useErrorStore();
-    const getTier = async (path: string) => {
-        try {
-            log.info('Fetching the tier');
-            navigate(path);
-            const response = await welcomePageApi.get('/get-tier');
-            setTierId(response.data.tierId);
+    useEffect(() => {
+        const syncTier = async () => {
+            try {
+                //navigate(path);
+                log.info('Pre-fetching the tier status on mount');
 
-            log.info(`this is the tier id as set by "{setTierId}" ${tierId}`);
-        } catch (error) {
-            handleApiError(error, setError);
-        }
-    };
+                const response = await welcomePageApi.get('/get-tier');
+                setTierId(response.data.tierId);
+                log.info(`Tier synchronized: ${response.data.tierId}`);
+            } catch (error) {
+                log.error('Failed to sync tier', { data: { error } });
+                setTierId('free');
+            }
+        };
+        syncTier();
+    }, [setTierId]);
+
+    //const { setError } = useErrorStore();
+
     return (
         <AnimatePresence>
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -61,7 +62,7 @@ const WelcomeModal: React.FC = () => {
                             {/* Feature 1: Folder Cleanup */}
                             <div className="group relative flex flex-col items-center rounded-3xl border border-white/5 bg-[#3939391a] p-8 backdrop-blur-3xl transition-all duration-300 hover:border-indigo-200/30 hover:bg-[#17171770] hover:shadow-xl hover:shadow-indigo-500/10">
                                 <button
-                                    onClick={() => getTier('/folder-cleaner')}
+                                    onClick={() => navigate('/folder-cleaner')}
                                     className="flex w-full flex-col items-center"
                                 >
                                     <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-100 text-2xl text-indigo-600 transition-all duration-300 group-hover:scale-110 group-hover:bg-indigo-600 group-hover:text-white">
@@ -80,7 +81,7 @@ const WelcomeModal: React.FC = () => {
                             {/* Feature 2: File Merge */}
                             <div className="group relative flex flex-col items-center rounded-3xl border border-white/5 bg-[#3939391a] p-8 backdrop-blur-3xl transition-all duration-300 hover:border-purple-200/30 hover:bg-[#17171770] hover:shadow-xl hover:shadow-purple-500/10">
                                 <button
-                                    onClick={() => getTier('/file-merger')}
+                                    onClick={() => navigate('/file-merger')}
                                     className="flex w-full flex-col items-center"
                                 >
                                     <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-purple-100 text-2xl text-purple-600 transition-all duration-300 group-hover:scale-110 group-hover:bg-purple-600 group-hover:text-white">
@@ -100,7 +101,7 @@ const WelcomeModal: React.FC = () => {
                         {/* New All-in-One Action */}
                         <div className="mt-8">
                             <button
-                                onClick={() => getTier('/all-tools')}
+                                onClick={() => navigate('/all-tools')}
                                 className="group relative flex w-full items-center justify-center gap-4 rounded-3xl border border-white/10 bg-linear-to-r from-indigo-600/20 to-purple-600/20 p-6 backdrop-blur-3xl transition-all duration-300 hover:border-white/20 hover:from-indigo-600/40 hover:to-purple-600/40 hover:shadow-2xl hover:shadow-indigo-500/20"
                             >
                                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-xl text-white transition-all duration-300 group-hover:scale-110 group-hover:bg-white group-hover:text-indigo-600">

@@ -14,6 +14,9 @@ import useCleaner from '../hooks/useCleaner';
 import SuccessPopup, { UpgradeModal } from '../components/Popup';
 import BreakdownPie from '../components/FilePie';
 import { useGeneralStore } from '../Store/generalStore';
+import { TIER_CONFIG } from '../library/tier';
+import { useTierStore } from '../Store/tierStore';
+
 export default function FolderCleanerUI() {
     const {
         isDragging,
@@ -39,6 +42,9 @@ export default function FolderCleanerUI() {
     };
     const cleaningStats = useGeneralStore((state) => state.cleaningStats);
     const path = 'processFolder';
+    const tierId = useTierStore((state) => state.tierId);
+    const CAN_ORGANIZE =
+        TIER_CONFIG[tierId as keyof typeof TIER_CONFIG].canOrganize;
     return (
         <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-purple-600 to-violet-800 p-6">
             <div className="w-full max-w-2xl">
@@ -275,7 +281,11 @@ export default function FolderCleanerUI() {
                                     </motion.div>
                                 </div>
                                 <div>
-                                    <BreakdownPie />
+                                    {CAN_ORGANIZE && (
+                                        <BreakdownPie
+                                            CAN_ORGANIZE={CAN_ORGANIZE}
+                                        />
+                                    )}
                                 </div>
 
                                 <div className="flex gap-3">

@@ -1,4 +1,4 @@
-import React, { use, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { fileCleanerApi } from '../library/client';
 import type { UploadedFolder, Status } from '../types/types';
 import traverseDirectory from '../utils/traverser';
@@ -27,7 +27,7 @@ export default function useCleaner() {
     const [progress, setProgress] = useState(0);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const tierId = useTierStore.getState().tierId;
+    const tierId = useTierStore((state) => state.tierId);
     /* ---------- Handlers ---------- */
     const handleDragEnter = (event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault();
@@ -258,10 +258,9 @@ export default function useCleaner() {
             );
             clearInterval(progressInterval);
             setProgress(100);
-            const res = response.data.stats;
-            log.debug('Before the setCleaningStats', { data: { res } });
 
             useGeneralStore.getState().setCleaningStats(response.data.stats);
+
             setDownloadURL(response.data.downloadURL);
 
             console.log(`[FRONTEND] download url ${downloadURL}`);
