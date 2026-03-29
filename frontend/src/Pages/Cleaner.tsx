@@ -22,8 +22,7 @@ export default function FolderCleanerUI() {
         isDragging,
         uploadedFolder,
         status,
-        isWorkSheet,
-        setIsWorkSheet,
+
         openPopup,
         upgradeModal,
         setUpgradeModal,
@@ -71,20 +70,7 @@ export default function FolderCleanerUI() {
                     multiple
                     style={{ display: 'none' }}
                 />
-                <div className="mb-6 flex items-center rounded-md bg-blue-50 p-3">
-                    <label className="relative inline-flex cursor-pointer items-center">
-                        <input
-                            type="checkbox"
-                            className="peer sr-only"
-                            checked={isWorkSheet}
-                            onChange={() => setIsWorkSheet(!isWorkSheet)}
-                        />
-                        <div className="peer h-6 w-11 rounded-full bg-gray-200 peer-checked:bg-blue-600 peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
-                    </label>
-                    <span className="ml-3 text-sm font-medium text-gray-700">
-                        Generate as **Worksheet** (Adds space for answers)
-                    </span>
-                </div>
+
                 <AnimatePresence mode="sync">
                     {status === 'idle' && (
                         <motion.div

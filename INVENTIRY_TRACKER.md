@@ -1,0 +1,14 @@
+- a way to track the spoiled goods
+- tracking inventory and finance tracking
+- availability of the system to record data
+- A way to calculate the monthly profit
+- personal expenses sends to my app
+- mobile first app
+- camera usage to input data and record
+- Calculate profit margins
+- Weekly email reports
+- mobile money for new inventory tracking
+- barcode/ qr reader
+- manage multiple locations
+- - # Notifications on low alert via email
+- - # taking goods on credit

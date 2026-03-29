@@ -6,13 +6,18 @@ import { FaBroom, FaFilePdf, FaLayerGroup } from 'react-icons/fa6';
 import { welcomePageApi } from '../library/client';
 import { useTierStore } from '../Store/tierStore';
 import createClientLogger from '../utils/clientLogger';
+import useErrorStore from '../Store/ErrorStore';
+import useCleaner from '../hooks/useCleaner';
+import { UpgradeModal } from '../components/Popup';
 //import handleApiError from '../utils/apiError';
 //import useErrorStore from '../Store/ErrorStore';
 const log = createClientLogger('Welcome page.tsx');
 const WelcomeModal: React.FC = () => {
     const navigate = useNavigate();
     const setTierId = useTierStore((state) => state.setTierId);
-
+    const tierId = useTierStore((state) => state.tierId);
+    const { setError } = useErrorStore();
+    const { setUpgradeModal, upgradeModal } = useCleaner();
     useEffect(() => {
         const syncTier = async () => {
             try {
@@ -31,7 +36,15 @@ const WelcomeModal: React.FC = () => {
     }, [setTierId]);
 
     //const { setError } = useErrorStore();
-
+    const handleTier3 = () => {
+        if (tierId === 'tier-3') {
+            navigate('/all-tools');
+        } else {
+            setError('This is not in you current subscription plan');
+            setUpgradeModal(true);
+            return;
+        }
+    };
     return (
         <AnimatePresence>
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -101,7 +114,7 @@ const WelcomeModal: React.FC = () => {
                         {/* New All-in-One Action */}
                         <div className="mt-8">
                             <button
-                                onClick={() => navigate('/all-tools')}
+                                onClick={() => handleTier3()}
                                 className="group relative flex w-full items-center justify-center gap-4 rounded-3xl border border-white/10 bg-linear-to-r from-indigo-600/20 to-purple-600/20 p-6 backdrop-blur-3xl transition-all duration-300 hover:border-white/20 hover:from-indigo-600/40 hover:to-purple-600/40 hover:shadow-2xl hover:shadow-indigo-500/20"
                             >
                                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-xl text-white transition-all duration-300 group-hover:scale-110 group-hover:bg-white group-hover:text-indigo-600">
@@ -119,7 +132,9 @@ const WelcomeModal: React.FC = () => {
                             </button>
                         </div>
                     </div>
-
+                    {upgradeModal && (
+                        <UpgradeModal onClose={() => setUpgradeModal(false)} />
+                    )}
                     <div className="border-t border-white/10 bg-linear-to-br from-purple-500/20 to-violet-700/20 p-4 text-center">
                         <p className="text-xs text-white/60 italic">
                             Efficiency meets simplicity.
