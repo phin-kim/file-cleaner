@@ -13,12 +13,13 @@ import {
 import useCleaner from '../hooks/useCleaner';
 import SuccessPopup, { UpgradeModal } from '../components/Popup';
 import BreakdownPie from '../components/FilePie';
+import { useGeneralStore } from '../Store/generalStore';
 export default function FolderCleanerUI() {
     const {
         isDragging,
         uploadedFolder,
         status,
-        cleaningStats,
+
         openPopup,
         upgradeModal,
         setUpgradeModal,
@@ -36,6 +37,7 @@ export default function FolderCleanerUI() {
     const handleClose = () => {
         setOpenPopUp(false);
     };
+    const cleaningStats = useGeneralStore((state) => state.cleaningStats);
     const path = 'processFolder';
     return (
         <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-purple-600 to-violet-800 p-6">
@@ -273,9 +275,6 @@ export default function FolderCleanerUI() {
                                     </motion.div>
                                 </div>
                                 <div>
-                                    <h3 className="text-3xl font-bold text-red-500">
-                                        this si the pie
-                                    </h3>
                                     <BreakdownPie />
                                 </div>
 

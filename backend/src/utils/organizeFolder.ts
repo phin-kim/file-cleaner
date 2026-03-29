@@ -6,6 +6,8 @@ export interface ExtensionStats {
         sizeByBytes: number;
     };
 }
+import createLogger from './logger';
+const log = createLogger('OrganizeFolder.ts');
 export async function organizeByExtension(folderPath: string) {
     const files = await fs.readdir(folderPath);
     const stats: ExtensionStats = {};
@@ -45,5 +47,7 @@ export async function organizeByExtension(folderPath: string) {
 
         await fs.move(filePath, path.join(targetDirPath, fileName));
     }
+    log.highlight('Checking the organize folder.ts for the response ');
+    log.info('This are the stats', { data: { stats } });
     return stats;
 }

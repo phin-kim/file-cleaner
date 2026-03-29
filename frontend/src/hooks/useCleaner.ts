@@ -1,6 +1,6 @@
-import React, { useRef, useState } from 'react';
+import React, { use, useRef, useState } from 'react';
 import { fileCleanerApi } from '../library/client';
-import type { CleaningStats, UploadedFolder, Status } from '../types/types';
+import type { UploadedFolder, Status } from '../types/types';
 import traverseDirectory from '../utils/traverser';
 import type { AnalysisResult } from '../types/types';
 import useErrorStore from '../Store/ErrorStore';
@@ -9,6 +9,7 @@ import handleApiError from '../utils/apiError';
 import { useTierStore } from '../Store/tierStore';
 import { TIER_CONFIG } from '../../../shared/tiers';
 import axios from 'axios';
+import { useGeneralStore } from '../Store/generalStore';
 const log = createClientLogger('UseCleaner.tsx');
 export default function useCleaner() {
     const { setError } = useErrorStore();
@@ -18,9 +19,7 @@ export default function useCleaner() {
         null
     );
     const [status, setStatus] = useState<Status>('idle'); // idle, uploading, processing, complete, error
-    const [cleaningStats, setCleaningStats] = useState<CleaningStats | null>(
-        null
-    );
+
     const [downloadURL, setDownloadURL] = useState<string | null>(null);
     const [openPopup, setOpenPopUp] = useState(false);
     const [upgradeModal, setUpgradeModal] = useState(false);
@@ -137,7 +136,7 @@ export default function useCleaner() {
             clearInterval(progressInterval);
             setProgress(100);
 
-            setCleaningStats(response.data.stats);
+            useGeneralStore.getState().setCleaningStats(response.data.stats);
             setDownloadURL(response.data.downloadURL);
             setStatus('complete');
 
@@ -259,8 +258,10 @@ export default function useCleaner() {
             );
             clearInterval(progressInterval);
             setProgress(100);
+            const res = response.data.stats;
+            log.debug('Before the setCleaningStats', { data: { res } });
 
-            setCleaningStats(response.data.stats);
+            useGeneralStore.getState().setCleaningStats(response.data.stats);
             setDownloadURL(response.data.downloadURL);
 
             console.log(`[FRONTEND] download url ${downloadURL}`);
@@ -314,7 +315,7 @@ export default function useCleaner() {
     const handleReset = () => {
         setUploadedFolder(null);
         setStatus('idle');
-        setCleaningStats(null);
+        useGeneralStore.getState().resetStats();
     };
     const resetMergerUpload = () => {
         setStatus('idle');
@@ -327,7 +328,6 @@ export default function useCleaner() {
         status,
         progress,
         result,
-        cleaningStats,
         downloadURL,
         openPopup,
         fileInputRef,

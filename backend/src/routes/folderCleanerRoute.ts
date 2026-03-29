@@ -385,6 +385,17 @@ cleanerRoute.post(
 
             //cleanup
             // return zip download link
+            log.info('the stats from the backend side logs', {
+                data: {
+                    stats: {
+                        originalFiles: uploadedFiles.length,
+                        finalFiles: tidyStats.finalFiles.length,
+                        duplicatesRemoved: tidyStats.duplicatesRemoved,
+                        spaceSaved: tidyStats.spaceSaved,
+                        breakdown: fileOrgStats,
+                    },
+                },
+            });
             res.json({
                 downloadURL,
                 stats: {
