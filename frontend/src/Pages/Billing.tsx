@@ -105,11 +105,11 @@ export default function Billing() {
         }
         setIsProcessing(true);
         setError('');
-        const isTestMode = import.meta.env.MODE === 'development';
-        const phoneToSend = isTestMode
-            ? '+254710000000'
-            : formatPhoneNumber(phoneNumber);
-
+        //const isTestMode = import.meta.env.MODE === 'development';
+        const phoneToSend = formatPhoneNumber(phoneNumber);
+        log.debug(
+            `This is the phone number to send to the backend ${phoneToSend}`
+        );
         try {
             const paystackResponse = await paystackApi.post(
                 '/payment/initialize-payment',

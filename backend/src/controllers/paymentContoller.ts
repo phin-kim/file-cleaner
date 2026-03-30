@@ -47,6 +47,18 @@ export async function mpesaPayment(
         log.warn(`is the user there ${user ? 'YESs' : 'NOr'}`);
         return next(new AppError(`${email} not found`, 404, 'NotFound'));
     }
+    if (!/^\+254[0-9]{9}$/.test(phoneNumber)) {
+        log.error('Invalid phone number format after formatting', {
+            data: {
+                original: phoneNumber,
+            },
+        });
+        return next(
+            AppError.badRequest(
+                'Invalid phone number format. Phone number must be in format: 7XXXXXXXX'
+            )
+        );
+    }
     const reference = 'MPESA_' + crypto.randomUUID();
     //check the mode that we are currently in to apply the correct phone number
     let formattedPhone = phoneNumber
@@ -64,30 +76,6 @@ export async function mpesaPayment(
                 provider: 'mpesa',
             },
         });
-        /*if (
-            formattedPhone.includes('710000000') ||
-            formattedPhone.endsWith('710000000') ||
-            formattedPhone === '254710000000' ||
-            formattedPhone === '710000000'
-        ) {
-            formattedPhone = '254710000000'; // Exact format Paystack expects
-            log.info('Using M-Pesa test number', {
-                data: {
-                    phone: formattedPhone,
-                },
-            });
-        } else {
-            // If they're using any other number in test mode, warn but still format it
-            log.warn(
-                'Using non-standard test number. Recommended: 254710000000',
-                {
-                    data: {
-                        original: phoneNumber,
-                        formatted: formattedPhone,
-                    },
-                }
-            );
-        }*/
     } else {
         if (formattedPhone.startsWith('0')) {
             formattedPhone = '+254' + formattedPhone.substring(1);
@@ -100,20 +88,7 @@ export async function mpesaPayment(
         // Remove any double zeros
         formattedPhone = formattedPhone.replace(/^2540+/, '+254');
     }
-    // Final validation - ensure it's exactly 12 digits (254 + 9 digits)
-    /* if (!/^254[0-9]{9}$/.test(formattedPhone)) {
-        log.error('Invalid phone number format after formatting', {
-            data: {
-                original: phoneNumber,
-                formatted: formattedPhone,
-            },
-        });
-        return next(
-            AppError.badRequest(
-                'Invalid phone number format. Phone number must be in format: 254XXXXXXXXX'
-            )
-        );
-    }*/
+
     //this is the create charge api
 
     const url = 'https://api.paystack.co/charge';
