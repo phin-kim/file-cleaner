@@ -134,6 +134,9 @@ export default function Billing() {
                 data: paystackData,
             });
         } catch (error) {
+            log.error('This is the error from the backend', {
+                data: { error },
+            });
             handleApiError(error, setError);
         } finally {
             setIsProcessing(false);

@@ -46,10 +46,10 @@ const Pricing: React.FC = () => {
             quarterlyPrice: 750,
             description: 'Ideal for educators and content creators.',
             features: [
-                'Merge multiple questions into PDF',
+                'Merge multiple questions into one PDF',
                 'Professional PDF formatting',
-
-                'Unlimited question entries',
+                'Remove duplicate questions for easier study',
+                'Get detailed breakdown on the source of the questions',
             ],
             highlight: true,
             icon: <FaFilePdf />,
@@ -61,11 +61,13 @@ const Pricing: React.FC = () => {
             quarterlyPrice: 1400,
             description: 'The complete utility suite for power users.',
             features: [
-                'Merge questions into PDF',
+                'Merge questions into one PDF',
                 'Clean multiple duplicate folders',
                 'Priority AI processing',
+                'Increased file upload limit',
+
                 'Advanced cleanup strategies',
-                '24/7 Support',
+                'Detailed breakdown of your folder composition',
             ],
             highlight: false,
             icon: <FaWandMagicSparkles />,

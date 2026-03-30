@@ -14,6 +14,7 @@ import AppError from '../utils/appError';
 import type { AuthenticatedRequest } from '../Types/authenticate';
 import { TransactionsModel } from '../schema/TransactionSchema';
 import { hashPhoneNumber } from '../utils/hashes';
+import { UserModel } from '../schema/UsersSchema';
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
 const TEST_PHONE_NUMBER = '+254710000000';
 const log = createLogger('Payment.ts');
@@ -25,11 +26,10 @@ export async function mpesaPayment(
     const authReq = req as AuthenticatedRequest;
     const userId = authReq?.user?.uid;
     const { amount, phoneNumber, email, metadata, currency } = req.body;
+
     if (!amount) {
-        log.error('One of the values is missing ');
-        return next(
-            AppError.badRequest('One of the necessary fields is missing')
-        );
+        log.error('Amount is missing ');
+        return next(AppError.badRequest('AMount field is necessary'));
     }
     if (!email) {
         log.error('Email is missing ');
@@ -39,7 +39,14 @@ export async function mpesaPayment(
         log.error('Phone number is missing');
         return next(AppError.badRequest('Phone number  is necessary'));
     }
+    log.info('What email is being passed ', { data: email });
+    const user = await UserModel.findOne({ email });
+    log.warn(`is the user there ${user ? 'YES' : 'NO'}`);
 
+    if (!user) {
+        log.warn(`is the user there ${user ? 'YESs' : 'NOr'}`);
+        return next(new AppError(`${email} not found`, 404, 'NotFound'));
+    }
     const reference = 'MPESA_' + crypto.randomUUID();
     //check the mode that we are currently in to apply the correct phone number
     let formattedPhone = phoneNumber
