@@ -5,16 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-    Sparkles,
-    CheckCircle,
-    Lock,
-    CreditCard,
-    Shield,
-    Zap,
-    ArrowLeft,
-    Info,
-} from 'lucide-react';
+import { Sparkles, CheckCircle, Lock, Shield, Zap, Info } from 'lucide-react';
 import { FaPaypal, FaCreditCard, FaCheck } from 'react-icons/fa6';
 import { MdPhoneAndroid } from 'react-icons/md';
 import { useTransactions } from '../Store/TransactionStore';

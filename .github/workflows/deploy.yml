@@ -1,71 +1,81 @@
 name: Test and Deploy Backend
 
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - 'backend/**'
-      - '.github/workflows/deploy.yml'
-  pull_request:
-    branches: [ main ]
-    paths:
-      - 'backend/**'
+    push:
+        branches: [main]
+        paths:
+            - 'backend/**'
+            - '.github/workflows/deploy.yml'
+    pull_request:
+        branches: [main]
+        paths:
+            - 'backend/**'
 
 jobs:
-  test:
-    name: Test Backend
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./backend
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '24.11.0'
-          cache: 'npm'
-          cache-dependency-path: backend/package-lock.json
-      
-      - name: Install dependencies
-        run: npm ci
-      
-      - name: Type check
-        run: npx tsc --noEmit
-      
-      - name: Run tests
-        run: npm test
-        continue-on-error: true  # Change to false once you have tests
+    test:
+        name: Test Backend
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: ./backend
 
-  deploy:
-    name: Deploy to Render
-    needs: test
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./backend
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '24.11.0'
-          cache: 'npm'
-          cache-dependency-path: backend/package-lock.json
-      
-      - name: Install dependencies
-        run: npm ci
-      
-      - name: Build
-        run: npm run build
-      
-      - name: Trigger Render Deploy
-        run: |
-          curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Install pnpm
+              uses: pnpm/action-setup@v3
+              with:
+                  version: 10.32.1 # Or your specific pnpm version
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '24.14.0'
+                  cache: 'pnpm'
+                  cache-dependency-path: backend/pnpm-lock.yaml
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Type check
+              run: pnpm exec tsc --noEmit
+
+            - name: Run tests
+              run: pnpm test
+              continue-on-error: true
+
+    deploy:
+        name: Deploy to Render
+        needs: test
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: ./backend
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Install pnpm
+              uses: pnpm/action-setup@v3
+              with:
+                  version: 10.32.1
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '24.11.0'
+                  cache: 'pnpm'
+                  cache-dependency-path: backend/pnpm-lock.yaml
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Build
+              run: pnpm run build
+
+            - name: Trigger Render Deploy
+              run: |
+                  curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
