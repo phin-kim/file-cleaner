@@ -32,20 +32,20 @@ function createLogger(_name: string) {
     ) => {
         const rid = options?.requestId ?? crypto.randomUUID().slice(0, 8);
         const ctx = options?.context ? `[${options.context}]` : '';
+        const colors = {
+            error: chalk.redBright,
+            warn: chalk.yellow,
+            highlight: chalk.cyanBright,
+            debug: chalk.blue, // Now setting debug to blue as requested
+            info: chalk.white,
+        };
+        const colorFn = colors[level] || chalk.gray;
         return [
-            `[${timestamp()}]`,
-            `[${rid}]`,
-            ctx,
-            chalk[
-                level === 'error'
-                    ? 'bgRedBright'
-                    : level === 'warn'
-                      ? 'yellow'
-                      : level === 'highlight'
-                        ? 'bgCyanBright'
-                        : 'gray'
-            ](level.toUpperCase()),
-            message,
+            chalk.gray(`[${timestamp()}]`), // Keep timestamps subtle
+            chalk.gray(`[${rid}]`),
+            chalk.magenta(ctx), // Context in a distinct color
+            chalk.bold(level.toUpperCase()), // The Level Tag
+            colorFn(message), // THE FIX: The message itself is now colored
             options?.data ? JSON.stringify(options.data, null, 2) : '',
         ]
             .filter(Boolean)
