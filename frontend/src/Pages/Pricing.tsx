@@ -9,11 +9,24 @@ import {
 } from 'react-icons/fa6';
 import { useTransactions } from '../Store/TransactionStore';
 import { useNavigate } from 'react-router-dom';
+import authApi from '../library/authApi';
+import createClientLogger from '../utils/clientLogger';
+import useSuccessStore from '../Store/SuccessStore';
+import PaystackPop from '@paystack/inline-js';
+import handleApiError from '../utils/apiError';
+import useErrorStore from '../Store/ErrorStore';
+import { useAuthStore } from '../Store/authStore';
+const log = createClientLogger('Pricing.tsx');
 //selected tier and the amount are what cary everything i need
 const Pricing: React.FC = () => {
     const [isQuarterly, setIsQuarterly] = useState(false);
-
+    const [processingTierId, setProcessingTierId] = useState<string | null>(
+        null
+    );
     // Use separate selectors instead of creating a new object every render
+    const setSuccess = useSuccessStore((state) => state.setSuccess);
+    const setError = useErrorStore((state) => state.setError);
+    const currentUser = useAuthStore((state) => state.user);
     const selectedPeriod = useTransactions((state) => state.selectedPeriod);
     //const amount = useTransactions((state) => state.amount);
     const selectedTier = useTransactions((state) => state.tier);
@@ -21,6 +34,7 @@ const Pricing: React.FC = () => {
         (state) => state.setSelectedPeriod
     );
     const setAmount = useTransactions((state) => state.setAmount);
+    const amount = useTransactions((state) => state.amount);
     const setTier = useTransactions((state) => state.setTier);
     const navigate = useNavigate();
     const tiers = [
@@ -82,19 +96,55 @@ const Pricing: React.FC = () => {
             setSelectedPeriod('monthly');
         }
     };
-    const handleTier = (tierId: string) => {
+    const handleTier = async (tierId: string) => {
         const selected = tiers.find((t) => t.id === tierId);
-        if (selected) {
-            setTier(selected);
-            // Use local isQuarterly state instead of selectedPeriod to avoid stale state
-            if (isQuarterly) {
-                setSelectedPeriod('3 months');
-                setAmount(selected.quarterlyPrice ?? 0);
-            } else {
-                setSelectedPeriod('monthly');
-                setAmount(selected.monthlyPrice ?? 0);
+        const email = currentUser?.email;
+
+        if (!selected && !currentUser) return;
+        const currentPeriod = isQuarterly ? '3 months' : 'monthly';
+        const currentAmount = isQuarterly
+            ? (selected?.quarterlyPrice ?? 0)
+            : (selected?.monthlyPrice ?? 0);
+
+        //setTier(selected);
+        // Use local isQuarterly state instead of selectedPeriod to avoid stale state
+
+        try {
+            setProcessingTierId(tierId);
+            setError('');
+            const paystackResponse = await authApi.post(
+                '/payment/initialize-payment',
+                {
+                    amount: currentAmount,
+                    email,
+                    currency: 'KES',
+                    metadata: {
+                        period: currentPeriod,
+                        tierId: selectedTier?.id,
+                        tierName: selectedTier?.name,
+                        paymentMethod: 'mpesa',
+                    },
+                }
+            );
+            const paystackData = paystackResponse.data;
+            if (paystackData.status) {
+                setSuccess(paystackData.message);
             }
-            navigate('/pricing/billing');
+            log.info('This is the paystack response  ', {
+                data: { paystackData },
+            });
+            const paystack = new PaystackPop();
+            paystack.resumeTransaction(paystackData.data.access_code);
+            log.info('Response from the paystack api', {
+                data: paystackData,
+            });
+        } catch (error) {
+            log.error('This is the error from the backend', {
+                data: { error },
+            });
+            handleApiError(error, setError);
+        } finally {
+            setProcessingTierId(null);
         }
     };
 
@@ -242,13 +292,24 @@ const Pricing: React.FC = () => {
 
                         <button
                             onClick={() => handleTier(tier.id)}
+                            disabled={processingTierId !== null}
                             className={`mt-10 block w-full rounded-2xl px-6 py-4 text-center text-sm font-bold transition-all ${
                                 tier.highlight
                                     ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/30 hover:bg-purple-700'
                                     : 'bg-white/10 text-white hover:bg-white/20'
                             }`}
                         >
-                            Get Started
+                            {processingTierId === tier.id ? (
+                                <>
+                                    <div className="absolute top-5 left-20 h-6 w-6 animate-spin rounded-full border-b-2 border-white" />
+
+                                    <span>Processing Securely...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <span>Get started</span>
+                                </>
+                            )}
                         </button>
                     </motion.div>
                 ))}

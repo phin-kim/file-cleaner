@@ -64,7 +64,7 @@ const TransactionsSchema = new Schema<Transaction_Type>(
         },
         phoneNumberHash: {
             type: String,
-            required: true,
+            //required: true,
         },
         metadata: { type: MetadataSchema },
         amount: {

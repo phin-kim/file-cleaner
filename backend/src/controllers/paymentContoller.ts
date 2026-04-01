@@ -25,11 +25,11 @@ export async function mpesaPayment(
 ) {
     const authReq = req as AuthenticatedRequest;
     const userId = authReq?.user?.uid;
-    const { amount, phoneNumber, email, metadata, currency } = req.body;
+    const { amount, email, metadata } = req.body;
 
-    if (!amount) {
+    /*if (!amount) {
         log.error('Amount is missing ');
-        return next(AppError.badRequest('AMount field is necessary'));
+        return next(AppError.badRequest('Amount field is necessary'));
     }
     if (!email) {
         log.error('Email is missing ');
@@ -38,16 +38,18 @@ export async function mpesaPayment(
     if (!phoneNumber) {
         log.error('Phone number is missing');
         return next(AppError.badRequest('Phone number  is necessary'));
-    }
+    }*/
     log.info('What email is being passed ', { data: email });
     const user = await UserModel.findOne({ email });
     log.warn(`is the user there ${user ? 'YES' : 'NO'}`);
 
     if (!user) {
-        log.warn(`is the user there ${user ? 'YESs' : 'NOr'}`);
+        log.warn(`The user isn't there for email : ${email}`);
         return next(new AppError(`${email} not found`, 404, 'NotFound'));
     }
-    if (!/^\+254[0-9]{9}$/.test(phoneNumber)) {
+    const reference = 'MPESA_' + crypto.randomUUID();
+
+    /*if (!/^\+254[0-9]{9}$/.test(phoneNumber)) {
         log.error('Invalid phone number format after formatting', {
             data: {
                 original: phoneNumber,
@@ -59,16 +61,15 @@ export async function mpesaPayment(
             )
         );
     }
-    const reference = 'MPESA_' + crypto.randomUUID();
     //check the mode that we are currently in to apply the correct phone number
     let formattedPhone = phoneNumber
         .toString()
-        .replace(/\s/g, '') // Remove all spaces
-        .replace(/[^\d]/g, '') // Remove anything not a digit
+        .replace(/\s/g, '') 
+        .replace(/[^\d]/g, '') 
         .trim();
     const isTestMode = PAYSTACK_SECRET_KEY?.startsWith('sk_test_');
     if (isTestMode) {
-        //if using real numbers in test mode, replace with test number
+        
         formattedPhone = TEST_PHONE_NUMBER;
         log.info('Using M-Pesa test number for STK push', {
             data: {
@@ -85,9 +86,8 @@ export async function mpesaPayment(
         ) {
             formattedPhone = '+254' + formattedPhone;
         }
-        // Remove any double zeros
         formattedPhone = formattedPhone.replace(/^2540+/, '+254');
-    }
+    }*/
 
     //this is the create charge api
 
@@ -107,7 +107,7 @@ export async function mpesaPayment(
             provider: 'mpesa',
         },*/
     };
-    const phoneNumberHash = hashPhoneNumber(formattedPhone);
+    //const phoneNumberHash = hashPhoneNumber(formattedPhone);
     log.info('Sending M-Pesa payment request to paystack', { data: payload });
     log.info('=== INFO PAYLOAD ===');
     /*log.info(
@@ -120,7 +120,7 @@ export async function mpesaPayment(
     log.info('Full payload:', {
         data: { payload: JSON.stringify(payload, null, 2) },
     });
-    log.info(`Is test mode:${isTestMode}`);
+    //log.info(`Is test mode:${isTestMode}`);
     log.info(`Key prefix: ${PAYSTACK_SECRET_KEY?.substring(0, 8)}`);
     log.info(`Checking the api key ${PAYSTACK_SECRET_KEY}`);
     log.info('===================');
@@ -148,7 +148,7 @@ export async function mpesaPayment(
                 userId,
                 amount,
                 email,
-                phoneNumberHash,
+                //phoneNumberHash,
                 status: 'pending',
                 reference,
                 //commented out coz of the shape of the response
@@ -204,7 +204,7 @@ export async function mpesaPayment(
                         headers: error.response.headers,
                     },
                 });
-                // Special handling for test mode phone number error
+                /*Special handling for test mode phone number error
                 if (
                     isTestMode &&
                     error.response.data?.data?.message?.includes(
@@ -216,7 +216,7 @@ export async function mpesaPayment(
                             `In test mode, please use Paystack test numbers: ${TEST_PHONE_NUMBER}`
                         )
                     );
-                }
+                }*/
                 //extract meaning full error message from paystack response
                 const paystackErrorMessage =
                     error.response.data?.data?.message ||
