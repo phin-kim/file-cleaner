@@ -4,11 +4,11 @@
     "version": "0.0.0",
     "type": "module",
     "scripts": {
-        "dev": "nodemon --ignore 'backend/temp/**' --ignore 'uploads/**' --ignore '**/temp/**' --watch 'src' --exec tsx src/App.ts",
+        "clean": "nodemon --ignore 'backend/temp/**' --ignore 'uploads/**' --ignore '**/temp/**' --watch 'src' --exec tsx src/App.ts",
         "build": "tsc ",
         "lint": "eslint .",
         "ignore": "temp/**/*|uploads/**/*|backend/temp/**/*|",
-        "clean": "cross-env NODE_ENV=development tsx src/App.ts",
+        "dev": "cross-env NODE_ENV=development tsx src/App.ts",
         "build:backend": "tsc -b ../tsconfig.node.json --force",
         "start": " node  dist/App.js"
     },

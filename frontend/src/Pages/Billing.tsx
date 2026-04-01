@@ -2,6 +2,7 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
+import PaystackPop from '@paystack/inline-js';
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -16,6 +17,7 @@ import { paystackApi } from '../library/client';
 import handleApiError from '../utils/apiError';
 import createClientLogger from '../utils/clientLogger';
 import useSuccessStore from '../Store/SuccessStore';
+import authApi from '../library/authApi';
 const log = createClientLogger('Billing.tsx');
 
 export default function Billing() {
@@ -102,7 +104,7 @@ export default function Billing() {
             `This is the phone number to send to the backend ${phoneToSend}`
         );
         try {
-            const paystackResponse = await paystackApi.post(
+            const paystackResponse = await authApi.post(
                 '/payment/initialize-payment',
                 {
                     amount,
@@ -121,6 +123,11 @@ export default function Billing() {
             if (paystackData.status) {
                 setSuccess(paystackData.message);
             }
+            log.info('This is the paystack response shape ', {
+                data: { paystackData },
+            });
+            const paystack = new PaystackPop();
+            paystack.resumeTransaction(paystackData.data.access_code);
             log.info('Response from the paystack api', {
                 data: paystackData,
             });

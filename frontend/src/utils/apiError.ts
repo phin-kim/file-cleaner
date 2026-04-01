@@ -30,6 +30,7 @@ const handleApiError = (
     //handle custom rejected objects(e.g. from interceptors)
     if (typeof error === 'object' && error !== null && 'message' in error) {
         setError((error as { message: string }).message);
+
         return;
     }
     //native js errors

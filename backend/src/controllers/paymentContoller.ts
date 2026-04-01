@@ -91,32 +91,32 @@ export async function mpesaPayment(
 
     //this is the create charge api
 
-    const url = 'https://api.paystack.co/charge';
+    const url = 'https://api.paystack.co/transaction/initialize';
     const payload = {
         amount: amount * 100,
         email: email,
-        currency: currency || 'KES',
+        currency: 'KES',
         reference: reference,
         metadata: {
             ...metadata,
             userId: userId,
             project: 'tidy-up',
         },
-        mobile_money: {
+        /*mobile_money: {
             phone: formattedPhone,
             provider: 'mpesa',
-        },
+        },*/
     };
     const phoneNumberHash = hashPhoneNumber(formattedPhone);
     log.info('Sending M-Pesa payment request to paystack', { data: payload });
     log.info('=== INFO PAYLOAD ===');
-    log.info(
+    /*log.info(
         `Phone number being sent:${JSON.stringify(payload.mobile_money.phone)}`
     );
     log.info('Phone number length:', payload.mobile_money.phone.length);
     log.info('Phone number regex test:', {
         data: { number: /^254[0-9]{9}$/.test(payload.mobile_money.phone) },
-    });
+    });*/
     log.info('Full payload:', {
         data: { payload: JSON.stringify(payload, null, 2) },
     });
@@ -139,7 +139,10 @@ export async function mpesaPayment(
             },
         });
         //check if the charge was created successfully
-        const paystackMetadata = paystackResponse.data.data.metadata;
+        const paystackAccessToken = paystackResponse.data.data.access_code;
+        log.debug('This is the paystack accessToken', {
+            data: { paystackAccessToken },
+        });
         if (paystackResponse.data.status) {
             await TransactionsModel.create({
                 userId,
@@ -148,14 +151,14 @@ export async function mpesaPayment(
                 phoneNumberHash,
                 status: 'pending',
                 reference,
-
-                paystackReference: paystackResponse.data.data.reference,
+                //commented out coz of the shape of the response
+                /*paystackReference: paystackResponse.data.data.reference,
                 metadata: {
                     period: paystackMetadata.period,
                     paymentMethod: paystackMetadata.paymentMethod,
                     tierName: paystackMetadata.tierName, // Ensure these match schema keys
                     tierId: paystackMetadata.tierId,
-                },
+                },*/
                 project: 'tidy-up',
                 provider: 'mpesa',
                 createdAt: new Date(),
@@ -163,17 +166,19 @@ export async function mpesaPayment(
 
             //Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
             //pesa returns a pending state until the user has verified using their pin
-            res.json({
-                status: true,
-                message:
-                    'Please complete authorization process on your mobile phone',
-                data: {
-                    reference: reference,
-                    paystackReference: paystackResponse.data.data.reference,
-                    amount: amount,
-                    phoneNumber: phoneNumber,
-                },
-            });
+            if (paystackResponse.data.status === true) {
+                res.json({
+                    status: true,
+                    message:
+                        'Please complete authorization process on your mobile phone',
+                    data: {
+                        reference: reference,
+                        paystackReference: paystackResponse.data.data.reference,
+                        amount: amount,
+                        access_code: paystackAccessToken,
+                    },
+                });
+            }
         } else {
             log.error('Paystack returned error status', {
                 data: {

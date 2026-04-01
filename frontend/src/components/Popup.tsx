@@ -3,7 +3,6 @@ import { Crown, X } from 'lucide-react';
 import { CheckCircle, Sparkles, Download, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { subscriptionApi } from '../library/client';
-import PaystackPop from '@paystack/inline-js';
 import createClientLogger from '../utils/clientLogger';
 const log = createClientLogger('Popup component');
 type SuccessPopupProps = {
@@ -218,12 +217,5 @@ export const UpgradeModal = ({ onClose }: { onClose: () => void }) => {
                 </motion.div>
             </>
         </AnimatePresence>
-    );
-};
-export const PaymentMOdal = () => {
-    return (
-        <div>
-            <h2></h2>
-        </div>
     );
 };
