@@ -9,6 +9,8 @@ import createLogger from '../utils/logger.js';
 import { fileURLToPath } from 'url';
 import { TIER_CONFIG } from '../config/tiers.js';
 import AppError from '../utils/appError.js';
+import { UserModel, type Subscription_Period } from '../schema/UsersSchema.js';
+import { sendEmailAlert } from '../utils/sendEmail.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const log = createLogger('Merge route');
@@ -36,6 +38,7 @@ mergerRoute.post(
     async (req, res, next) => {
         try {
             const tierId = req.query.tierId as keyof typeof TIER_CONFIG;
+
             const isWorkSheet = req.query.isWorkSheet === 'true';
             const CAN_MERGE = TIER_CONFIG[tierId].canMerge;
             if (!CAN_MERGE) {
@@ -47,6 +50,11 @@ mergerRoute.post(
                     )
                 );
             }
+            const EXPIRED = await sendEmailAlert(req);
+            if (EXPIRED) {
+                return res.status(503).json({ expired: true });
+            }
+
             const folderName = req.body.folderName;
             if (!folderName) {
                 return res.status(400).json({ error: 'Folder is required' });

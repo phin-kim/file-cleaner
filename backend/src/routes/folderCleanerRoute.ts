@@ -12,6 +12,7 @@ import AppError from '../utils/appError.js';
 import asyncHandler from '../middleware/asyncHandler.js';
 import uploadLimiter from '../utils/rateLimiter.js';
 import { TIER_CONFIG } from '../config/tiers.js';
+import { sendEmailAlert } from '../utils/sendEmail.js';
 import {
     organizeByExtension,
     type ExtensionStats,
@@ -86,11 +87,11 @@ NB:THIS IS WRONG and it caused a server crash ie the server stopped working
     )
 */
 //let MAX_UPLOADS: number = TIER_CONFIG.free.maxUploads;
-const handleUploadErrors = (
+function handleUploadErrors(
     req: Request,
     res: Response,
     next: NextFunction
-): void => {
+): void {
     /**
      * determining the tier id (Ideally from he auth middleware of the decoded user)
      * I was to sed it via the body but since multer runs prior even b4 the body is loaded, we have to use query parameter
@@ -258,7 +259,7 @@ const handleUploadErrors = (
         }
         next();
     });
-};
+}
 const folderCleanerBaseDir = path.join(
     projectRoot,
     'output/folder-cleaner-temps'
@@ -305,7 +306,10 @@ cleanerRoute.post(
         const CAN_ORGANIZE = TIER_CONFIG[tierId].canOrganize;
         const uploadedFiles = req.files as Express.Multer.File[];
         const uploadedFolderName = req.body.folderName; //fallback
-
+        const EXPIRED = await sendEmailAlert(req);
+        if (EXPIRED) {
+            return res.status(503).json({ expired: true });
+        }
         //const tierId = (req.query.tierId as keyof typeof TIER_CONFIG) || 'free';
 
         //MAX_UPLOADS = TIER_CONFIG[tierId].maxUploads;

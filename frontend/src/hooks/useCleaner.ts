@@ -30,6 +30,7 @@ export default function useCleaner() {
     const [upgradeModal, setUpgradeModal] = useState(false);
     const [result, setResult] = useState<AnalysisResult | null>(null);
     const [progress, setProgress] = useState(0);
+    const [isExpired, setIsExpired] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const tierId = useTierStore((state) => state.tierId);
@@ -116,13 +117,18 @@ export default function useCleaner() {
             log.info('Sending files to backend');
             log.debug(`form data ${formData}`);
             log.warn(`file count${fileArray.length}`);
+            const storage = localStorage.getItem('auth-storage');
+            if (!storage) return;
+            const parsed = JSON.parse(storage);
+            const userId = parsed.state.user.id;
             const response = await fileCleanerApi.post(
-                `/${path}?tierId=${tierId}`,
+                `/${path}?tierId=${tierId}&userId=${userId}&isWorkSheet=${isWorkSheet}`,
                 formData,
                 {
                     headers: { 'Content-Type': 'multipart/form-data' },
                 }
             );
+
             /*if (response.data.subscription) {
                 log.info(
                     `Checking if the subscription is there ${response.data.subscription ? 'yes' : 'no'}`
@@ -131,6 +137,9 @@ export default function useCleaner() {
                 setStatus('idle');
                 return;
             }*/
+            if (response.data.expired) {
+                setIsExpired(true);
+            }
             log.highlight(
                 `[FRONTEND] backend responded in ${Date.now() - start}ms`
             );
@@ -248,13 +257,24 @@ export default function useCleaner() {
 
             const start = Date.now();
             console.log(`[FRONTEND] sending files to backend`);
+            const storage = localStorage.getItem('auth-storage');
+            if (!storage) return;
+            const parsed = JSON.parse(storage);
+            const userId = parsed.state.user.id;
+
             const response = await fileCleanerApi.post(
-                `/${path}?tierId=${tierId}&isWorkSheet=${isWorkSheet}`,
+                `/${path}?tierId=${tierId}&isWorkSheet=${isWorkSheet}&userId=${userId}`,
                 formData,
                 {
                     headers: { 'Content-Type': 'multipart/form-data' },
                 }
             );
+            if (response.data.expired) {
+                log.debug(
+                    `Is expired sent from the backend ${response.data.isExpired ? 'YES' : 'NO'}`
+                );
+                setIsExpired(true);
+            }
 
             log.highlight(
                 `[FRONTEND] backend responded in ${Date.now() - start}ms`
@@ -345,6 +365,8 @@ export default function useCleaner() {
         fileInputRef,
         upgradeModal,
         isWorkSheet,
+        isExpired,
+        setIsExpired,
         setUpgradeModal,
         setIsWorkSheet,
         handleFolderInputChange,

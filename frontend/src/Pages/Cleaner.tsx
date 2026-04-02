@@ -11,18 +11,19 @@ import {
     MousePointerClick,
 } from 'lucide-react';
 import useCleaner from '../hooks/useCleaner';
-import SuccessPopup, { UpgradeModal } from '../components/Popup';
+import { UpgradeModal, SuccessPopup } from '../components/Popup';
 import BreakdownPie from '../components/FilePie';
 import { useGeneralStore } from '../Store/generalStore';
 import { TIER_CONFIG } from '../library/tier';
 import { useTierStore } from '../Store/tierStore';
-
+import { SubscriptionExpiredModal } from '../components/Popup';
 export default function FolderCleanerUI() {
     const {
         isDragging,
         uploadedFolder,
         status,
-
+        isExpired,
+        setIsExpired,
         openPopup,
         upgradeModal,
         setUpgradeModal,
@@ -353,6 +354,11 @@ export default function FolderCleanerUI() {
                     )}
                     {upgradeModal && (
                         <UpgradeModal onClose={() => setUpgradeModal(false)} />
+                    )}
+                    {isExpired && (
+                        <SubscriptionExpiredModal
+                            onClose={() => setIsExpired(false)}
+                        />
                     )}
                 </AnimatePresence>
 

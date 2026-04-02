@@ -38,6 +38,9 @@ export async function paystackWebhook(
                 },
             });
             const verification = await verifyTransaction(reference, next);
+            log.debug('The response from verification', {
+                data: { verification },
+            });
             if (
                 !verification?.status &&
                 verification?.data.status !== 'success'
@@ -51,8 +54,11 @@ export async function paystackWebhook(
                     }
                 );
             } else {
+                log.debug(
+                    'Debug check to see if the data base is being updated'
+                );
                 await TransactionsModel.findOneAndUpdate(
-                    { paystackReference: reference },
+                    { reference: reference },
                     {
                         $set: { status: 'success' },
                     },

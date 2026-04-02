@@ -9,7 +9,7 @@ import {
     CheckCircle2,
     MousePointerClick,
 } from 'lucide-react';
-import { UpgradeModal } from '../components/Popup';
+import { SubscriptionExpiredModal, UpgradeModal } from '../components/Popup';
 const FolderQuestionAnalyzer = () => {
     const {
         handleDrop,
@@ -20,6 +20,8 @@ const FolderQuestionAnalyzer = () => {
         fileInputRef,
         setUpgradeModal,
         upgradeModal,
+        isExpired,
+        setIsExpired,
         isWorkSheet,
         setIsWorkSheet,
         handleFolderInputChange,
@@ -271,6 +273,11 @@ const FolderQuestionAnalyzer = () => {
                 </div>
                 {upgradeModal && (
                     <UpgradeModal onClose={() => setUpgradeModal(false)} />
+                )}
+                {isExpired && (
+                    <SubscriptionExpiredModal
+                        onClose={() => setIsExpired(false)}
+                    />
                 )}
                 {/* Footer */}
                 <motion.p

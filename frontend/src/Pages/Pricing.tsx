@@ -100,13 +100,13 @@ const Pricing: React.FC = () => {
         const selected = tiers.find((t) => t.id === tierId);
         const email = currentUser?.email;
 
-        if (!selected && !currentUser) return;
+        if (!selected || !currentUser) return;
         const currentPeriod = isQuarterly ? '3 months' : 'monthly';
         const currentAmount = isQuarterly
             ? (selected?.quarterlyPrice ?? 0)
             : (selected?.monthlyPrice ?? 0);
 
-        //setTier(selected);
+        setTier(selected);
         // Use local isQuarterly state instead of selectedPeriod to avoid stale state
 
         try {
@@ -120,8 +120,9 @@ const Pricing: React.FC = () => {
                     currency: 'KES',
                     metadata: {
                         period: currentPeriod,
-                        tierId: selectedTier?.id,
-                        tierName: selectedTier?.name,
+                        tierId: selected?.id,
+                        tierName: selected?.name,
+
                         paymentMethod: 'mpesa',
                     },
                 }

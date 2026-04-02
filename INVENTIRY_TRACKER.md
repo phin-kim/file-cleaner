@@ -10,5 +10,15 @@
 - mobile money for new inventory tracking
 - barcode/ qr reader
 - manage multiple locations
-- - # Notifications on low alert via email
-- - # taking goods on credit
+-   - # Notifications on low alert via email
+-   - # taking goods on credit
+        water refil can fill in one shop details and then separate
+- multiple shops diffrent managrs same source of truth
+- Each shop profit and then totla profit for all the shops
+- bar code reader gets the product details update inventory , scans, ad display on screen and price the business owner inputs price
+- invoicing
+- connecting with outher business apps
+- store front
+- Biz flow
+- BizOO/BizOps/BizO
+- Apex
