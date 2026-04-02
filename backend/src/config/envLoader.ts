@@ -3,7 +3,8 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs-extra';
-
+import createLogger from '../utils/logger.js';
+const log = createLogger('EnvLoader.ts');
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -17,9 +18,9 @@ const possiblePaths = [
 
 let loaded = false;
 for (const envPath of possiblePaths) {
-    console.log('Checking for .env at:', envPath);
+    log.info('Checking for .env at:', { data: { envPath } });
     if (fs.existsSync(envPath)) {
-        console.log('✅ Found .env at:', envPath);
+        log.info('✅ Found .env at:', { data: { envPath } });
         dotenv.config({ path: envPath });
         loaded = true;
         break;
@@ -27,26 +28,28 @@ for (const envPath of possiblePaths) {
 }
 
 if (!loaded) {
-    console.error(
-        '❌ No .env file found in any of these locations:',
-        possiblePaths
-    );
+    log.error('❌ No .env file found in any of these locations:', {
+        data: { possiblePaths },
+    });
 }
 
 // Debug: Check what variables are available
-console.log('📋 Environment variables loaded:');
-console.log(
-    'GEMINI_API_KEY:',
-    process.env.GEMINI_API_KEY ? '✅ Set' : '❌ Missing'
+log.debug('📋 Environment variables loaded:');
+log.debug(
+    `GEMINI_API_KEY:,
+    ${process.env.GEMINI_API_KEY ? '✅ Set' : '❌ Missing'}`
 );
-console.log('HF_API_KEY:', process.env.HF_API_KEY ? '✅ Set' : '❌ Missing');
-console.log(
-    'PAYSTACK_SECRET_KEY:',
-    process.env.PAYSTACK_SECRET_KEY ? '✅ Set' : '❌ Missing'
+log.debug(`HF_API_KEY: ${process.env.HF_API_KEY ? '✅ Set' : '❌ Missing'}`);
+log.debug(
+    `PAYSTACK_SECRET_KEY:,
+    ${process.env.PAYSTACK_SECRET_KEY ? '✅ Set' : '❌ Missing'}`
 );
-console.log(
-    'COOKIE_SECRET:',
-    process.env.COOKIE_SECRET ? '✅ Set' : '❌ Missing'
+log.debug(
+    `COOKIE_SECRET:,
+    ${process.env.COOKIE_SECRET ? '✅ Set' : '❌ Missing'}`
+);
+log.debug(
+    `BREVO_API_KEY:, ${process.env.BREVO_API_KEY ? '✅ Set' : '❌ Missing'}`
 );
 
 // Export the keys with fallbacks
@@ -55,24 +58,27 @@ export const GEMINI_API_KEY =
 export const HF_API_KEY = process.env.HF_API_KEY;
 export const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
 export const COOKIE_SECRET = process.env.COOKIE_SECRET;
+export const BREVO_API_KEY = process.env.BREVO_API_KEY;
 
 // Validate required keys
 if (!GEMINI_API_KEY) {
-    console.error(
-        '❌ GEMINI_API_KEY or GOOGLE_API_KEY is required in .env file'
-    );
+    log.error('❌ GEMINI_API_KEY or GOOGLE_API_KEY is required in .env file');
+    process.exit(1);
+}
+if (!BREVO_API_KEY) {
+    log.error('❌ BREVO_API_KEY  is required in .env file');
     process.exit(1);
 }
 
 if (!HF_API_KEY) {
-    console.error('❌ HF_API_KEY is required in .env file');
+    log.error('❌ HF_API_KEY is required in .env file');
     process.exit(1);
 }
 if (!PAYSTACK_SECRET_KEY) {
-    console.error('❌ PAYSTACK_SECRET_KEY is required in .env file');
+    log.error('❌ PAYSTACK_SECRET_KEY is required in .env file');
     process.exit(1);
 }
 if (!COOKIE_SECRET) {
-    console.error('❌ COOKIE_SECRET is required in .env file');
+    log.error('❌ COOKIE_SECRET is required in .env file');
     process.exit(1);
 }

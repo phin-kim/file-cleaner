@@ -9,7 +9,7 @@ import createLogger from '../utils/logger.js';
 import { fileURLToPath } from 'url';
 import { TIER_CONFIG } from '../config/tiers.js';
 import AppError from '../utils/appError.js';
-import { UserModel, type Subscription_Period } from '../schema/UsersSchema.js';
+
 import { sendEmailAlert } from '../utils/sendEmail.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -50,9 +50,12 @@ mergerRoute.post(
                     )
                 );
             }
-            const EXPIRED = await sendEmailAlert(req);
-            if (EXPIRED) {
-                return res.status(503).json({ expired: true });
+            const subscriptionStatus = await sendEmailAlert(req);
+            log.highlight('This is the subscription status', {
+                data: { subscriptionStatus },
+            });
+            if (subscriptionStatus?.expired) {
+                return res.status(403).json({ expired: true });
             }
 
             const folderName = req.body.folderName;

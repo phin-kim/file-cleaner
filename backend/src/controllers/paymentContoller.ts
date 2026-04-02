@@ -13,10 +13,8 @@ import axios from 'axios';
 import AppError from '../utils/appError';
 import type { AuthenticatedRequest } from '../Types/authenticate';
 import { TransactionsModel } from '../schema/TransactionSchema';
-import { hashPhoneNumber } from '../utils/hashes';
 import { UserModel } from '../schema/UsersSchema';
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
-const TEST_PHONE_NUMBER = '+254710000000';
 const log = createLogger('Payment.ts');
 export async function mpesaPayment(
     req: Request,

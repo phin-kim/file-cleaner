@@ -1,13 +1,21 @@
-import type { Response, Request } from 'express';
+import type { Request } from 'express';
 import { UserModel } from '../schema/UsersSchema';
 import type { Subscription_Period } from '../schema/UsersSchema';
 import axios from 'axios';
 import AppError from './appError';
+import createLogger from './logger';
+const log = createLogger('sendEmailAlert.ts');
 const BREVO_API_KEY = process.env.BREVO_API_KEY;
 if (!BREVO_API_KEY) {
     throw AppError.badRequest('Brevo api key is missing');
 }
-export async function sendEmailAlert(req: Request) {
+interface SendEmailResponse {
+    expired: boolean;
+    message: string;
+}
+export async function sendEmailAlert(
+    req: Request
+): Promise<SendEmailResponse | undefined> {
     const userId = req.query.userId;
     const user = await UserModel.findById(userId);
     const userEmail = user?.email;
@@ -17,19 +25,30 @@ export async function sendEmailAlert(req: Request) {
     const lastPaymentDate = user?.['last-payment-date'];
 
     const now = new Date().getTime();
-    const MONTHLY_LIMIT = 30 * 24 * 60 * 60 * 1000;
-    const THREE_MONTH_LIMIT = 90 * 24 * 60 * 60 * 1000;
+    const MONTHLY_LIMIT = 2 * 24 * 60 * 60 * 1000; //test for 2 days to see if the email wll be sent
+    const THREE_MONTH_LIMIT = 2 * 24 * 60 * 60 * 1000;
 
     if (lastPaymentDate && userSubscriptionPeriod) {
         const paymentTime = new Date(lastPaymentDate).getTime();
         const timeElapsed = now - paymentTime;
         const currentLimit =
             userSubscriptionPeriod ===
-            ('monthly ' as unknown as Subscription_Period)
+            ('monthly' as unknown as Subscription_Period)
                 ? MONTHLY_LIMIT
                 : THREE_MONTH_LIMIT;
         if (timeElapsed > currentLimit) {
             //update ui to show subscription expired
+            await UserModel.findByIdAndUpdate(
+                userId,
+                {
+                    $set: { 'subscription-status': 'suspended' },
+                },
+                { returnDocument: 'after', runValidators: true }
+            );
+            log.debug(
+                'This is what is supposed to be sent over to the routes',
+                { data: { expired: true, message: 'Subscription expired' } }
+            );
             return {
                 expired: true,
                 message: 'Subscription expired',
@@ -39,13 +58,16 @@ export async function sendEmailAlert(req: Request) {
                 0,
                 Math.ceil((currentLimit - timeElapsed) / (24 * 60 * 60 * 1000))
             );
-            if (daysRemaining === 2) {
+            log.highlight(
+                `THis are the days remaining for ${userEmail}: ${daysRemaining}`
+            );
+            if (daysRemaining <= 2) {
                 try {
                     await axios.post(
                         'https://api.brevo.com/v3/smtp/email',
                         {
                             to: [{ email: userEmail }],
-                            TEMPLATE_ID,
+                            templateId: TEMPLATE_ID,
                             params: {
                                 daysRemaining,
                                 adminName: 'Phinehas Njuguna',
@@ -65,7 +87,7 @@ export async function sendEmailAlert(req: Request) {
                         'https://api.brevo.com/v3/smtp/email',
                         {
                             to: [{ email: 'phinjugushdev@gmail.com' }],
-                            ADMIN_TEMPLATE_ID,
+                            templateId: ADMIN_TEMPLATE_ID,
                             params: {
                                 subject: `Email alert fail for ${userEmail}`,
                                 timestamp: new Date().toLocaleDateString(),
@@ -83,7 +105,14 @@ export async function sendEmailAlert(req: Request) {
                     );
                 }
             }
-            //set up an email to remind the users of their time elapse
+            return {
+                expired: false,
+                message: 'Subscription active',
+            };
         }
     }
+    return {
+        expired: false,
+        message: 'No subscription data',
+    };
 }

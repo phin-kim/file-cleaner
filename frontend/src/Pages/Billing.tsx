@@ -13,7 +13,6 @@ import { useTransactions } from '../Store/TransactionStore';
 import { useNavigate } from 'react-router-dom';
 import type { PaymentMethod } from '../types/transactions';
 import useErrorStore from '../Store/ErrorStore';
-import { paystackApi } from '../library/client';
 import handleApiError from '../utils/apiError';
 import createClientLogger from '../utils/clientLogger';
 import useSuccessStore from '../Store/SuccessStore';

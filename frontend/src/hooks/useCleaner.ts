@@ -12,10 +12,16 @@ import { AxiosError } from 'axios';
 import { useGeneralStore } from '../Store/generalStore';
 const log = createClientLogger('UseCleaner.tsx');
 interface BackendError {
+    expired?: boolean;
     message: string;
     status: number;
     type: string;
 }
+type UnknownApiError = {
+    status?: number;
+    data?: BackendError;
+    response?: { status: number; data: BackendError };
+};
 export default function useCleaner() {
     const { setError } = useErrorStore();
     /* ---------- State ---------- */
@@ -137,9 +143,7 @@ export default function useCleaner() {
                 setStatus('idle');
                 return;
             }*/
-            if (response.data.expired) {
-                setIsExpired(true);
-            }
+
             log.highlight(
                 `[FRONTEND] backend responded in ${Date.now() - start}ms`
             );
@@ -165,8 +169,47 @@ export default function useCleaner() {
         } catch (error) {
             clearInterval(progressInterval);
             log.error('Error in processing files', { data: { error } });
+
+            let serverStatus: number | undefined;
+            let serverData: BackendError | undefined;
+
+            if (error instanceof AxiosError) {
+                serverStatus = error.response?.status || error.status;
+                serverData = error.response?.data as BackendError | undefined;
+            } else {
+                serverStatus = undefined;
+                serverData = undefined;
+            }
+
+            log.error('Error in processing files', {
+                data: { serverStatus, serverData },
+            });
+
+            // Check for both the 409 (Multer/File Count) and 503 (Tier/Subscription)
+            // 1. Handle Tier-Limited Features (503)
+            if (serverStatus === 503) {
+                setStatus('idle');
+                setProgress(0);
+                setUpgradeModal(true);
+
+                handleApiError(error, setError);
+
+                return; // Exit immediately
+            }
+
+            // 2. Handle Resource Conflicts/Limits (409)
+            if (serverStatus === 409) {
+                setStatus('idle');
+                setUpgradeModal(true);
+                handleApiError(serverData, setError);
+                return; // Exit immediately
+            }
+            if (serverStatus === 403 && serverData?.expired) {
+                setIsExpired(true);
+            }
             handleApiError(error, setError);
             setStatus('error');
+            //setStatus('processing');
             setTimeout(() => {
                 setStatus('idle');
             }, 1500);
@@ -269,6 +312,10 @@ export default function useCleaner() {
                     headers: { 'Content-Type': 'multipart/form-data' },
                 }
             );
+            const res = response.data;
+            log.debug('This is the response from my backend', {
+                data: { res },
+            });
             if (response.data.expired) {
                 log.debug(
                     `Is expired sent from the backend ${response.data.isExpired ? 'YES' : 'NO'}`
@@ -298,14 +345,42 @@ export default function useCleaner() {
         } catch (error) {
             clearInterval(progressInterval);
             log.error('Error in processing files', { data: { error } });
-            const apiError = error as AxiosError<BackendError>;
-            const serverStatus = apiError.response?.status || apiError.status;
-            const serverData = apiError.response?.data || apiError;
+
+            let serverStatus: number | undefined;
+            let serverData: BackendError | undefined;
+
+            const potentialError = error as UnknownApiError;
+
+            // Check if it has the typical Axios response structure
+            if (potentialError?.response) {
+                serverStatus = potentialError.response.status;
+                serverData = potentialError.response.data;
+                const rawData = potentialError.response?.data;
+                serverData =
+                    typeof rawData === 'string' ? JSON.parse(rawData) : rawData;
+            }
+            // Check if the error itself has a status (some middlewares do this)
+            else if (potentialError?.status) {
+                serverStatus = potentialError.status;
+                const rawData = potentialError?.data;
+                serverData =
+                    typeof rawData === 'string' ? JSON.parse(rawData) : rawData;
+            }
+
+            log.debug('Manually extracted shape:', {
+                data: { serverStatus, serverData },
+            });
 
             log.error('Error in processing files', {
                 data: { serverStatus, serverData },
             });
-
+            /*const expiredFlag = log.debug(
+                `Is the 403 error being triggered: ${serverStatus === 403 ? 'YES' : 'NO'}`
+            );*/
+            log.debug(`What is the server status code: ${serverStatus}`);
+            log.debug(
+                `Does it contain an expired flag: ${serverData?.expired ? 'YES' : 'NO'}`
+            );
             // Check for both the 409 (Multer/File Count) and 503 (Tier/Subscription)
             // 1. Handle Tier-Limited Features (503)
             if (serverStatus === 503) {
@@ -324,6 +399,9 @@ export default function useCleaner() {
                 setUpgradeModal(true);
                 handleApiError(serverData, setError);
                 return; // Exit immediately
+            }
+            if (serverStatus === 403) {
+                setIsExpired(true);
             }
             handleApiError(error, setError);
             setStatus('error');

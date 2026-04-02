@@ -306,9 +306,12 @@ cleanerRoute.post(
         const CAN_ORGANIZE = TIER_CONFIG[tierId].canOrganize;
         const uploadedFiles = req.files as Express.Multer.File[];
         const uploadedFolderName = req.body.folderName; //fallback
-        const EXPIRED = await sendEmailAlert(req);
-        if (EXPIRED) {
-            return res.status(503).json({ expired: true });
+        const subscriptionStatus = await sendEmailAlert(req);
+        log.highlight('This is the subscription status', {
+            data: { subscriptionStatus },
+        });
+        if (subscriptionStatus?.expired) {
+            return res.status(403).json({ expired: true });
         }
         //const tierId = (req.query.tierId as keyof typeof TIER_CONFIG) || 'free';
 

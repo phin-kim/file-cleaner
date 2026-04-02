@@ -34,9 +34,7 @@ const Pricing: React.FC = () => {
         (state) => state.setSelectedPeriod
     );
     const setAmount = useTransactions((state) => state.setAmount);
-    const amount = useTransactions((state) => state.amount);
     const setTier = useTransactions((state) => state.setTier);
-    const navigate = useNavigate();
     const tiers = [
         {
             id: 'tier-1',
