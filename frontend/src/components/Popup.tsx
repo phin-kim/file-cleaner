@@ -141,6 +141,7 @@ export const SuccessPopup = ({ onDownload, onClose }: SuccessPopupProps) => {
 
 export const UpgradeModal = ({ onClose }: { onClose: () => void }) => {
     const navigate = useNavigate();
+
     const handleUpgrade = () => {
         navigate('/pricing');
     };
@@ -230,10 +231,17 @@ export const UpgradeModal = ({ onClose }: { onClose: () => void }) => {
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export function SubscriptionExpiredModal({ onClose }: { onClose: () => void }) {
-    const { isExpired, setIsExpired } = useCleaner();
+export function SubscriptionExpiredModal({
+    onClose,
+    isExpired,
+}: {
+    onClose: () => void;
+    isExpired: boolean;
+}) {
+    const { setIsExpired } = useCleaner();
+    log.debug('this is being triggered');
     const navigate = useNavigate();
-
+    log.debug(`State of isExpired toggle ${isExpired}`);
     if (!isExpired) return null;
 
     const handleGoToSubscription = () => {
@@ -250,61 +258,66 @@ export function SubscriptionExpiredModal({ onClose }: { onClose: () => void }) {
 
     return (
         <AnimatePresence>
-            {isExpired && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                        className="relative w-full max-w-md overflow-hidden rounded-3xl bg-white shadow-2xl"
-                    >
-                        {/* Decorative background */}
-                        <div className="absolute top-0 left-0 h-32 w-full bg-linear-to-br from-red-500 to-rose-600 opacity-10" />
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={handleCloseButton}
+                className="fixed inset-0 z-40 bg-black/60 p-4 backdrop-blur-sm"
+            />
+            <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                className="fixed inset-0 z-51 flex items-center justify-center"
+            >
+                <div className="relative w-full max-w-md rounded-2xl bg-white shadow-2xl">
+                    {/* Decorative background */}
+                    <div className="absolute top-0 left-0 h-32 w-full bg-linear-to-br from-red-500 to-rose-600 opacity-10" />
 
-                        <div className="relative p-8 pt-12 text-center">
-                            {/* Close button */}
-                            <button
-                                onClick={() => handleCloseButton}
-                                className="absolute top-4 right-4 rounded-full p-2 transition-colors hover:bg-gray-100"
-                            >
-                                <X className="h-5 w-5 text-gray-400" />
-                            </button>
+                    <div className="relative p-8 pt-12 text-center">
+                        {/* Close button */}
+                        <button
+                            onClick={handleCloseButton}
+                            className="absolute top-4 right-4 rounded-full p-2 transition-colors hover:bg-gray-100"
+                        >
+                            <X className="h-5 w-5 text-gray-400" />
+                        </button>
 
-                            {/* Icon */}
-                            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-red-50">
-                                <AlertCircle className="h-10 w-10 text-red-500" />
-                            </div>
-
-                            {/* Content */}
-                            <h2 className="mb-2 text-2xl font-bold text-gray-900">
-                                Subscription Expired
-                            </h2>
-                            <p className="mb-8 leading-relaxed text-gray-600">
-                                Your current plan has expired. Please renew your
-                                subscription to continue using our premium
-                                cleanup features.
-                            </p>
-
-                            {/* Actions */}
-                            <div className="space-y-3">
-                                <button
-                                    onClick={handleGoToSubscription}
-                                    className="flex w-full items-center justify-center gap-2 rounded-2xl bg-red-500 py-4 font-bold text-white shadow-lg shadow-red-200 transition-all hover:bg-red-600 active:scale-95"
-                                >
-                                    Renew Subscription
-                                    <ArrowRight className="h-5 w-5" />
-                                </button>
-                                <button
-                                    onClick={() => handleDecline}
-                                    className="w-full rounded-2xl border border-gray-200 py-4 font-bold text-gray-500 transition-all hover:bg-gray-50"
-                                >
-                                    Maybe Later
-                                </button>
-                            </div>
+                        {/* Icon */}
+                        <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-red-50">
+                            <AlertCircle className="h-10 w-10 text-red-500" />
                         </div>
-                    </motion.div>
+
+                        {/* Content */}
+                        <h2 className="mb-2 text-2xl font-bold text-gray-900">
+                            Subscription Expired
+                        </h2>
+                        <p className="mb-8 leading-relaxed text-gray-600">
+                            Your current plan has expired. Please renew your
+                            subscription to continue using our premium cleanup
+                            features.
+                        </p>
+
+                        {/* Actions */}
+                        <div className="space-y-3">
+                            <button
+                                onClick={handleGoToSubscription}
+                                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-red-500 py-4 font-bold text-white shadow-lg shadow-red-200 transition-all hover:bg-red-600 active:scale-95"
+                            >
+                                Renew Subscription
+                                <ArrowRight className="h-5 w-5" />
+                            </button>
+                            <button
+                                onClick={handleDecline}
+                                className="w-full rounded-2xl border border-gray-200 py-4 font-bold text-gray-500 transition-all hover:bg-gray-50"
+                            >
+                                Maybe Later
+                            </button>
+                        </div>
+                    </div>
                 </div>
-            )}
+            </motion.div>
         </AnimatePresence>
     );
 }

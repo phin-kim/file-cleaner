@@ -16,6 +16,8 @@ import BreakdownPie from '../components/FilePie';
 import { useGeneralStore } from '../Store/generalStore';
 import { TIER_CONFIG } from '../library/tier';
 import { useTierStore } from '../Store/tierStore';
+import createClientLogger from '../utils/clientLogger';
+const log = createClientLogger('Cleaner.tsx');
 import { SubscriptionExpiredModal } from '../components/Popup';
 export default function FolderCleanerUI() {
     const {
@@ -41,6 +43,7 @@ export default function FolderCleanerUI() {
     const handleClose = () => {
         setOpenPopUp(false);
     };
+    log.debug(`State of the isexpred ${isExpired}`);
     const cleaningStats = useGeneralStore((state) => state.cleaningStats);
     const path = 'processFolder';
     const tierId = useTierStore((state) => state.tierId);
@@ -352,16 +355,17 @@ export default function FolderCleanerUI() {
                             </>
                         </AnimatePresence>
                     )}
-                    {upgradeModal && (
-                        <UpgradeModal onClose={() => setUpgradeModal(false)} />
-                    )}
-                    {isExpired && (
-                        <SubscriptionExpiredModal
-                            onClose={() => setIsExpired(false)}
-                        />
-                    )}
                 </AnimatePresence>
-
+                {upgradeModal && (
+                    <UpgradeModal onClose={() => setUpgradeModal(false)} />
+                )}
+                {isExpired && (
+                    <SubscriptionExpiredModal
+                        key={'subcription-expired-modal'}
+                        isExpired={isExpired}
+                        onClose={() => setIsExpired(false)}
+                    />
+                )}
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}

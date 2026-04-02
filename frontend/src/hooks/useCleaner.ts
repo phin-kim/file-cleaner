@@ -20,6 +20,7 @@ interface BackendError {
 type UnknownApiError = {
     status?: number;
     data?: BackendError;
+    type?: string;
     response?: { status: number; data: BackendError };
 };
 export default function useCleaner() {
@@ -379,7 +380,7 @@ export default function useCleaner() {
             );*/
             log.debug(`What is the server status code: ${serverStatus}`);
             log.debug(
-                `Does it contain an expired flag: ${serverData?.expired ? 'YES' : 'NO'}`
+                `Does it contain an expired flag: ${potentialError.type}`
             );
             // Check for both the 409 (Multer/File Count) and 503 (Tier/Subscription)
             // 1. Handle Tier-Limited Features (503)
@@ -400,8 +401,18 @@ export default function useCleaner() {
                 handleApiError(serverData, setError);
                 return; // Exit immediately
             }
-            if (serverStatus === 403) {
+            if (
+                serverStatus === 403 &&
+                potentialError?.type === 'SUBSCRIPTION_EXPIRED'
+            ) {
                 setIsExpired(true);
+                setTimeout(() => {
+                    setStatus('idle');
+                }, 1500);
+                log.debug(
+                    `Satte of isexpired immediately after being set ${isExpired}`
+                );
+                return;
             }
             handleApiError(error, setError);
             setStatus('error');

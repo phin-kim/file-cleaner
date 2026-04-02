@@ -311,7 +311,12 @@ cleanerRoute.post(
             data: { subscriptionStatus },
         });
         if (subscriptionStatus?.expired) {
-            return res.status(403).json({ expired: true });
+            return res
+                .status(403)
+                .json({
+                    type: 'SUBSCRIPTION_EXPIRED',
+                    message: 'Your subscription has expired',
+                });
         }
         //const tierId = (req.query.tierId as keyof typeof TIER_CONFIG) || 'free';
 
