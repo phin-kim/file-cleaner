@@ -89,11 +89,13 @@ export async function mpesaPayment(
 
     //this is the create charge api
 
-    const url = 'https://api.paystack.co/transaction/initialize';
+    const url = 'https://backend.payhero.co.ke/api/v2/payments';
     const payload = {
-        amount: amount * 100,
+        amount: amount,
         email: email,
         currency: 'KES',
+        phone: formattedPhone,
+        provider: 'mpesa',
         reference: reference,
         metadata: {
             ...metadata,
@@ -101,8 +103,8 @@ export async function mpesaPayment(
             project: 'tidy-up',
         },
         /*mobile_money: {
-            phone: formattedPhone,
-            provider: 'mpesa',
+           
+            
         },*/
     };
     //const phoneNumberHash = hashPhoneNumber(formattedPhone);

@@ -239,9 +239,7 @@ export function SubscriptionExpiredModal({
     isExpired: boolean;
 }) {
     const { setIsExpired } = useCleaner();
-    log.debug('this is being triggered');
     const navigate = useNavigate();
-    log.debug(`State of isExpired toggle ${isExpired}`);
     if (!isExpired) return null;
 
     const handleGoToSubscription = () => {
@@ -259,6 +257,7 @@ export function SubscriptionExpiredModal({
     return (
         <AnimatePresence>
             <motion.div
+                key="backdrop"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -266,6 +265,7 @@ export function SubscriptionExpiredModal({
                 className="fixed inset-0 z-40 bg-black/60 p-4 backdrop-blur-sm"
             />
             <motion.div
+                key="modal"
                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9, y: 20 }}

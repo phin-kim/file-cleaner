@@ -55,9 +55,11 @@ mergerRoute.post(
                 data: { subscriptionStatus },
             });
             if (subscriptionStatus?.expired) {
-                return res.status(403).json({ expired: true });
+                return res.status(403).json({
+                    type: 'SUBSCRIPTION_EXPIRED',
+                    message: 'Your subscription has expired',
+                });
             }
-
             const folderName = req.body.folderName;
             if (!folderName) {
                 return res.status(400).json({ error: 'Folder is required' });

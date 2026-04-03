@@ -13,22 +13,15 @@ import { useTransactions } from '../Store/TransactionStore';
 import { useNavigate } from 'react-router-dom';
 import type { PaymentMethod } from '../types/transactions';
 import useErrorStore from '../Store/ErrorStore';
-import handleApiError from '../utils/apiError';
-import createClientLogger from '../utils/clientLogger';
-import useSuccessStore from '../Store/SuccessStore';
-import authApi from '../library/authApi';
-const log = createClientLogger('Billing.tsx');
 
 export default function Billing() {
     const [selectedPayment, setSelectedPayment] = useState<string>('mpesa');
     const [phoneNumber, setPhoneNumber] = useState<string>('');
     const [email, setEmail] = useState<string>('');
-    const [isProcessing, setIsProcessing] = useState<boolean>(false);
     const amount = useTransactions((state) => state.amount);
     const selectedPeriod = useTransactions((state) => state.selectedPeriod);
     const selectedTier = useTransactions((state) => state.tier);
     const setError = useErrorStore((state) => state.setError);
-    const setSuccess = useSuccessStore((state) => state.setSuccess);
     const navigate = useNavigate();
 
     // Redirect if no tier is selected
@@ -67,7 +60,7 @@ export default function Billing() {
             ),
         },
     ];
-    const formatPhoneNumber = (phone: string) => {
+    /*const formatPhoneNumber = (phone: string) => {
         const cleaned = phone.replace(/\D/g, '');
         //if it starts with 0 replace with 254
         if (cleaned.startsWith('0')) {
@@ -80,7 +73,7 @@ export default function Billing() {
         if (cleaned.startsWith('254')) {
             return '+' + cleaned;
         }
-    };
+    };*/
     if (!selectedTier) {
         setError('Please select a plan first');
         return;
@@ -95,49 +88,7 @@ export default function Billing() {
             setError('Please enter the email you logged in with');
             return;
         }
-        setIsProcessing(true);
-        setError('');
-        //const isTestMode = import.meta.env.MODE === 'development';
-        const phoneToSend = formatPhoneNumber(phoneNumber);
-        log.debug(
-            `This is the phone number to send to the backend ${phoneToSend}`
-        );
-        try {
-            const paystackResponse = await authApi.post(
-                '/payment/initialize-payment',
-                {
-                    amount,
-                    phoneNumber: phoneToSend,
-                    currency: 'KES',
-                    email,
-                    metadata: {
-                        period: selectedPeriod,
-                        tierId: selectedTier.id,
-                        tierName: selectedTier.name,
-                        paymentMethod: 'mpesa',
-                    },
-                }
-            );
-            const paystackData = paystackResponse.data;
-            if (paystackData.status) {
-                setSuccess(paystackData.message);
-            }
-            log.info('This is the paystack response shape ', {
-                data: { paystackData },
-            });
-            const paystack = new PaystackPop();
-            paystack.resumeTransaction(paystackData.data.access_code);
-            log.info('Response from the paystack api', {
-                data: paystackData,
-            });
-        } catch (error) {
-            log.error('This is the error from the backend', {
-                data: { error },
-            });
-            handleApiError(error, setError);
-        } finally {
-            setIsProcessing(false);
-        }
+        navigate('/pricing/billing');
     };
 
     return (
@@ -440,7 +391,7 @@ export default function Billing() {
                                 )}
                             </AnimatePresence>
 
-                            {/* Payment Button */}
+                            {/* Payment Button 
                             <motion.button
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
@@ -461,7 +412,7 @@ export default function Billing() {
                                         <span>Pay {amount}sh Now</span>
                                     </>
                                 )}
-                            </motion.button>
+                            </motion.button>*/}
 
                             <p className="mt-6 text-center text-[10px] leading-relaxed text-purple-300/40">
                                 By completing this purchase, you agree to our

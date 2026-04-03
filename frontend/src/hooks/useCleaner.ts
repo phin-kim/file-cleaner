@@ -174,18 +174,38 @@ export default function useCleaner() {
             let serverStatus: number | undefined;
             let serverData: BackendError | undefined;
 
-            if (error instanceof AxiosError) {
-                serverStatus = error.response?.status || error.status;
-                serverData = error.response?.data as BackendError | undefined;
-            } else {
-                serverStatus = undefined;
-                serverData = undefined;
+            const potentialError = error as UnknownApiError;
+
+            // Check if it has the typical Axios response structure
+            if (potentialError?.response) {
+                serverStatus = potentialError.response.status;
+                serverData = potentialError.response.data;
+                const rawData = potentialError.response?.data;
+                serverData =
+                    typeof rawData === 'string' ? JSON.parse(rawData) : rawData;
             }
+            // Check if the error itself has a status (some middlewares do this)
+            else if (potentialError?.status) {
+                serverStatus = potentialError.status;
+                const rawData = potentialError?.data;
+                serverData =
+                    typeof rawData === 'string' ? JSON.parse(rawData) : rawData;
+            }
+
+            log.debug('Manually extracted shape:', {
+                data: { serverStatus, serverData },
+            });
 
             log.error('Error in processing files', {
                 data: { serverStatus, serverData },
             });
-
+            /*const expiredFlag = log.debug(
+                `Is the 403 error being triggered: ${serverStatus === 403 ? 'YES' : 'NO'}`
+            );*/
+            log.debug(`What is the server status code: ${serverStatus}`);
+            log.debug(
+                `Does it contain an expired flag: ${potentialError.type}`
+            );
             // Check for both the 409 (Multer/File Count) and 503 (Tier/Subscription)
             // 1. Handle Tier-Limited Features (503)
             if (serverStatus === 503) {
@@ -205,8 +225,16 @@ export default function useCleaner() {
                 handleApiError(serverData, setError);
                 return; // Exit immediately
             }
-            if (serverStatus === 403 && serverData?.expired) {
+            if (
+                serverStatus === 403 &&
+                potentialError?.type === 'SUBSCRIPTION_EXPIRED'
+            ) {
                 setIsExpired(true);
+                setTimeout(() => {
+                    setStatus('idle');
+                }, 1500);
+
+                return;
             }
             handleApiError(error, setError);
             setStatus('error');
@@ -409,9 +437,7 @@ export default function useCleaner() {
                 setTimeout(() => {
                     setStatus('idle');
                 }, 1500);
-                log.debug(
-                    `Satte of isexpired immediately after being set ${isExpired}`
-                );
+
                 return;
             }
             handleApiError(error, setError);

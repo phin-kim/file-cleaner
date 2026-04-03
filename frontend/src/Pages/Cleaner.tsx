@@ -55,7 +55,7 @@ export default function FolderCleanerUI() {
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="mb-8 text-center"
+                    className="mt-12 mb-8 text-center"
                 >
                     <h1 className="mb-2 text-4xl font-bold text-slate-100">
                         Tidy Up
@@ -361,7 +361,7 @@ export default function FolderCleanerUI() {
                 )}
                 {isExpired && (
                     <SubscriptionExpiredModal
-                        key={'subcription-expired-modal'}
+                        key={'subscription-expired-modal'}
                         isExpired={isExpired}
                         onClose={() => setIsExpired(false)}
                     />

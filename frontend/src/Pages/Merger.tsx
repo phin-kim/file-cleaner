@@ -148,7 +148,7 @@ const FolderQuestionAnalyzer = () => {
                                         onClick={handleFolderSelectClick}
                                         className="group mb-6 inline-flex items-center gap-3 rounded-xl bg-purple-500/20 px-6 py-3 text-purple-300 transition-all hover:bg-purple-500/30 hover:text-purple-200"
                                     >
-                                        <MousePointerClick className="h-12 w-12 transition-transform group-hover:rotate-12 sm:h-5 sm:w-5" />
+                                        <MousePointerClick className="h-5 w-5 transition-transform group-hover:rotate-12" />
                                         <span className="font-medium">
                                             Click to select a folder
                                         </span>
@@ -276,6 +276,8 @@ const FolderQuestionAnalyzer = () => {
                 )}
                 {isExpired && (
                     <SubscriptionExpiredModal
+                        key={'subscription-expired-modal'}
+                        isExpired={isExpired}
                         onClose={() => setIsExpired(false)}
                     />
                 )}
