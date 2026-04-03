@@ -9,10 +9,10 @@ import {
 } from 'react-icons/fa6';
 import { useTransactions } from '../Store/TransactionStore';
 // removed unused imports to satisfy TS strict checks
-import PayheroButton from '../components/PayheroButton';
 
 import useErrorStore from '../Store/ErrorStore';
 import { useAuthStore } from '../Store/authStore';
+import { useNavigate } from 'react-router-dom';
 //selected tier and the amount are what cary everything i need
 const Pricing: React.FC = () => {
     const [isQuarterly, setIsQuarterly] = useState(false);
@@ -80,6 +80,7 @@ const Pricing: React.FC = () => {
             icon: <FaWandMagicSparkles />,
         },
     ];
+    const navigate = useNavigate();
     const handleChangePeriod = () => {
         const newIsQuarterly = !isQuarterly;
         setIsQuarterly(newIsQuarterly);
@@ -89,12 +90,27 @@ const Pricing: React.FC = () => {
             setSelectedPeriod('monthly');
         }
     };
-    const handleTierSelect = (selectedId: string) => {
+    /*const handleTierSelect = (selectedId: string) => {
         const selected = tiers.find((t) => t.id === selectedId);
         if (!selected) return;
         setTier(selected);
+        navigate('/pricing/billing');
+    };*/
+    const handleTier = (tierId: string) => {
+        const selected = tiers.find((t) => t.id === tierId);
+        if (selected) {
+            setTier(selected);
+            // Use local isQuarterly state instead of selectedPeriod to avoid stale state
+            if (isQuarterly) {
+                setSelectedPeriod('3 months');
+                setAmount(selected.quarterlyPrice ?? 0);
+            } else {
+                setSelectedPeriod('monthly');
+                setAmount(selected.monthlyPrice ?? 0);
+            }
+            navigate('/pricing/billing');
+        }
     };
-
     // Recalculate price whenever period changes or tier changes
     useEffect(() => {
         if (selectedTier) {
@@ -237,7 +253,7 @@ const Pricing: React.FC = () => {
                             </ul>
                         </div>
 
-                        <PayheroButton
+                        {/* <PayheroButton
                             amount={
                                 isQuarterly
                                     ? tier.quarterlyPrice
@@ -270,7 +286,28 @@ const Pricing: React.FC = () => {
                                     Get started
                                 </span>
                             )}
-                        </PayheroButton>
+                        </PayheroButton>*/}
+                        <button
+                            onClick={() => handleTier(tier.id)}
+                            disabled={processingTierId !== null}
+                            className={`mt-10 block w-full rounded-2xl px-6 py-4 text-center text-sm font-bold transition-all ${
+                                tier.highlight
+                                    ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/30 hover:bg-purple-700'
+                                    : 'bg-white/10 text-white hover:bg-white/20'
+                            }`}
+                        >
+                            {processingTierId === tier.id ? (
+                                <>
+                                    <div className="absolute top-5 left-20 h-6 w-6 animate-spin rounded-full border-b-2 border-white" />
+
+                                    <span>Processing Securely...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <span>Get started</span>
+                                </>
+                            )}
+                        </button>
                     </motion.div>
                 ))}
             </div>

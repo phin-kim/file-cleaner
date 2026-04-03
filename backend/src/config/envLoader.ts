@@ -41,8 +41,8 @@ log.debug(
 );
 log.debug(`HF_API_KEY: ${process.env.HF_API_KEY ? '✅ Set' : '❌ Missing'}`);
 log.debug(
-    `PAYSTACK_SECRET_KEY:,
-    ${process.env.PAYSTACK_SECRET_KEY ? '✅ Set' : '❌ Missing'}`
+    `PAYHERO_AUTH_TOKEN:,
+    ${process.env.PAYHERO_AUTH_TOKEN ? '✅ Set' : '❌ Missing'}`
 );
 log.debug(
     `COOKIE_SECRET:,
@@ -56,7 +56,7 @@ log.debug(
 export const GEMINI_API_KEY =
     process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
 export const HF_API_KEY = process.env.HF_API_KEY;
-export const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
+export const PAYHERO_AUTH_TOKEN = process.env.PAYHERO_AUTH_TOKEN;
 export const COOKIE_SECRET = process.env.COOKIE_SECRET;
 export const BREVO_API_KEY = process.env.BREVO_API_KEY;
 
@@ -74,8 +74,8 @@ if (!HF_API_KEY) {
     log.error('❌ HF_API_KEY is required in .env file');
     process.exit(1);
 }
-if (!PAYSTACK_SECRET_KEY) {
-    log.error('❌ PAYSTACK_SECRET_KEY is required in .env file');
+if (!PAYHERO_AUTH_TOKEN) {
+    log.error('❌ PAYHERO_AUTH_TOKEN is required in .env file');
     process.exit(1);
 }
 if (!COOKIE_SECRET) {

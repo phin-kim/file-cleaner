@@ -13,24 +13,93 @@ import { useTransactions } from '../Store/TransactionStore';
 import { useNavigate } from 'react-router-dom';
 import type { PaymentMethod } from '../types/transactions';
 import useErrorStore from '../Store/ErrorStore';
-
+import handleApiError from '../utils/apiError';
+import createClientLogger from '../utils/clientLogger';
+import useSuccessStore from '../Store/SuccessStore';
+import authApi from '../library/authApi';
+const log = createClientLogger('Billing.tsx');
+declare global {
+    interface Window {
+        PayHero: any;
+    }
+}
 export default function Billing() {
     const [selectedPayment, setSelectedPayment] = useState<string>('mpesa');
     const [phoneNumber, setPhoneNumber] = useState<string>('');
     const [email, setEmail] = useState<string>('');
+    const [isProcessing, setIsProcessing] = useState<boolean>(false);
     const amount = useTransactions((state) => state.amount);
     const selectedPeriod = useTransactions((state) => state.selectedPeriod);
     const selectedTier = useTransactions((state) => state.tier);
     const setError = useErrorStore((state) => state.setError);
+    const setSuccess = useSuccessStore((state) => state.setSuccess);
     const navigate = useNavigate();
-
+    const formatPhoneNumber = (phone: string) => {
+        const cleaned = phone.replace(/\D/g, '');
+        //if it starts with 0 replace with 254
+        if (cleaned.startsWith('0')) {
+            return '+254' + cleaned;
+        }
+        //if its 9 digits starting with 7add 254
+        if (cleaned.length === 9 && cleaned.startsWith('7')) {
+            return '+254' + cleaned;
+        }
+        if (cleaned.startsWith('254')) {
+            return '+' + cleaned;
+        }
+    };
+    const phoneToSend = formatPhoneNumber(phoneNumber);
     // Redirect if no tier is selected
     useEffect(() => {
         if (!selectedTier) {
             navigate('/');
         }
     }, [selectedTier, navigate]);
+    /*useEffect(() => {
+        //create the script element
+        const script = document.createElement('script');
+        script.src = 'https://applet.payherokenya.com/cdn/button_sdk.js?v=3.1';
+        script.async = true;
+        script.onload = () => {
+            //initialize the payhero once script is loaded
+            if (window.PayHero) {
+                window.PayHero.init({
+                    paymentUrl: 'https://lipwa.link/7182',
+                    width: '100%',
+                    height: '100%',
+                    containerId: 'payHero',
+                    channelID: 6761,
+                    amount: amount,
+                    phone: phoneToSend,
+                    name: email,
+                    reference: 'buttonTesting',
+                    buttonName: `Pay Now KES ${amount}`,
+                    buttonColor: '#00a884',
+                    successUrl: null,
+                    failedUrl: null,
+                    callbackUrl: null,
+                });
+            }
+        };
+        document.body.appendChild(script);
+        //set up the message listener
+        const handlePaymentMessage = (event: MessageEvent) => {
+            if (event.data.paymentSuccess) {
+                console.log('Payment Successful:', event.data);
+                alert('Payment successful!');
+            } else if (event.data.paymentFailed) {
+                alert('Oopsie! Payment failed');
+            }
+        };
 
+        window.addEventListener('message', handlePaymentMessage);
+
+        // Cleanup function to prevent memory leaks/duplicate listeners
+        return () => {
+            window.removeEventListener('message', handlePaymentMessage);
+            document.body.removeChild(script);
+        };
+    }, []);*/
     const paymentMethods: PaymentMethod[] = [
         {
             id: 'mpesa',
@@ -60,20 +129,7 @@ export default function Billing() {
             ),
         },
     ];
-    /*const formatPhoneNumber = (phone: string) => {
-        const cleaned = phone.replace(/\D/g, '');
-        //if it starts with 0 replace with 254
-        if (cleaned.startsWith('0')) {
-            return '+254' + cleaned;
-        }
-        //if its 9 digits starting with 7add 254
-        if (cleaned.length === 9 && cleaned.startsWith('7')) {
-            return '+254' + cleaned;
-        }
-        if (cleaned.startsWith('254')) {
-            return '+' + cleaned;
-        }
-    };*/
+
     if (!selectedTier) {
         setError('Please select a plan first');
         return;
@@ -88,7 +144,49 @@ export default function Billing() {
             setError('Please enter the email you logged in with');
             return;
         }
-        navigate('/pricing/billing');
+        setIsProcessing(true);
+        setError('');
+        //const isTestMode = import.meta.env.MODE === 'development';
+
+        log.debug(
+            `This is the phone number to send to the backend ${phoneToSend}`
+        );
+        try {
+            const paystackResponse = await authApi.post(
+                '/payment/initialize-payment',
+                {
+                    amount,
+                    phoneNumber ,
+                    currency: 'KES',
+                    email,
+                    metadata: {
+                        period: selectedPeriod,
+                        tierId: selectedTier.id,
+                        tierName: selectedTier.name,
+                        paymentMethod: 'mpesa',
+                    },
+                }
+            );
+            const paystackData = paystackResponse.data;
+            if (paystackData.status) {
+                setSuccess(paystackData.message);
+            }
+            log.info('This is the paystack response shape ', {
+                data: { paystackData },
+            });
+            const paystack = new PaystackPop();
+            paystack.resumeTransaction(paystackData.data.access_code);
+            log.info('Response from the paystack api', {
+                data: paystackData,
+            });
+        } catch (error) {
+            log.error('This is the error from the backend', {
+                data: { error },
+            });
+            handleApiError(error, setError);
+        } finally {
+            setIsProcessing(false);
+        }
     };
 
     return (
@@ -391,7 +489,7 @@ export default function Billing() {
                                 )}
                             </AnimatePresence>
 
-                            {/* Payment Button 
+                            {/* Payment Button */}
                             <motion.button
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
@@ -412,7 +510,7 @@ export default function Billing() {
                                         <span>Pay {amount}sh Now</span>
                                     </>
                                 )}
-                            </motion.button>*/}
+                            </motion.button>
 
                             <p className="mt-6 text-center text-[10px] leading-relaxed text-purple-300/40">
                                 By completing this purchase, you agree to our
