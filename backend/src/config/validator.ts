@@ -1,9 +1,10 @@
-import AppError from '../utils/appError';
+import AppError from '../utils/appError.js';
 import createLogger from '../utils/logger.js';
 import {
     registerSchema,
     type RegisterInput,
 } from '../schema/validatorSchema.js';
+
 const log = createLogger('VALIDATOR');
 export interface Input {
     email: string;
