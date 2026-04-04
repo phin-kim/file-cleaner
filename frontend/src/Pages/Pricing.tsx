@@ -90,12 +90,7 @@ const Pricing: React.FC = () => {
             setSelectedPeriod('monthly');
         }
     };
-    /*const handleTierSelect = (selectedId: string) => {
-        const selected = tiers.find((t) => t.id === selectedId);
-        if (!selected) return;
-        setTier(selected);
-        navigate('/pricing/billing');
-    };*/
+
     const handleTier = (tierId: string) => {
         const selected = tiers.find((t) => t.id === tierId);
         if (selected) {

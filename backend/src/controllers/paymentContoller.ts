@@ -14,7 +14,6 @@ import AppError from '../utils/appError';
 import type { AuthenticatedRequest } from '../Types/authenticate';
 import { TransactionsModel } from '../schema/TransactionSchema';
 import { UserModel } from '../schema/UsersSchema';
-const payhero_SECRET_KEY = process.env.payhero_SECRET_KEY;
 const PAYHERO_AUTH_TOKEN = process.env.PAYHERO_AUTH_TOKEN;
 const log = createLogger('Payment.ts');
 export async function mpesaPayment(
@@ -26,7 +25,7 @@ export async function mpesaPayment(
     const userId = authReq?.user?.uid;
     const { amount, email, phoneNumber, metadata } = req.body;
 
-    /*if (!amount) {
+    if (!amount) {
         log.error('Amount is missing ');
         return next(AppError.badRequest('Amount field is necessary'));
     }
@@ -37,7 +36,7 @@ export async function mpesaPayment(
     if (!phoneNumber) {
         log.error('Phone number is missing');
         return next(AppError.badRequest('Phone number  is necessary'));
-    }*/
+    }
     log.info('What email is being passed ', { data: email });
     const user = await UserModel.findOne({ email });
     log.warn(`is the user there ${user ? 'YES' : 'NO'}`);
@@ -101,13 +100,7 @@ export async function mpesaPayment(
     //const phoneNumberHash = hashPhoneNumber(formattedPhone);
     log.info('Sending M-Pesa payment request to payhero', { data: payload });
     log.info('=== INFO PAYLOAD ===');
-    /*log.info(
-        `Phone number being sent:${JSON.stringify(payload.mobile_money.phone)}`
-    );
-    log.info('Phone number length:', payload.mobile_money.phone.length);
-    log.info('Phone number regex test:', {
-        data: { number: /^254[0-9]{9}$/.test(payload.mobile_money.phone) },
-    });*/
+
     log.info('Full payload:', {
         data: { payload: JSON.stringify(payload, null, 2) },
     });
@@ -121,15 +114,14 @@ export async function mpesaPayment(
                 'Content-Type': 'application/json',
             },
         });
-
+        const resp = payheroResponse.data;
         log.info('Data fom payhero', {
             data: {
-                status: payheroResponse.status,
-                data: payheroResponse.data,
+                resp,
             },
         });
 
-        if (payheroResponse.data.status) {
+        if (payheroResponse.data.success) {
             await TransactionsModel.create({
                 userId,
                 amount,
@@ -149,17 +141,29 @@ export async function mpesaPayment(
                 provider: 'mpesa',
                 createdAt: new Date(),
             });
+            await UserModel.findByIdAndUpdate(
+                userId,
+
+                {
+                    $set: {
+                        tierId: metadata.tierId,
+                        'subscription-period': metadata.period,
+                        'subscription-status': 'active',
+                        'last-payment-date': new Date(),
+                    },
+                },
+                { returnDocument: 'after', runValidators: true } // Returns the updated document
+            );
 
             //Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
             //pesa returns a pending state until the user has verified using their pin
-            if (payheroResponse.data.status === true) {
+            if (payheroResponse.data.success) {
                 res.json({
                     status: true,
                     message:
                         'Please complete authorization process on your mobile phone',
                     data: {
                         reference: reference,
-                        payheroReference: payheroResponse.data.data.reference,
                         amount: amount,
                     },
                 });
@@ -189,19 +193,7 @@ export async function mpesaPayment(
                         headers: error.response.headers,
                     },
                 });
-                /*Special handling for test mode phone number error
-                if (
-                    isTestMode &&
-                    error.response.data?.data?.message?.includes(
-                        'test mobile money number'
-                    )
-                ) {
-                    return next(
-                        AppError.badRequest(
-                            `In test mode, please use payhero test numbers: ${TEST_PHONE_NUMBER}`
-                        )
-                    );
-                }*/
+
                 //extract meaning full error message from payhero response
                 const payheroErrorMessage =
                     error.response.data?.data?.message ||

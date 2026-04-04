@@ -2,7 +2,6 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
-import PaystackPop from '@paystack/inline-js';
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -156,7 +155,7 @@ export default function Billing() {
                 '/payment/initialize-payment',
                 {
                     amount,
-                    phoneNumber ,
+                    phoneNumber,
                     currency: 'KES',
                     email,
                     metadata: {
@@ -174,8 +173,7 @@ export default function Billing() {
             log.info('This is the paystack response shape ', {
                 data: { paystackData },
             });
-            const paystack = new PaystackPop();
-            paystack.resumeTransaction(paystackData.data.access_code);
+
             log.info('Response from the paystack api', {
                 data: paystackData,
             });
