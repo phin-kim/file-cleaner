@@ -4,7 +4,9 @@ export interface RegisterData {
 }
 export interface User {
     id: string;
+    phone: string;
     email: string;
+    name?: string;
     role: 'user' | 'admin';
 }
 export type AuthResponse = {

@@ -7,29 +7,20 @@ import {
     FaFilePdf,
     FaCheck,
 } from 'react-icons/fa6';
-import { useTransactions } from '../Store/TransactionStore';
-// removed unused imports to satisfy TS strict checks
-
-import useErrorStore from '../Store/ErrorStore';
-import { useAuthStore } from '../Store/authStore';
 import { useNavigate } from 'react-router-dom';
-//selected tier and the amount are what cary everything i need
+import { useTransactions } from '../Store/TransactionStore';
+import { useAuthStore } from '../Store/authStore';
+
 const Pricing: React.FC = () => {
+    const navigate = useNavigate();
+    const selectedTier = useTransactions((s) => s.tier);
+    const selectedPeriod = useTransactions((s) => s.selectedPeriod);
+    const setSelectedPeriod = useTransactions((s) => s.setSelectedPeriod);
+    const setAmount = useTransactions((s) => s.setAmount);
+    const setTier = useTransactions((s) => s.setTier);
+
     const [isQuarterly, setIsQuarterly] = useState(false);
-    const [processingTierId, setProcessingTierId] = useState<string | null>(
-        null
-    );
-    // Use separate selectors instead of creating a new object every render
-    const setError = useErrorStore((state) => state.setError);
-    const currentUser = useAuthStore((state) => state.user);
-    const selectedPeriod = useTransactions((state) => state.selectedPeriod);
-    //const amount = useTransactions((state) => state.amount);
-    const selectedTier = useTransactions((state) => state.tier);
-    const setSelectedPeriod = useTransactions(
-        (state) => state.setSelectedPeriod
-    );
-    const setAmount = useTransactions((state) => state.setAmount);
-    const setTier = useTransactions((state) => state.setTier);
+
     const tiers = [
         {
             id: 'tier-1',
@@ -45,7 +36,6 @@ const Pricing: React.FC = () => {
             highlight: false,
             icon: <FaBroom />,
         },
-        //have one free trial of tier 2
         {
             id: 'tier-2',
             name: 'Question Master',
@@ -72,7 +62,6 @@ const Pricing: React.FC = () => {
                 'Clean multiple duplicate folders',
                 'Priority AI processing',
                 'Increased file upload limit',
-
                 'Advanced cleanup strategies',
                 'Detailed breakdown of your folder composition',
             ],
@@ -80,7 +69,7 @@ const Pricing: React.FC = () => {
             icon: <FaWandMagicSparkles />,
         },
     ];
-    const navigate = useNavigate();
+
     const handleChangePeriod = () => {
         const newIsQuarterly = !isQuarterly;
         setIsQuarterly(newIsQuarterly);
@@ -94,8 +83,7 @@ const Pricing: React.FC = () => {
     const handleTier = (tierId: string) => {
         const selected = tiers.find((t) => t.id === tierId);
         if (selected) {
-            setTier(selected);
-            // Use local isQuarterly state instead of selectedPeriod to avoid stale state
+            setTier(selected as any);
             if (isQuarterly) {
                 setSelectedPeriod('3 months');
                 setAmount(selected.quarterlyPrice ?? 0);
@@ -106,7 +94,7 @@ const Pricing: React.FC = () => {
             navigate('/pricing/billing');
         }
     };
-    // Recalculate price whenever period changes or tier changes
+
     useEffect(() => {
         if (selectedTier) {
             if (selectedPeriod === 'monthly') {
@@ -248,60 +236,15 @@ const Pricing: React.FC = () => {
                             </ul>
                         </div>
 
-                        {/* <PayheroButton
-                            amount={
-                                isQuarterly
-                                    ? tier.quarterlyPrice
-                                    : tier.monthlyPrice
-                            }
-                            email={currentUser?.email ?? null}
-                            currency="KES"
-                            metadata={{
-                                period: isQuarterly ? '3 months' : 'monthly',
-                                tierId: tier.id,
-                                tierName: tier.name,
-                                paymentMethod: 'mpesa',
-                            }}
-                            disabled={processingTierId !== null}
-                            className={`mt-10 block w-full rounded-2xl px-6 py-4 text-center text-sm font-bold transition-all ${
-                                tier.highlight
-                                    ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/30 hover:bg-purple-700'
-                                    : 'bg-white/10 text-white hover:bg-white/20'
-                            }`}
-                            onSuccess={() => setProcessingTierId(null)}
-                            onError={() => setProcessingTierId(null)}
-                        >
-                            {processingTierId === tier.id ? (
-                                <>
-                                    <div className="absolute top-5 left-20 h-6 w-6 animate-spin rounded-full border-b-2 border-white" />
-                                    <span>Processing Securely...</span>
-                                </>
-                            ) : (
-                                <span onClick={() => handleTierSelect(tier.id)}>
-                                    Get started
-                                </span>
-                            )}
-                        </PayheroButton>*/}
                         <button
                             onClick={() => handleTier(tier.id)}
-                            disabled={processingTierId !== null}
                             className={`mt-10 block w-full rounded-2xl px-6 py-4 text-center text-sm font-bold transition-all ${
                                 tier.highlight
                                     ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/30 hover:bg-purple-700'
                                     : 'bg-white/10 text-white hover:bg-white/20'
                             }`}
                         >
-                            {processingTierId === tier.id ? (
-                                <>
-                                    <div className="absolute top-5 left-20 h-6 w-6 animate-spin rounded-full border-b-2 border-white" />
-
-                                    <span>Processing Securely...</span>
-                                </>
-                            ) : (
-                                <>
-                                    <span>Get started</span>
-                                </>
-                            )}
+                            <span>Get started</span>
                         </button>
                     </motion.div>
                 ))}
