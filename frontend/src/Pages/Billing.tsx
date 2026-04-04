@@ -12,11 +12,11 @@ import { useTransactions } from '../Store/TransactionStore';
 import { useNavigate } from 'react-router-dom';
 import type { PaymentMethod } from '../types/transactions';
 import useErrorStore from '../Store/ErrorStore';
-import handleApiError from '../utils/apiError';
+//import handleApiError from '../utils/apiError';
 import createClientLogger from '../utils/clientLogger';
 import PayheroButton from '../components/PayheroButton';
 import useSuccessStore from '../Store/SuccessStore';
-import authApi from '../library/authApi';
+//import authApi from '../library/authApi';
 const log = createClientLogger('Billing.tsx');
 export default function Billing() {
     const [selectedPayment, setSelectedPayment] = useState<string>('mpesa');
@@ -86,7 +86,7 @@ export default function Billing() {
         return;
     }
     //log.debug(`is authenticated ${isAuthenticated}`);
-    const handlePayment = async () => {
+    /*const handlePayment = async () => {
         if (selectedPayment === 'mpesa' && !phoneNumber) {
             setError('Please enter your M-Pesa phone number');
             return;
@@ -137,7 +137,7 @@ export default function Billing() {
         } finally {
             setIsProcessing(false);
         }
-    };
+    };*/
     log.debug(`this is the selected method of payment ${selectedPayment}`);
 
     return (
@@ -459,7 +459,7 @@ export default function Billing() {
                             callbackUrl={undefined}
                             disabled={isProcessing}
                             className="group relative flex w-full items-center justify-center gap-3 overflow-hidden rounded-2xl bg-linear-to-r from-purple-500 to-fuchsia-500 py-5 font-bold text-white shadow-2xl shadow-purple-500/40 transition-all hover:from-purple-600 hover:to-fuchsia-600 disabled:cursor-not-allowed disabled:opacity-50"
-                            onSuccess={(data) => {
+                            onSuccess={() => {
                                 setIsProcessing(false);
                                 setSuccess('Payment successful');
                                 navigate('/folder-cleaner');
