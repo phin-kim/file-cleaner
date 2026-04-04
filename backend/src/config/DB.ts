@@ -4,9 +4,9 @@ import AppError from '../utils/appError.js';
 const log = createLogger('Config:db');
 const isProd = process.env.NODE_ENV === 'production';
 const TIDY_UP = isProd
-    ? process.env.USER_MONGO_URL ||
+    ? process.env.TIDY_UP_DB ||
       (() => {
-          throw AppError.notFound('Missing USER_MONGO_URL in production');
+          throw AppError.notFound('Missing TIDY_UP_DB in production');
       })()
     : 'mongodb://127.0.0.1:27017/tidyUpDB';
 /*const TRANSACTIONS = isProd
