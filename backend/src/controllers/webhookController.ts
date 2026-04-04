@@ -1,12 +1,13 @@
-import { UserModel } from '../schema/UsersSchema';
-import type { Response, Request, NextFunction } from 'express';
 import axios from 'axios';
-import createLogger from '../utils/logger';
 import crypto from 'node:crypto';
-import AppError from '../utils/appError';
-import { TransactionsModel } from '../schema/TransactionSchema';
-import type { PaystackVerificationResponse } from '../Types/transactions';
-import handleAxiosError from '../utils/axiosErrorHandler';
+import type { Response, Request, NextFunction } from 'express';
+
+import { UserModel } from '../schema/UsersSchema.js';
+import createLogger from '../utils/logger.js';
+import AppError from '../utils/appError.js';
+import { TransactionsModel } from '../schema/TransactionSchema.js';
+import type { PaystackVerificationResponse } from '../Types/transactions.js';
+import handleAxiosError from '../utils/axiosErrorHandler.js';
 
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
 const log = createLogger('webhook.ts');

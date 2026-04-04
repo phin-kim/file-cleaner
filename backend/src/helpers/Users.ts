@@ -1,4 +1,4 @@
-import type { User } from '../Types/Types';
+import type { User } from '../Types/Types.js';
 export const users: Record<string, User> = {
     'demo-free': {
         id: 'demo-free',

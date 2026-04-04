@@ -1,5 +1,5 @@
 import { Schema } from 'mongoose';
-import { TidyUpConnection } from '../config/DB';
+import { TidyUpConnection } from '../config/DB.js';
 import type { Document } from 'mongoose';
 
 export interface Transaction_Type extends Document {

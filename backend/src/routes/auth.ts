@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import asyncHandler from '../middleware/asyncHandler';
-import { register } from '../controllers/authController';
-import { logout } from '../controllers/logoutController';
-import { refresh } from '../controllers/refresh';
+import asyncHandler from '../middleware/asyncHandler.js';
+import { register } from '../controllers/authController.js';
+import { logout } from '../controllers/logoutController.js';
+import { refresh } from '../controllers/refresh.js';
 export const authRoute: Router = Router();
 authRoute.post('/register', asyncHandler(register));
 authRoute.post('/refresh', refresh);

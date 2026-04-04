@@ -6,14 +6,14 @@
  * When a payment is successful, payhero sends a charge.success webhook event to webhook URL that you provide. It's highly recommended that you use webhooks to confirm the payment status before delivering value to your customers.
  * You’ll typically listen to these events on a POST endpoint called your webhook URL.
  */
-import type { Response, Request, NextFunction } from 'express';
-import createLogger from '../utils/logger';
 import crypto from 'node:crypto';
 import axios from 'axios';
-import AppError from '../utils/appError';
-import type { AuthenticatedRequest } from '../Types/authenticate';
-import { TransactionsModel } from '../schema/TransactionSchema';
-import { UserModel } from '../schema/UsersSchema';
+import type { Response, Request, NextFunction } from 'express';
+import createLogger from '../utils/logger.js';
+import AppError from '../utils/appError.js';
+import type { AuthenticatedRequest } from '../Types/authenticate.js';
+import { TransactionsModel } from '../schema/TransactionSchema.js';
+import { UserModel } from '../schema/UsersSchema.js';
 const PAYHERO_AUTH_TOKEN = process.env.PAYHERO_AUTH_TOKEN;
 const log = createLogger('Payment.ts');
 export async function mpesaPayment(

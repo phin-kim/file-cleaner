@@ -1,8 +1,9 @@
 import jwt from 'jsonwebtoken';
 import crypto from 'node:crypto';
-import type { JWTTokenPayload } from '../Types/authenticate';
+import type { JWTTokenPayload } from '../Types/authenticate.js';
+import createLogger from './logger.js';
 import 'dotenv/config';
-import createLogger from './logger';
+
 const log = createLogger('JWT-helper');
 const accessSecret = process.env.JWT_ACCESS_SECRET;
 const refreshSecret = process.env.JWT_REFRESH_SECRET;

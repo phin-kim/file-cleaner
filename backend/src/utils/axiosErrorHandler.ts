@@ -1,8 +1,9 @@
 import axios from 'axios';
-import createLogger from './logger';
-const log = createLogger('AxiosErrorhandler.ts');
+import createLogger from './logger.js';
 import AppError from './appError';
 import type { NextFunction } from 'express';
+const log = createLogger('AxiosErrorhandler.ts');
+
 const handleAxiosError = (error: unknown, next: NextFunction): void => {
     if (axios.isAxiosError(error)) {
         if (error.response) {

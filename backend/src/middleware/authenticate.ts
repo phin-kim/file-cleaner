@@ -1,11 +1,13 @@
 import type { RequestHandler } from 'express';
-import AppError from '../utils/appError';
 import jwt, { type JwtPayload } from 'jsonwebtoken';
+import AppError from '../utils/appError.js';
+
 import type {
     JWTUserPayload,
     AuthenticatedRequest,
-} from '../Types/authenticate';
-import createLogger from '../utils/logger';
+} from '../Types/authenticate.js';
+import createLogger from '../utils/logger.js';
+
 const log = createLogger('AUTHENTICATE');
 const authenticate: RequestHandler = async (req, _res, next) => {
     const requestIdHeader = req.headers['x-request-id'];

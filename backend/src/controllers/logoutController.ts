@@ -1,10 +1,11 @@
 import type { Request, Response, NextFunction } from 'express';
-import jwt, { type JwtPayload } from 'jsonwebtoken';
-import AppError from '../utils/appError';
-import { UserModel } from '../schema/UsersSchema';
-import { hashToken } from '../utils/jwt';
 import 'dotenv/config';
-import createLogger from '../utils/logger';
+
+import jwt, { type JwtPayload } from 'jsonwebtoken';
+import AppError from '../utils/appError.js';
+import { UserModel } from '../schema/UsersSchema.js';
+import { hashToken } from '../utils/jwt.js';
+import createLogger from '../utils/logger.js';
 const log = createLogger('Logout');
 const refreshSecret = process.env.JWT_REFRESH_SECRET;
 

@@ -1,11 +1,12 @@
 import type { Request, Response } from 'express';
-import { UserModel } from '../schema/UsersSchema';
-import AppError from '../utils/appError';
-import { hashPassword } from '../utils/hashes';
-import { validateRegisterInput } from '../config/validator';
-import { hashToken, signAccessToken, signRefreshToken } from '../utils/jwt';
-import createLogger from '../utils/logger';
+import { UserModel } from '../schema/UsersSchema.js';
+import AppError from '../utils/appError.js';
+import { hashPassword } from '../utils/hashes.js';
+import { validateRegisterInput } from '../config/validator.js';
+import { hashToken, signAccessToken, signRefreshToken } from '../utils/jwt.js';
+import createLogger from '../utils/logger.js';
 const log = createLogger('AUTH CONTROLLER');
+
 export async function register(req: Request, res: Response) {
     const { email, password } = validateRegisterInput(req.body);
     log.info('Data from the front end', { data: { email, password } });

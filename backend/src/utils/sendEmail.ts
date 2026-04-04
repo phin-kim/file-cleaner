@@ -1,9 +1,11 @@
 import type { Request } from 'express';
-import { UserModel } from '../schema/UsersSchema';
-import type { Subscription_Period } from '../schema/UsersSchema';
 import axios from 'axios';
-import AppError from './appError';
-import createLogger from './logger';
+
+import { UserModel } from '../schema/UsersSchema.js';
+import type { Subscription_Period } from '../schema/UsersSchema.js';
+import AppError from './appError.js';
+import createLogger from './logger.js';
+
 const log = createLogger('sendEmailAlert.ts');
 const BREVO_API_KEY = process.env.BREVO_API_KEY;
 if (!BREVO_API_KEY) {

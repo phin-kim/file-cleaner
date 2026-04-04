@@ -1,9 +1,11 @@
 import path from 'path';
 import fs from 'fs-extra';
 import archiver from 'archiver';
-import createLogger from '../utils/logger';
-const log = createLogger('Zip create');
-import AppError from '../utils/appError';
+import createLogger from '../utils/logger.js';
+import AppError from '../utils/appError.js';
+
+const log = createLogger('ZipCreate.ts');
+
 async function createZipWithRetry(
     tempDir: string,
     zippedDir: string,

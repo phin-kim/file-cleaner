@@ -1,12 +1,13 @@
 import fs from 'fs-extra';
 import path from 'path';
+import createLogger from './logger.js';
+
 export interface ExtensionStats {
     [category: string]: {
         count: number;
         sizeByBytes: number;
     };
 }
-import createLogger from './logger';
 const log = createLogger('OrganizeFolder.ts');
 export async function organizeByExtension(folderPath: string) {
     const files = await fs.readdir(folderPath);

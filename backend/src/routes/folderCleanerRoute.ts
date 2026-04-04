@@ -3,10 +3,11 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs-extra';
 import { fileURLToPath } from 'url';
-import { tidyFolder } from '../utils/tidy.js';
-import createLogger from '../utils/logger.js';
 import type { Request, Response, NextFunction } from 'express';
 import { MulterError } from 'multer';
+
+import { tidyFolder } from '../utils/tidy.js';
+import createLogger from '../utils/logger.js';
 import createZipWithRetry from '../helpers/zipFolderRetry.js';
 import AppError from '../utils/appError.js';
 import asyncHandler from '../middleware/asyncHandler.js';
@@ -311,12 +312,10 @@ cleanerRoute.post(
             data: { subscriptionStatus },
         });
         if (subscriptionStatus?.expired) {
-            return res
-                .status(403)
-                .json({
-                    type: 'SUBSCRIPTION_EXPIRED',
-                    message: 'Your subscription has expired',
-                });
+            return res.status(403).json({
+                type: 'SUBSCRIPTION_EXPIRED',
+                message: 'Your subscription has expired',
+            });
         }
         //const tierId = (req.query.tierId as keyof typeof TIER_CONFIG) || 'free';
 

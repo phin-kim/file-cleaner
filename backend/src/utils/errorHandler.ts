@@ -1,9 +1,9 @@
 import type { Request, Response, NextFunction } from 'express';
-import AppError from './appError.js';
-import type { ErrorType } from '../Types/ErrorHandler.js';
 import mongoose from 'mongoose';
 import { MongoServerError } from 'mongodb';
 import crypto from 'node:crypto';
+import AppError from './appError.js';
+import type { ErrorType } from '../Types/ErrorHandler.js';
 
 const errorHandler = (
     err: ErrorType,

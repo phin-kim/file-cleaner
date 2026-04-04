@@ -1,10 +1,11 @@
 import type { Response, NextFunction, Request } from 'express';
 import jwt, { type JwtPayload } from 'jsonwebtoken';
 
-import { UserModel } from '../schema/UsersSchema';
-import { hashToken, signAccessToken, signRefreshToken } from '../utils/jwt';
-import createLogger from '../utils/logger';
-import AppError from '../utils/appError';
+import { UserModel } from '../schema/UsersSchema.js';
+import { hashToken, signAccessToken, signRefreshToken } from '../utils/jwt.js';
+import createLogger from '../utils/logger.js';
+import AppError from '../utils/appError.js';
+
 const log = createLogger('Refresh controller');
 export async function refresh(req: Request, res: Response, next: NextFunction) {
     const refreshSecret = process.env.JWT_REFRESH_SECRET;

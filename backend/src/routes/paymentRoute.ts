@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import asyncHandler from '../middleware/asyncHandler';
-import { mpesaPayment } from '../controllers/paymentContoller';
-import authenticate from '../middleware/authenticate';
+import asyncHandler from '../middleware/asyncHandler.js';
+import { mpesaPayment } from '../controllers/paymentContoller.js';
+import authenticate from '../middleware/authenticate.js';
 
 export const paymentRoute: Router = Router();
 paymentRoute.post(

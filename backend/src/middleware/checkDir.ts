@@ -1,5 +1,5 @@
 import fs from 'fs-extra';
-import AppError from '../utils/appError';
+import AppError from '../utils/appError.js';
 async function ensureDirExists(dirPath: string) {
     try {
         await fs.ensureDir(dirPath);

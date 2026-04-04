@@ -2,15 +2,16 @@ import { Router } from 'express';
 import path from 'path';
 import fs from 'fs-extra';
 import multer from 'multer';
+import { fileURLToPath } from 'url';
+
 import { processUploadedFiles } from '../utils/fileMerger.js';
 import generatePDF from '../utils/generatePDF.js';
 import uploadLimiter from '../utils/rateLimiter.js';
 import createLogger from '../utils/logger.js';
-import { fileURLToPath } from 'url';
 import { TIER_CONFIG } from '../config/tiers.js';
 import AppError from '../utils/appError.js';
-
 import { sendEmailAlert } from '../utils/sendEmail.js';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const log = createLogger('Merge route');
