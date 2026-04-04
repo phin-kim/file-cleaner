@@ -33,7 +33,7 @@ export async function logout(req: Request, res: Response, next: NextFunction) {
         }
         const tokenHash = hashToken(refreshToken);
         user.refreshTokens = user.refreshTokens.filter(
-            (token: string) => token.tokenHash !== tokenHash
+            (token) => token.tokenHash !== tokenHash
         );
         await user.save();
         res.clearCookie('refreshToken', {

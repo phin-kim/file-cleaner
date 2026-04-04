@@ -462,10 +462,11 @@ export default function Billing() {
                             onSuccess={(data) => {
                                 setIsProcessing(false);
                                 setSuccess('Payment successful');
-                                navigate('/');
+                                navigate('/folder-cleaner');
                             }}
                             onError={(err) => {
                                 setIsProcessing(false);
+                                navigate('/');
                                 setError(
                                     typeof err === 'string'
                                         ? err
