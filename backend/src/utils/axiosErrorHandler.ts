@@ -1,6 +1,6 @@
 import axios from 'axios';
 import createLogger from './logger.js';
-import AppError from './appError';
+import AppError from './appError.js';
 import type { NextFunction } from 'express';
 const log = createLogger('AxiosErrorhandler.ts');
 
