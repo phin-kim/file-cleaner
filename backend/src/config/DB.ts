@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
-import createLogger from '../utils/logger';
-import AppError from '../utils/appError';
+import createLogger from '../utils/logger.js';
+import AppError from '../utils/appError.js';
 const log = createLogger('Config:db');
 const isProd = process.env.NODE_ENV === 'production';
 const TIDY_UP = isProd
