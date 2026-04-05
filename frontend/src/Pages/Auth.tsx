@@ -12,7 +12,7 @@ import { FaShieldHalved } from 'react-icons/fa6';
 const log = createClientLogger('AuthForm');
 const AuthForm = () => {
     const { setError } = useErrorStore();
-
+    log.debug(` what environment are we in ${import.meta.env}`);
     const navigate = useNavigate();
     const registerUser = useAuthStore((state) => state.register);
     const {

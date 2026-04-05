@@ -50,7 +50,14 @@ export default function Billing() {
             navigate('/');
         }
     }, [selectedTier, navigate]);
-
+    const prodURL = 'https://tidy-upp.netlify.app';
+    const devURL = 'http://localhost:5173';
+    const isProd = import.meta.env.PROD ? prodURL : devURL;
+    const CALLBACK_URL = import.meta.env.PROD
+        ? 'https://tidy-up.onrender.com/api/payment/webhook'
+        : 'https://unparasitical-unsigned-lasonya.ngrok-free.dev/api/payment/webhook';
+    const FAILED_URL = `${isProd}/pricing/billing`;
+    const SUCCESS_URL = `${isProd}/folder-cleaner`;
     const paymentMethods: PaymentMethod[] = [
         {
             id: 'mpesa',
@@ -454,9 +461,9 @@ export default function Billing() {
                             channelID={6761}
                             paymentUrl={'https://lipwa.link/7182'}
                             buttonColor={'#00a884'}
-                            successUrl={undefined}
-                            failedUrl={undefined}
-                            callbackUrl={undefined}
+                            successUrl={SUCCESS_URL}
+                            failedUrl={FAILED_URL}
+                            callbackUrl={CALLBACK_URL}
                             disabled={isProcessing}
                             className="group relative flex w-full items-center justify-center gap-3 overflow-hidden rounded-2xl bg-linear-to-r from-purple-500 to-fuchsia-500 py-5 font-bold text-white shadow-2xl shadow-purple-500/40 transition-all hover:from-purple-600 hover:to-fuchsia-600 disabled:cursor-not-allowed disabled:opacity-50"
                             onSuccess={() => {
@@ -466,7 +473,7 @@ export default function Billing() {
                             }}
                             onError={(err) => {
                                 setIsProcessing(false);
-                                navigate('/');
+                                //navigate('/');
                                 setError(
                                     typeof err === 'string'
                                         ? err

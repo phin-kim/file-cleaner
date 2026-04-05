@@ -5,7 +5,7 @@ import type {
 } from 'axios';
 import axios from 'axios';
 import createClientLogger from '../utils/clientLogger';
-import { useAuthStore } from '../Store/authStore';
+//import { useAuthStore } from '../Store/authStore';
 const log = createClientLogger('Auth api');
 const baseURL =
     import.meta.env.MODE === 'development'
