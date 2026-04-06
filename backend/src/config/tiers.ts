@@ -1,7 +1,7 @@
 export const TIER_CONFIG = {
     free: {
         name: 'Free',
-        maxUploads: 150,
+        maxUploads: 30,
         features: ['basic_cleanup'],
         canMerge: false,
         canClean: true,
