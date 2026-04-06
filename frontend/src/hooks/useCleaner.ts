@@ -8,7 +8,7 @@ import createClientLogger from '../utils/clientLogger';
 import handleApiError from '../utils/apiError';
 import { useTierStore } from '../Store/tierStore';
 import { TIER_CONFIG } from '../../../shared/tiers';
-import { AxiosError } from 'axios';
+//import { AxiosError } from 'axios';
 import { useGeneralStore } from '../Store/generalStore';
 const log = createClientLogger('UseCleaner.tsx');
 interface BackendError {
@@ -39,8 +39,10 @@ export default function useCleaner() {
     const [progress, setProgress] = useState(0);
     const [isExpired, setIsExpired] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
-
     const tierId = useTierStore((state) => state.tierId);
+    const CURRENT_LIMIT =
+        TIER_CONFIG[tierId as keyof typeof TIER_CONFIG]?.maxUploads;
+
     /* ---------- Handlers ---------- */
     const handleDragEnter = (event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault();
@@ -99,14 +101,15 @@ export default function useCleaner() {
             const fileArray = Array.from(files);
 
             // Check file limit before uploading
-            /*if (fileArray.length > MAX_UPLOADS) {
+            if (fileArray.length > CURRENT_LIMIT) {
                 setError(
-                    `${fileArray.length} files. Kindly upgrade to premium`
+                    `You're trying to upload ${fileArray.length} files, but your current plan supports ${CURRENT_LIMIT}.`
                 );
                 setUpgradeModal(true);
                 setStatus('idle');
+                setIsDragging(false);
                 return;
-            }*/
+            }
 
             setUploadedFolder({
                 name: folderName,
@@ -300,15 +303,15 @@ export default function useCleaner() {
                                 `[FRONTEND] processing folder ${dirEntry.name}`
                             );
                             const dirFiles = await traverseDirectory(dirEntry);
-                            /*if (dirFiles.length > 150) {
+                            if (dirFiles.length > CURRENT_LIMIT) {
                                 setError(
-                                    `${dirFiles.length} files. Kindly upgrade to premium`
+                                    `You're trying to upload ${dirFiles.length} files, but your current plan supports ${CURRENT_LIMIT}.`
                                 );
                                 setUpgradeModal(true);
                                 setStatus('idle');
                                 setIsDragging(false);
                                 return;
-                            }*/
+                            }
 
                             log.info(
                                 `[FRONTEND] ${dirFiles.length} found in folder`

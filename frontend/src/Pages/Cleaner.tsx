@@ -43,7 +43,7 @@ export default function FolderCleanerUI() {
     const handleClose = () => {
         setOpenPopUp(false);
     };
-    log.debug(`State of the isexpred ${isExpired}`);
+    log.debug(`State of the is expired ${isExpired}`);
     const cleaningStats = useGeneralStore((state) => state.cleaningStats);
     const path = 'processFolder';
     const tierId = useTierStore((state) => state.tierId);

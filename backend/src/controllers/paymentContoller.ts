@@ -23,7 +23,7 @@ export async function mpesaPayment(
 ) {
     const authReq = req as AuthenticatedRequest;
     const userId = authReq?.user?.uid;
-    const { amount, email, phoneNumber, metadata } = req.body;
+    const { amount, email, phoneNumber } = req.body;
 
     if (!amount) {
         log.error('Amount is missing ');
@@ -122,6 +122,8 @@ export async function mpesaPayment(
         });
 
         if (payheroResponse.data.success) {
+            log.debug('Are the db being touched');
+
             await TransactionsModel.create({
                 userId,
                 amount,
@@ -141,7 +143,7 @@ export async function mpesaPayment(
                 provider: 'mpesa',
                 createdAt: new Date(),
             });
-            await UserModel.findByIdAndUpdate(
+            /*await UserModel.findByIdAndUpdate(
                 userId,
 
                 {
@@ -153,8 +155,7 @@ export async function mpesaPayment(
                     },
                 },
                 { returnDocument: 'after', runValidators: true } // Returns the updated document
-            );
-
+            );*/
             //Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
             //pesa returns a pending state until the user has verified using their pin
             if (payheroResponse.data.success) {

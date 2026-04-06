@@ -13,13 +13,11 @@ import { useNavigate } from 'react-router-dom';
 import type { PaymentMethod } from '../types/transactions';
 import useErrorStore from '../Store/ErrorStore';
 //import handleApiError from '../utils/apiError';
-import createClientLogger from '../utils/clientLogger';
 import PayheroButton from '../components/PayheroButton';
 import useSuccessStore from '../Store/SuccessStore';
-const baseURL = import.meta.env.VITE_API_URL;
+//const baseURL = import.meta.env.VITE_API_URL;
 
 //import authApi from '../library/authApi';
-const log = createClientLogger('Billing.tsx');
 export default function Billing() {
     const [selectedPayment, setSelectedPayment] = useState<string>('mpesa');
     const [phoneNumber, setPhoneNumber] = useState<string>('');
@@ -54,10 +52,10 @@ export default function Billing() {
     }, [selectedTier, navigate]);
     //const prodURL = 'https://tidy-upp.netlify.app';
     //const devURL = 'http://localhost:5173';
-
-    const CALLBACK_URL = import.meta.env.PROD
-        ? `${baseURL}/webhook`
-        : `${baseURL}/payment/webhook`;
+    const BACKEND_URL = import.meta.env.PROD
+        ? 'https://tidy-up.onrender.com/api'
+        : 'https://unparasitical-unsigned-lasonya.ngrok-free.dev/api';
+    const CALLBACK_URL = `${BACKEND_URL}/payment/webhook`;
     const SUCCESS_URL = `${window.location.origin}/folder-cleaner`;
     const FAILED_URL = `${window.location.origin}/pricing/billing`;
     const paymentMethods: PaymentMethod[] = [
@@ -94,6 +92,10 @@ export default function Billing() {
         setError('Please select a plan first');
         return;
     }
+    const storage = localStorage.getItem('auth-storage');
+    if (!storage) return;
+    const parsed = JSON.parse(storage);
+    const user = parsed.state.user;
     //log.debug(`is authenticated ${isAuthenticated}`);
     /*const handlePayment = async () => {
         if (selectedPayment === 'mpesa' && !phoneNumber) {
@@ -147,7 +149,6 @@ export default function Billing() {
             setIsProcessing(false);
         }
     };*/
-    log.debug(`this is the selected method of payment ${selectedPayment}`);
 
     return (
         <div className="min-h-screen bg-linear-to-br from-purple-600 to-violet-800 p-4 md:p-8">
@@ -459,7 +460,7 @@ export default function Billing() {
                             amount={amount}
                             phone={phoneToSend ?? ''}
                             name={email}
-                            reference={`tier-${selectedTier?.id ?? 'unknown'}-${Date.now()}`}
+                            reference={`user_${user.id}|tier_${selectedTier?.id}|name_${email}|period_${selectedPeriod}|${Date.now()}`}
                             channelID={6761}
                             paymentUrl={'https://lipwa.link/7182'}
                             buttonColor={'#00a884'}

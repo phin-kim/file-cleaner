@@ -1,15 +1,16 @@
-import axios from 'axios';
+/**import axios from 'axios';
 import crypto from 'node:crypto';
+import type { PaystackVerificationResponse } from '../Types/transactions.js';
+import handleAxiosError from '../utils/axiosErrorHandler.js';
+
+const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;*/
 import type { Response, Request, NextFunction } from 'express';
 
 import { UserModel } from '../schema/UsersSchema.js';
 import createLogger from '../utils/logger.js';
 import AppError from '../utils/appError.js';
 import { TransactionsModel } from '../schema/TransactionSchema.js';
-import type { PaystackVerificationResponse } from '../Types/transactions.js';
-import handleAxiosError from '../utils/axiosErrorHandler.js';
 
-const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
 const log = createLogger('webhook.ts');
 export async function paystackWebhook(
     req: Request,
@@ -17,78 +18,98 @@ export async function paystackWebhook(
     next: NextFunction
 ) {
     try {
-        //validate signature
-        log.info('webhook url is called');
-        const hash = crypto
-            .createHmac('sha512', PAYSTACK_SECRET_KEY!)
-            .update(JSON.stringify(req.body))
-            .digest('hex');
-        if (hash !== req.headers['x-paystack-signature']) {
-            log.warn('Invalid webhook signature');
-            return next(AppError.badRequest('Invalid signature'));
-        }
-        res.sendStatus(200);
-        const event = req.body;
-        if (event.event === 'charge.success') {
-            const { reference, metadata } = event.data;
-            const userId = metadata.userId;
-            log.info('Payment successful webhook received', {
+        const { paymentSuccess, user_reference, providerReference, amount } =
+            req.body || {};
+
+        // 1. Check if paymentSuccess is true (based on your logs)
+        if (paymentSuccess !== true) {
+            log.warn('Payment not successful according to Payhero', {
                 data: {
-                    reference,
-                    userId,
+                    ref: user_reference,
                 },
             });
-            const verification = await verifyTransaction(reference, next);
-            log.debug('The response from verification', {
-                data: { verification },
-            });
-            if (
-                !verification?.status &&
-                verification?.data.status !== 'success'
-            ) {
-                log.error(
-                    `Error occurred after the paystack 200 for email ${verification?.data.customer.email}`,
-                    {
-                        data: {
-                            message: verification?.data.message,
-                        },
-                    }
-                );
-            } else {
-                log.debug(
-                    'Debug check to see if the data base is being updated'
-                );
-                await TransactionsModel.findOneAndUpdate(
-                    { reference: reference },
-                    {
-                        $set: { status: 'success' },
-                    },
-                    { returnDocument: 'after' }
-                );
-                //update the user
-
-                await UserModel.findByIdAndUpdate(
-                    userId,
-
-                    {
-                        $set: {
-                            tierId: metadata.tierId,
-                            'subscription-period': metadata.period,
-                            'subscription-status': 'active',
-                            'last-payment-date': new Date(),
-                        },
-                    },
-                    { returnDocument: 'after', runValidators: true } // Returns the updated document
-                );
-                log.info('Databases updated');
-            }
+            return res.status(200).json({ status: 'ignored' });
         }
+
+        // 2. Parse the metadata from 'user_reference'
+        // Format: "user_ID|tier_ID|name_EMAIL|period_MONTHLY|TIMESTAMP"
+        const parts = user_reference?.split('|') || [];
+
+        // Helper to find specific keys in your pipe-delimited string
+        const getVal = (prefix: string) =>
+            parts.find((p: string) => p.startsWith(prefix))?.split('_')[1];
+
+        const userId = getVal('user');
+        const tierId = getVal('tier');
+        const email = getVal('name');
+        const period = getVal('period');
+
+        if (!userId || !tierId) {
+            log.error('Critical metadata missing in user_reference', {
+                data: {
+                    user_reference,
+                },
+            });
+            return res.status(200).json({ message: 'Metadata error' });
+        }
+        // 1. Check if this transaction already exists before trying to create it
+        const existingTransaction = await TransactionsModel.findOne({
+            reference: user_reference,
+        });
+
+        if (existingTransaction) {
+            log.info('Transaction already processed, skipping duplicate.', {
+                data: {
+                    ref: user_reference,
+                },
+            });
+            return res
+                .status(200)
+                .json({ success: true, message: 'Already processed' });
+        }
+
+        // 3. Update Transaction Database
+        try {
+            await TransactionsModel.create({
+                userId,
+                amount: amount,
+                email: email,
+                status: 'success',
+                reference: user_reference,
+                mpesaReceipt: providerReference, // This is "UD6KQ0A5WX" in your logs
+                project: 'tidy-up',
+                provider: 'mpesa',
+                createdAt: new Date(),
+            });
+        } catch (dbError: any) {
+            if (dbError.code === 11000) {
+                return res
+                    .status(200)
+                    .json({ success: true, message: 'Duplicate blocked' });
+            }
+            throw dbError;
+        }
+
+        // 4. Upgrade User Tier
+        await UserModel.findByIdAndUpdate(userId, {
+            $set: {
+                tierId: tierId,
+                'subscription-period': period,
+                'subscription-status': 'active',
+                'last-payment-date': new Date(),
+            },
+        });
+
+        log.info(`✅ Successfully upgraded ${email} to ${tierId}`);
+
+        // Always return 200 so Payhero stops retrying
+        return res.status(200).json({ success: true });
     } catch (error) {
         log.error('Web hook error', { data: { error } });
         return next(error);
     }
 }
-export const verifyTransaction = async (
+/*export const verifyTransaction = async (
     reference: string,
     next: NextFunction
 ): Promise<PaystackVerificationResponse | undefined> => {
@@ -108,4 +129,4 @@ export const verifyTransaction = async (
         handleAxiosError(error, next);
         return;
     }
-};
+};*/

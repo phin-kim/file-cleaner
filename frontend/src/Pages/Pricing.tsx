@@ -9,7 +9,7 @@ import {
 } from 'react-icons/fa6';
 import { useNavigate } from 'react-router-dom';
 import { useTransactions } from '../Store/TransactionStore';
-import { useAuthStore } from '../Store/authStore';
+//import { useAuthStore } from '../Store/authStore';
 
 const Pricing: React.FC = () => {
     const navigate = useNavigate();
@@ -25,7 +25,7 @@ const Pricing: React.FC = () => {
         {
             id: 'tier-1',
             name: 'Basic Cleanup',
-            monthlyPrice: 200,
+            monthlyPrice: 1,
             quarterlyPrice: 550,
             description: 'Perfect for individuals needing quick organization.',
             features: [

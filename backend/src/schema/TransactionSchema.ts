@@ -12,7 +12,7 @@ export interface Transaction_Type extends Document {
     tierName: string;
     metadata?: Metadata;
     status: 'pending' | 'success' | 'failed' | 'processing';
-    paystackReference?: string;
+    mpesaReceipt?: string;
     createdAt: Date;
     project: string;
     provider: string;
@@ -83,7 +83,7 @@ const TransactionsSchema = new Schema<Transaction_Type>(
             enum: ['pending', 'success', 'failed', 'processing'],
             default: 'pending',
         },
-        paystackReference: {
+        mpesaReceipt: {
             type: String,
             sparse: true, // Allows null/undefined but maintains uniqueness for those that exist
         },

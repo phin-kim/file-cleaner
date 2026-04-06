@@ -39,6 +39,7 @@ export const TIER_CONFIG = {
         canMerge: true,
         canClean: true,
         canOrganize: true,
+
         priority: true,
     },
 };

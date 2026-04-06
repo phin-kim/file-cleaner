@@ -1,6 +1,4 @@
 import React, { useEffect, useState, useRef } from 'react';
-import createClientLogger from '../utils/clientLogger';
-const log = createClientLogger('PayheroButton.tsx');
 const PAYHERO_SDK_URL =
     'https://applet.payherokenya.com/cdn/button_sdk.js?v=3.1';
 
@@ -154,8 +152,7 @@ export default function PayheroButton({
             onError?.(new Error('Payment SDK not ready'));
         }
     };
-    log.debug('The payhero button is being triggered');
-
+    //
     return (
         <div>
             <div id={containerIdRef.current} />
