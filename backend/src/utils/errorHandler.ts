@@ -11,7 +11,7 @@ const errorHandler = (
     res: Response,
     _next: NextFunction
 ) => {
-    const isProd = process.env.NODE_ENV === 'production'; //not to return generic errors in prod
+    //const isProd = process.env.NODE_ENV === 'production'; //not to return generic errors in prod
     const requestId = req.headers['x-request-id'] ?? crypto.randomUUID();
     const stack = err instanceof Error ? err.stack : undefined;
     console.error('🔥 Caught in Error Handler', {
@@ -38,7 +38,8 @@ const errorHandler = (
         appError = AppError.database('Internal server error');
     }
     const statusCode = appError.statusCode || 500;
-    const message = isProd ? 'Something went wrong' : appError.message;
+    //const message = isProd ? 'Something went wrong' : appError.message;
+    const message = appError.message;
     const type = appError.type || 'Server Error';
     return res.status(appError.statusCode).json({
         success: false,
