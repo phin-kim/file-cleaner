@@ -8,7 +8,7 @@ import type { Response, Request, NextFunction } from 'express';
 
 import { UserModel } from '../schema/UsersSchema.js';
 import createLogger from '../utils/logger.js';
-import AppError from '../utils/appError.js';
+//import AppError from '../utils/appError.js';
 import { TransactionsModel } from '../schema/TransactionSchema.js';
 
 const log = createLogger('webhook.ts');

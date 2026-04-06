@@ -25,7 +25,7 @@ const Pricing: React.FC = () => {
         {
             id: 'tier-1',
             name: 'Basic Cleanup',
-            monthlyPrice: 1,
+            monthlyPrice: 200,
             quarterlyPrice: 550,
             description: 'Perfect for individuals needing quick organization.',
             features: [
