@@ -16,6 +16,8 @@ import useErrorStore from '../Store/ErrorStore';
 import createClientLogger from '../utils/clientLogger';
 import PayheroButton from '../components/PayheroButton';
 import useSuccessStore from '../Store/SuccessStore';
+const baseURL = import.meta.env.VITE_API_URL;
+
 //import authApi from '../library/authApi';
 const log = createClientLogger('Billing.tsx');
 export default function Billing() {
@@ -50,14 +52,14 @@ export default function Billing() {
             navigate('/');
         }
     }, [selectedTier, navigate]);
-    const prodURL = 'https://tidy-upp.netlify.app';
-    const devURL = 'http://localhost:5173';
-    const isProd = import.meta.env.PROD ? prodURL : devURL;
+    //const prodURL = 'https://tidy-upp.netlify.app';
+    //const devURL = 'http://localhost:5173';
+
     const CALLBACK_URL = import.meta.env.PROD
-        ? 'https://tidy-up.onrender.com/api/payment/webhook'
-        : 'https://unparasitical-unsigned-lasonya.ngrok-free.dev/api/payment/webhook';
-    const FAILED_URL = `${isProd}/pricing/billing`;
-    const SUCCESS_URL = `${isProd}/folder-cleaner`;
+        ? `${baseURL}/webhook`
+        : `${baseURL}/payment/webhook`;
+    const SUCCESS_URL = `${window.location.origin}/folder-cleaner`;
+    const FAILED_URL = `${window.location.origin}/pricing/billing`;
     const paymentMethods: PaymentMethod[] = [
         {
             id: 'mpesa',
@@ -469,7 +471,7 @@ export default function Billing() {
                             onSuccess={() => {
                                 setIsProcessing(false);
                                 setSuccess('Payment successful');
-                                navigate('/folder-cleaner');
+                                //navigate('/folder-cleaner');
                             }}
                             onError={(err) => {
                                 setIsProcessing(false);

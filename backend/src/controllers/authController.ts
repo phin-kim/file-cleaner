@@ -46,11 +46,21 @@ export async function register(req: Request, res: Response) {
         expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
     });
     await user.save();
+    const isProduction = process.env.NODE_ENV === 'production';
+    const isNgrok = req.get('host')?.includes('ngrok-free.dev');
+
+    // Use 'none' if we are on Render (Production) OR using the Ngrok tunnel
+    // Use 'lax' ONLY if we are testing on plain http://localhost
+    const cookieSameSite = isProduction || isNgrok ? 'none' : 'lax';
+
+    // Use true if we are on Render OR Ngrok (since both provide HTTPS)
+    const cookieSecure = isProduction || isNgrok;
     res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        //secure: process.env.NODE_ENV === 'production',
+        secure: cookieSecure,
         path: '/',
-        sameSite: 'strict',
+        sameSite: cookieSameSite,
         signed: true,
         maxAge: 30 * 24 * 60 * 60 * 1000,
     });

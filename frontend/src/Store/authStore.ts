@@ -81,6 +81,8 @@ export const useAuthStore = create<AuthState>()(
             },
             refresh: async () => {
                 set({ isLoading: true });
+                localStorage.setItem('hasSession', 'true');
+
                 log.highlight('REFRESH IS TRIGGERED');
                 try {
                     const res = await authApi.post('/auth/refresh');

@@ -48,7 +48,15 @@ function App() {
             */
 
             try {
+                /*const hasSession = localStorage.getItem('hasSession');
+                if (!hasSession) {
+                    log.info('No stored session skipping refresh');
+                    return;
+                } else {
+                    log.info('Session present');
+                }*/
                 const refresh = useAuthStore.getState().refresh;
+
                 await refresh();
                 const currentUser = useAuthStore.getState().user;
                 const currentAuth = useAuthStore.getState().isAuthenticated;

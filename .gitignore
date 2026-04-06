@@ -27,6 +27,8 @@ dist-ssr/
 
 # Environment and secrets
 .env
+.env.production
+.env.development
 serviceAccountKey.json
 
 # Cache files - using relative paths from root

@@ -61,6 +61,15 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
             if (recentToken) {
                 log.warn('Double render detected, ignoring revoked error');
                 return res.status(200).json({ success: true });
+                /**
+                 * might implement this if the double render issue persists 
+                 * const accessToken = signAccessToken({ uid: user._id.toString() });
+                return res.status(200).json({
+                    success: true,
+                    accessToken,
+                    user: { id: user.id, email: user.email, role: user.role }
+                }); 
+    */
             }
             log.error('No matching token found - REVOKED', {
                 data: {
@@ -97,14 +106,24 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
             (token) => token.tokenHash !== tokenHash
         );
         await user.save();
+
+        const isProduction = process.env.NODE_ENV === 'production';
+        const isNgrok = req.get('host')?.includes('ngrok-free.dev');
+
+        // Use 'none' if we are on Render (Production) OR using the Ngrok tunnel
+        // Use 'lax' ONLY if we are testing on plain http://localhost
+        const cookieSameSite = isProduction || isNgrok ? 'none' : 'lax';
+
+        // Use true if we are on Render OR Ngrok (since both provide HTTPS)
+        const cookieSecure = isProduction || isNgrok;
         res.cookie('refreshToken', newRefreshToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            //set to general path coz i need payment to access the cookie change later due to security issues
+            //secure: process.env.NODE_ENV === 'production',
+            secure: cookieSecure,
             path: '/',
-            maxAge: 30 * 24 * 60 * 60 * 1000,
+            sameSite: cookieSameSite,
             signed: true,
+            maxAge: 30 * 24 * 60 * 60 * 1000,
         });
         //send the new access token
         const newAccessToken = signAccessToken({ uid: user._id.toString() });

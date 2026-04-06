@@ -12,7 +12,13 @@ import { FaShieldHalved } from 'react-icons/fa6';
 const log = createClientLogger('AuthForm');
 const AuthForm = () => {
     const { setError } = useErrorStore();
-    log.debug(` what environment are we in ${import.meta.env}`);
+    const mode = import.meta.env.MODE;
+    const url = import.meta.env.VITE_API_URL;
+    log.debug('Current Mode:', { data: { mode } });
+    log.debug('API URL being used:', { data: { url } });
+    log.debug(
+        ` what environment are we in ${import.meta.env.DEV ? 'development' : 'Production'}`
+    );
     const navigate = useNavigate();
     const registerUser = useAuthStore((state) => state.register);
     const {

@@ -7,10 +7,12 @@ import axios from 'axios';
 import createClientLogger from '../utils/clientLogger';
 //import { useAuthStore } from '../Store/authStore';
 const log = createClientLogger('Auth api');
-const baseURL =
+/*const baseURL =
     import.meta.env.MODE === 'development'
         ? 'http://localhost:5000/api'
-        : 'https://tidy-up.onrender.com/api';
+        : 'https://tidy-up.onrender.com/api';*/
+// authAPI.ts or wherever you define baseURL
+const baseURL = import.meta.env.VITE_API_URL;
 interface QueuedRequest {
     resolve: (value: string | null) => void;
     reject: (reason?: AxiosError) => void;
@@ -31,14 +33,25 @@ const authApi: AxiosInstance = axios.create({
  */
 authApi.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
-        if (accessToken && config.headers) {
+        /*if (accessToken && config.headers) {
             config.headers.Authorization = `Bearer ${accessToken}`;
         }
+        console.log(`Access token read from authAPI.ts ${accessToken}`);*/
+        // 1. Add the ngrok bypass header
+        if (config.headers) {
+            config.headers['ngrok-skip-browser-warning'] = 'true';
+
+            // 2. Add the Bearer token if it exists
+            if (accessToken) {
+                config.headers.Authorization = `Bearer ${accessToken}`;
+            }
+        }
+
+        console.log(`Access token read from authAPI.ts ${accessToken}`);
         return config;
     },
     (error) => Promise.reject(error)
 );
-console.log(`Access token read from authAPI.ts ${accessToken}`);
 authApi.interceptors.response.use(
     (response) => response,
     async (error: AxiosError) => {

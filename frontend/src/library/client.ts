@@ -2,10 +2,12 @@ import axios from 'axios';
 /**importing this access token like this wont be ideal coz it will be stale in the case of an update so we use a getter function defined in the auth api.ts */
 import { accessToken } from './authApi';
 import type { AxiosInstance } from 'axios';
-const baseURL =
+/*const baseURL =
     import.meta.env.MODE === 'development'
         ? 'http://localhost:5000/api'
-        : 'https://tidy-up.onrender.com/api';
+        : 'https://tidy-up.onrender.com/api';*/
+const baseURL = import.meta.env.VITE_API_URL;
+
 export const fileCleanerApi = axios.create({
     baseURL,
     timeout: 600000, // 10 minutes for large file uploads
@@ -20,10 +22,19 @@ export const paystackApi = axios.create({
 const attachAuth = (instance: AxiosInstance) => {
     instance.interceptors.request.use((config) => {
         // We use the live 'accessToken' exported from authApi.ts
-        if (accessToken && config.headers) {
+        /*if (accessToken && config.headers) {
             config.headers.Authorization = `Bearer ${accessToken}`;
+        }*/
+        if (config.headers) {
+            config.headers['ngrok-skip-browser-warning'] = 'true';
+
+            // 2. Add the Bearer token if it exists
+            if (accessToken) {
+                config.headers.Authorization = `Bearer ${accessToken}`;
+            }
         }
 
+        console.log(`Access token read from authAPI.ts ${accessToken}`);
         return config;
     });
 };
