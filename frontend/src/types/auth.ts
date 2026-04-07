@@ -14,3 +14,8 @@ export type AuthResponse = {
     user: User;
     message: string;
 };
+export type LoginResponse = {
+    accessToken: string;
+    user: User;
+    message: string;
+};

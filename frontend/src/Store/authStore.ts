@@ -1,9 +1,9 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import { setAccessToken as setApiToken } from '../library/authApi';
+import { accessToken, setAccessToken as setApiToken } from '../library/authApi';
 import createClientLogger from '../utils/clientLogger';
 //remember to change is authenticated in the db and also in the routes
-import type { User, AuthResponse } from '../types/auth';
+import type { User, AuthResponse, LoginResponse } from '../types/auth';
 import authApi, { setAccessToken } from '../library/authApi';
 import useSuccessStore from './SuccessStore';
 import useErrorStore from './ErrorStore';
@@ -16,7 +16,9 @@ type AuthState = {
     isAuthenticated: boolean;
     isLoading: boolean;
     register: (email: string, password: string) => Promise<void>;
+    login: (email: string, password: string) => Promise<void>;
     setHasHydrated: (state: boolean) => void;
+
     setAccessToken: (token: string | null) => void;
     refresh: () => Promise<void>;
     logout: () => Promise<void>;
@@ -77,6 +79,45 @@ export const useAuthStore = create<AuthState>()(
                     set({ isAuthenticated: false });
                 } finally {
                     set({ isLoading: false });
+                }
+            },
+            login: async (email, password) => {
+                set({ isLoading: true });
+                try {
+                    const res = await authApi.post<LoginResponse>(
+                        '/auth/login',
+                        { email, password }
+                    );
+                    get().setAccessToken(res.data.accessToken);
+                    set({
+                        user: res.data.user,
+                        accessToken: res.data.accessToken,
+                        isAuthenticated: true,
+                    });
+                    setApiToken(res.data.accessToken);
+                    localStorage.setItem('hasSession', 'true');
+                    const currentState = get();
+                    log.debug(`Current user `, {
+                        data: currentState.user,
+                    });
+                    log.debug(
+                        `Is authenticated ${currentState.isAuthenticated}`
+                    );
+                    useSuccessStore.setState({
+                        success: 'Registration successful',
+                    });
+                } catch (error) {
+                    log.warn(`Get the general error ${error}`);
+                    log.error('Error in registering', {
+                        data: { error },
+                    });
+
+                    const { setError } = useErrorStore.getState();
+                    handleApiError(error, setError);
+
+                    set({ isAuthenticated: false });
+                } finally {
+                    set({ isLoading: true });
                 }
             },
             refresh: async () => {

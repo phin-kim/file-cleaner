@@ -53,7 +53,6 @@ const UserSchema = new Schema<User_Type>(
         },
         passwordHash: {
             type: String,
-            select: false,
         },
         refreshTokens: {
             type: [refreshTokenSchema],

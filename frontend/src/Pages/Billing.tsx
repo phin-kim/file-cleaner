@@ -68,7 +68,7 @@ export default function Billing() {
                 </span>
             ),
         },
-        {
+        /* {
             id: 'card',
             name: 'Credit/Debit Card',
             icon: (
@@ -85,7 +85,7 @@ export default function Billing() {
                     <FaPaypal />
                 </span>
             ),
-        },
+        },*/
     ];
 
     if (!selectedTier) {
@@ -232,7 +232,7 @@ export default function Billing() {
                     </div>
 
                     {/* Security Banner */}
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                    <div className="mt-3 grid grid-cols-1 gap-4 md:grid-cols-3">
                         {[
                             {
                                 icon: Lock,
@@ -240,9 +240,9 @@ export default function Billing() {
                                 color: 'text-blue-400',
                             },
                             {
-                                icon: Shield,
-                                label: 'Money-Back Guarantee',
-                                color: 'text-emerald-400',
+                                icon: Zap,
+                                label: 'Instant upgrade on pay',
+                                color: 'text-yellow-400',
                             },
                             {
                                 icon: Info,
