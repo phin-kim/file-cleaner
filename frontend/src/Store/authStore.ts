@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import { accessToken, setAccessToken as setApiToken } from '../library/authApi';
+import { setAccessToken as setApiToken } from '../library/authApi';
 import createClientLogger from '../utils/clientLogger';
 //remember to change is authenticated in the db and also in the routes
 import type { User, AuthResponse, LoginResponse } from '../types/auth';

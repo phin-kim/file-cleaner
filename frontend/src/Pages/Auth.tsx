@@ -14,7 +14,7 @@ const AuthForm = () => {
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex min-h-[600px] flex-col overflow-hidden rounded-[2.5rem] border border-white/20 bg-white/20 shadow-[0_32px_64px_rgba(0,0,0,0.2)] backdrop-blur-3xl md:flex-row"
+                className="flex min-h-150 flex-col overflow-hidden rounded-[2.5rem] border border-white/20 bg-white/20 shadow-[0_32px_64px_rgba(0,0,0,0.2)] backdrop-blur-3xl md:flex-row"
             >
                 {/* Left Side - Brand & Illustration */}
                 <div className="relative flex flex-col overflow-hidden bg-linear-to-br from-purple-600 to-violet-700 p-10 md:w-5/12">

@@ -7,7 +7,7 @@ import useErrorStore from '../Store/ErrorStore';
 import createClientLogger from '../utils/clientLogger';
 import handleApiError from '../utils/apiError';
 import { useTierStore } from '../Store/tierStore';
-import { TIER_CONFIG } from '../../../shared/tiers';
+import { TIER_CONFIG } from '../library/tier';
 //import { AxiosError } from 'axios';
 import { useGeneralStore } from '../Store/generalStore';
 const log = createClientLogger('UseCleaner.tsx');
@@ -265,6 +265,8 @@ export default function useCleaner() {
             });
         }, 100);
         try {
+            const startTime = new Date().getSeconds();
+
             const files: File[] = [];
             let folderName = 'folder';
             const items = event.dataTransfer.items;
@@ -303,7 +305,12 @@ export default function useCleaner() {
                                 `[FRONTEND] processing folder ${dirEntry.name}`
                             );
                             const dirFiles = await traverseDirectory(dirEntry);
+                            log.debug(`current limit ${CURRENT_LIMIT}`);
                             if (dirFiles.length > CURRENT_LIMIT) {
+                                log.debug(
+                                    `The limit detected after ${Date.now() - startTime}ms`
+                                );
+
                                 setError(
                                     `You're trying to upload ${dirFiles.length} files, but your current plan supports ${CURRENT_LIMIT}.`
                                 );

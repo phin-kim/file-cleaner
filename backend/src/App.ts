@@ -29,6 +29,7 @@ app.use(
             'http://localhost:5173',
             'https://tidy-upp.netlify.app',
             'http://localhost:4173',
+            'https://unparasitical-unsigned-lasonya.ngrok-free.dev',
         ],
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
