@@ -67,6 +67,9 @@ export default function useCleaner() {
             setError('No folder input');
             return;
         }
+        let uploadLimit: UploadLimitResult = {
+            allowed: true,
+        };
         log.info(`Folder selected via input`);
         setStatus('uploading');
         setProgress(0);
@@ -90,7 +93,14 @@ export default function useCleaner() {
             const folderName = firstFile.webkitRelativePath.split('/')[0];
             log.highlight('Folder name', { data: folderName });
             const fileArray = Array.from(files);
-
+            uploadLimit = uploadLimiter(fileArray.length);
+            if (!uploadLimit.allowed) {
+                setError(
+                    'Daily limit reached for large files. Resets at midnight.'
+                );
+                setStatus('idle');
+                return;
+            }
             // Check file limit before uploading
             if (fileArray.length > CURRENT_LIMIT) {
                 setError(
@@ -138,6 +148,13 @@ export default function useCleaner() {
                 setStatus('idle');
                 return;
             }*/
+            if (uploadLimit.stats) {
+                const newStats = {
+                    ...uploadLimit.stats,
+                    count: uploadLimit.stats.count + 1,
+                };
+                localStorage.setItem('upload-stats', JSON.stringify(newStats));
+            }
 
             log.highlight(
                 `[FRONTEND] backend responded in ${Date.now() - start}ms`
@@ -357,7 +374,6 @@ export default function useCleaner() {
             log.debug('This is the response from my backend', {
                 data: { res },
             });
-            const stats = uploadLimit.stats;
 
             if (uploadLimit.stats) {
                 const newStats = {

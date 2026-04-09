@@ -30,6 +30,8 @@ app.use(
             'https://tidy-upp.netlify.app',
             'http://localhost:4173',
             'https://unparasitical-unsigned-lasonya.ngrok-free.dev',
+            'https://tidyupp.site',
+            'https://literalistically-paleobiologic-leatrice.ngrok-free.dev',
         ],
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
