@@ -47,7 +47,6 @@ authApi.interceptors.request.use(
             }
         }
 
-        console.log(`Access token read from authAPI.ts ${accessToken}`);
         return config;
     },
     (error) => Promise.reject(error)

@@ -8,21 +8,11 @@ import authApi, { setAccessToken } from '../library/authApi';
 import useSuccessStore from './SuccessStore';
 import useErrorStore from './ErrorStore';
 import handleApiError from '../utils/apiError';
+import type { BackendError, UnknownApiError } from '../types/types';
+import type { AuthState } from '../types/auth';
+//import NotFound from '../components/NotFound';
 const log = createClientLogger('AUTH STORE');
-type AuthState = {
-    user: User | null;
-    accessToken: string | null;
-    _hasHydrated: boolean; //<-- used  as a flag to tell the pages to wait until the is authenticated is read from the local storage
-    isAuthenticated: boolean;
-    isLoading: boolean;
-    register: (email: string, password: string) => Promise<void>;
-    login: (email: string, password: string) => Promise<void>;
-    setHasHydrated: (state: boolean) => void;
 
-    setAccessToken: (token: string | null) => void;
-    refresh: () => Promise<void>;
-    logout: () => Promise<void>;
-};
 export const useAuthStore = create<AuthState>()(
     persist(
         (set, get) => ({
@@ -30,6 +20,8 @@ export const useAuthStore = create<AuthState>()(
             isAuthenticated: false,
             accessToken: null,
             isLoading: true,
+            notFound: false,
+            setNotFound: (state) => set({ notFound: state }),
             _hasHydrated: false,
             setHasHydrated: (state) => set({ _hasHydrated: state }),
             setAccessToken: (token: string | null) => {
@@ -104,20 +96,61 @@ export const useAuthStore = create<AuthState>()(
                         `Is authenticated ${currentState.isAuthenticated}`
                     );
                     useSuccessStore.setState({
-                        success: 'Registration successful',
+                        success: 'Login  successful',
                     });
                 } catch (error) {
+                    //const statusCode = error.code;
+
                     log.warn(`Get the general error ${error}`);
                     log.error('Error in registering', {
                         data: { error },
                     });
+
+                    let serverStatus: number | undefined;
+                    let serverData: BackendError | undefined;
+
+                    const potentialError = error as UnknownApiError;
+
+                    // Check if it has the typical Axios response structure
+                    if (potentialError?.response) {
+                        serverStatus = potentialError.response.status;
+                        serverData = potentialError.response.data;
+                        const rawData = potentialError.response?.data;
+                        serverData =
+                            typeof rawData === 'string'
+                                ? JSON.parse(rawData)
+                                : rawData;
+                    }
+                    // Check if the error itself has a status (some middlewares do this)
+                    else if (potentialError?.status) {
+                        serverStatus = potentialError.status;
+                        const rawData = potentialError?.data;
+                        serverData =
+                            typeof rawData === 'string'
+                                ? JSON.parse(rawData)
+                                : rawData;
+                    }
+
+                    log.error('Error in processing files', {
+                        data: { serverStatus, serverData },
+                    });
+                    /*const expiredFlag = log.debug(
+                `Is the 403 error being triggered: ${serverStatus === 403 ? 'YES' : 'NO'}`
+            );*/
+                    log.debug(
+                        `What is the server status code: ${serverStatus}`
+                    );
+                    set({ notFound: true });
+                    log.debug(
+                        `Does it contain an expired flag: ${potentialError.type}`
+                    );
 
                     const { setError } = useErrorStore.getState();
                     handleApiError(error, setError);
 
                     set({ isAuthenticated: false });
                 } finally {
-                    set({ isLoading: true });
+                    set({ isLoading: false });
                 }
             },
             refresh: async () => {

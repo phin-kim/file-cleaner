@@ -188,7 +188,10 @@ export default function FolderCleanerUI() {
                                         className="flex items-center justify-center gap-2 text-sm text-purple-300"
                                     >
                                         <Trash2 className="h-4 w-4" />
-                                        <span>Removing duplicate files...</span>
+                                        <span>
+                                            Removing duplicate files. This may
+                                            take a while...
+                                        </span>
                                     </motion.div>
                                 )}
                             </div>

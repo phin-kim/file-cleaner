@@ -38,7 +38,8 @@ const LoginForm = ({ onToggle }: LoginFormProps) => {
             navigate('/');
         } catch (error) {
             log.error('Login error', { data: { error } });
-            handleApiError(error, setError);
+
+            //handleApiError(error, setError);
         }
     };
 

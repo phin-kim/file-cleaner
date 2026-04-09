@@ -4,11 +4,17 @@ import { useNavigate } from 'react-router-dom';
 import { Rocket, ArrowLeft } from 'lucide-react';
 import LoginForm from '../components/Login';
 import RegisterForm from '../components/Register';
+import { useAuthStore } from '../Store/authStore';
+import NotFound from '../components/NotFound';
 
 const AuthForm = () => {
     const [isLogin, setIsLogin] = useState(false);
     const navigate = useNavigate();
-
+    const notFound = useAuthStore((state) => state.notFound);
+    const setNotFound = useAuthStore((state) => state.setNotFound);
+    if (notFound) {
+        return <NotFound onClose={() => setNotFound(false)} />;
+    }
     return (
         <div className="mx-auto max-w-5xl px-4 py-8">
             <motion.div

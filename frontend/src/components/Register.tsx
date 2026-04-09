@@ -13,13 +13,7 @@ interface RegisterFormProps {
 const log = createClientLogger('AuthForm');
 const RegistrationForm = ({ onToggle }: RegisterFormProps) => {
     const { setError } = useErrorStore();
-    const mode = import.meta.env.MODE;
-    const url = import.meta.env.VITE_API_URL;
-    log.debug('Current Mode:', { data: { mode } });
-    log.debug('API URL being used:', { data: { url } });
-    log.debug(
-        ` what environment are we in ${import.meta.env.DEV ? 'development' : 'Production'}`
-    );
+
     const navigate = useNavigate();
     const registerUser = useAuthStore((state) => state.register);
     const {

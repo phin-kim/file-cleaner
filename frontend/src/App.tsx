@@ -23,6 +23,7 @@ import WelcomeModal from './Pages/WelcomePage';
 import Breadcrumb from './components/Navbar';
 import ProtectedRoutes from './components/ProtectedRoutes';
 import AllTools from './Pages/Alltools';
+import NotFound from './components/NotFound';
 /** 
  
 Method	Name	React-Reactive?	Use Case

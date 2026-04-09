@@ -125,7 +125,7 @@ function handleUploadErrors(
     const uploadMiddleware = multer({
         storage: storage,
         limits: {
-            fileSize: 200 * 1024 * 1024,
+            fileSize: 1000 * 1024 * 1024,
             files: DYNAMIC_LIMIT,
         },
     }).array('files');
@@ -177,7 +177,7 @@ function handleUploadErrors(
                     );
                 case 'MULTER_ERROR':
                     const errorMessages: Record<string, string> = {
-                        LIMIT_FILE_SIZE: 'File too large. Max 200MB.',
+                        LIMIT_FILE_SIZE: 'File too large. Max 1GB.',
                         LIMIT_FILE_COUNT: `File count exceeded ${DYNAMIC_LIMIT}`,
                         LIMIT_UNEXPECTED_FILE: 'Unexpected file field.',
                     };

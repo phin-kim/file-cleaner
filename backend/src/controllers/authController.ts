@@ -142,7 +142,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
         signed: true,
         maxAge: 30 * 24 * 60 * 60 * 1000,
     });
-    res.status(201).json({
+    res.status(200).json({
         success: true,
         accessToken,
         user: {

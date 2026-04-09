@@ -34,7 +34,6 @@ const attachAuth = (instance: AxiosInstance) => {
             }
         }
 
-        console.log(`Access token read from authAPI.ts ${accessToken}`);
         return config;
     });
 };

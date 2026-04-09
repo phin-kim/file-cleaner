@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { fileCleanerApi } from '../library/client';
-import type { UploadedFolder, Status } from '../types/types';
+import type { UploadedFolder, Status, UploadLimitResult } from '../types/types';
 import traverseDirectory from '../utils/traverser';
 import type { AnalysisResult } from '../types/types';
 import useErrorStore from '../Store/ErrorStore';
@@ -10,19 +10,10 @@ import { useTierStore } from '../Store/tierStore';
 import { TIER_CONFIG } from '../library/tier';
 //import { AxiosError } from 'axios';
 import { useGeneralStore } from '../Store/generalStore';
+import type { BackendError, UnknownApiError } from '../types/types';
+import { uploadLimiter } from '../utils/uploadLimiter';
 const log = createClientLogger('UseCleaner.tsx');
-interface BackendError {
-    expired?: boolean;
-    message: string;
-    status: number;
-    type: string;
-}
-type UnknownApiError = {
-    status?: number;
-    data?: BackendError;
-    type?: string;
-    response?: { status: number; data: BackendError };
-};
+
 export default function useCleaner() {
     const { setError } = useErrorStore();
     /* ---------- State ---------- */
@@ -257,7 +248,9 @@ export default function useCleaner() {
         log.highlight('[FRONTEND] drop event triggered');
         setStatus('uploading');
         setProgress(0);
-
+        let uploadLimit: UploadLimitResult = {
+            allowed: true,
+        };
         const progressInterval = setInterval(() => {
             setProgress((prev) => {
                 if (prev >= 95) return prev;
@@ -282,6 +275,7 @@ export default function useCleaner() {
 
                 return;
             }
+
             if (items && items.length > 0) {
                 for (const item of items) {
                     if (item.kind === 'file') {
@@ -317,6 +311,14 @@ export default function useCleaner() {
                                 setUpgradeModal(true);
                                 setStatus('idle');
                                 setIsDragging(false);
+                                return;
+                            }
+                            uploadLimit = uploadLimiter(dirFiles.length);
+                            if (!uploadLimit.allowed) {
+                                setError(
+                                    'Daily limit reached for large files. Resets at midnight.'
+                                );
+                                setStatus('idle');
                                 return;
                             }
 
@@ -355,6 +357,15 @@ export default function useCleaner() {
             log.debug('This is the response from my backend', {
                 data: { res },
             });
+            const stats = uploadLimit.stats;
+
+            if (uploadLimit.stats) {
+                const newStats = {
+                    ...uploadLimit.stats,
+                    count: uploadLimit.stats.count + 1,
+                };
+                localStorage.setItem('upload-stats', JSON.stringify(newStats));
+            }
             if (response.data.expired) {
                 log.debug(
                     `Is expired sent from the backend ${response.data.isExpired ? 'YES' : 'NO'}`
