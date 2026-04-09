@@ -1,7 +1,7 @@
 import type { UploadLimitResult } from '../types/types';
 
-const UPLOAD_LIMIT = 1; //3
-const FILE_NO_THRESHOLD = 10; //100
+const UPLOAD_LIMIT = 10; //3
+const FILE_NO_THRESHOLD = 1000; //100
 export const uploadLimiter = (fileCount: number): UploadLimitResult => {
     if (fileCount <= FILE_NO_THRESHOLD) return { allowed: true };
     const now = new Date();

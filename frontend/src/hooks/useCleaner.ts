@@ -62,6 +62,7 @@ export default function useCleaner() {
         event: React.ChangeEvent<HTMLInputElement>,
         path: string
     ) => {
+        log.debug(`Current tierId ${tierId}`);
         const files = event.target.files;
         if (!files || files.length === 0) {
             setError('No folder input');

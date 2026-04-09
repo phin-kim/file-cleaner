@@ -23,7 +23,9 @@ import WelcomeModal from './Pages/WelcomePage';
 import Breadcrumb from './components/Navbar';
 import ProtectedRoutes from './components/ProtectedRoutes';
 import AllTools from './Pages/Alltools';
-import NotFound from './components/NotFound';
+import { welcomePageApi } from './library/client';
+import { useTierStore } from './Store/tierStore';
+
 /** 
  
 Method	Name	React-Reactive?	Use Case
@@ -33,7 +35,11 @@ useAuthStore.getState()	Store getters	❌ No	Non-React code (interceptors, helpe
 */
 function App() {
     const refreshExecuted = useRef(false);
-
+    const setTierId = useTierStore((state) => state.setTierId);
+    const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+    log.debug(
+        `State of is authenticated after the fetch in app.tsx isAuthenticated: ${isAuthenticated}`
+    );
     useEffect(() => {
         if (refreshExecuted.current) {
             log.warn('refresh already executed skipping duplicate');
@@ -63,18 +69,26 @@ function App() {
                 const currentAuth = useAuthStore.getState().isAuthenticated;
                 if (currentAuth) {
                     log.info('Session restored');
+                    const response = await welcomePageApi.get('/get-tier');
+                    setTierId(response.data.tierId);
+                    log.info(`Tier synchronized: ${response.data.tierId}`);
                 } else {
                     log.warn('Session restoration failed no valid session');
+                    log.error('Failed to sync tier');
+                    setTierId('free');
                 }
                 log.debug(`is authenticated ${currentAuth}`);
                 log.highlight(`Logged in as ${currentUser?.email}`);
             } catch (error) {
+                log.error('Initialization failed', { data: { error } });
                 const { setError } = useErrorStore.getState();
                 handleApiError(error, setError);
+                setTierId('free');
             }
         };
         restoreSession();
-    }, []);
+    }, [setTierId]);
+
     return (
         <>
             <ErrorToast />

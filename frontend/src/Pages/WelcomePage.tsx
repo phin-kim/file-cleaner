@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { FaMagic } from 'react-icons/fa';
 import { FaBroom, FaFilePdf, FaLayerGroup } from 'react-icons/fa6';
-import { welcomePageApi } from '../library/client';
 import { useTierStore } from '../Store/tierStore';
 import createClientLogger from '../utils/clientLogger';
 import useErrorStore from '../Store/ErrorStore';
@@ -14,26 +13,10 @@ import { UpgradeModal } from '../components/Popup';
 const log = createClientLogger('Welcome page.tsx');
 const WelcomeModal: React.FC = () => {
     const navigate = useNavigate();
-    const setTierId = useTierStore((state) => state.setTierId);
+    //const setTierId = useTierStore((state) => state.setTierId);
     const tierId = useTierStore((state) => state.tierId);
     const { setError } = useErrorStore();
     const { setUpgradeModal, upgradeModal } = useCleaner();
-    useEffect(() => {
-        const syncTier = async () => {
-            try {
-                //navigate(path);
-                log.info('Pre-fetching the tier status on mount');
-
-                const response = await welcomePageApi.get('/get-tier');
-                setTierId(response.data.tierId);
-                log.info(`Tier synchronized: ${response.data.tierId}`);
-            } catch (error) {
-                log.error('Failed to sync tier', { data: { error } });
-                setTierId('free');
-            }
-        };
-        syncTier();
-    }, [setTierId]);
 
     //const { setError } = useErrorStore();
     const handleTier3 = () => {
