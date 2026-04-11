@@ -88,10 +88,13 @@ export default function Billing() {
         },*/
     ];
 
-    if (!selectedTier) {
-        setError('Please select a plan first');
-        return;
-    }
+    useEffect(() => {
+        if (!selectedTier && !isProcessing) {
+            setError('Please select a plan first');
+            // We use a small delay or check a 'loading' state if you're fetching user data
+            navigate('/pricing');
+        }
+    }, [selectedTier, navigate, isProcessing]);
     const storage = localStorage.getItem('auth-storage');
     if (!storage) return;
     const parsed = JSON.parse(storage);
@@ -182,14 +185,14 @@ export default function Billing() {
                             <div>
                                 <div className="mb-2 flex items-center gap-3">
                                     <div className="rounded-lg bg-purple-500/20 p-2 text-purple-400">
-                                        {selectedTier.icon}
+                                        {selectedTier?.icon}
                                     </div>
                                     <h2 className="text-2xl font-bold text-white">
-                                        {selectedTier.name}
+                                        {selectedTier?.name}
                                     </h2>
                                 </div>
                                 <p className="text-purple-200/60">
-                                    {selectedTier.description}
+                                    {selectedTier?.description}
                                 </p>
                             </div>
                             <div className="text-right">
@@ -210,7 +213,7 @@ export default function Billing() {
                         </h3>
 
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                            {selectedTier.features.map((feature, index) => (
+                            {selectedTier?.features.map((feature, index) => (
                                 <motion.div
                                     key={index}
                                     initial={{ opacity: 0, y: 10 }}

@@ -31,6 +31,8 @@ app.use(
             'http://localhost:4173',
             'https://unparasitical-unsigned-lasonya.ngrok-free.dev',
             'https://tidyupp.site',
+            'https://file-cleaner-git-main-phin-kims-projects.vercel.app/',
+            'https://file-cleaner-75ltxmcpm-phin-kims-projects.vercel.app/',
             'https://literalistically-paleobiologic-leatrice.ngrok-free.dev',
         ],
         credentials: true,
