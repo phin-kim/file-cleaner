@@ -259,6 +259,14 @@ const Pricing: React.FC = () => {
                     <span className="text-sm font-bold text-purple-100 italic">
                         phinjugushdev@gmail.com
                     </span>
+                    <br />
+                    <span className="text-base font-bold text-white italic">
+                        or
+                    </span>
+                    <br />
+                    <span className="text-sm font-bold text-purple-100 italic">
+                        0113868425
+                    </span>
                 </p>
             </div>
         </div>
