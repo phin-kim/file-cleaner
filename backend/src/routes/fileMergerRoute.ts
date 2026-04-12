@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import path from 'path';
 import fs from 'fs-extra';
 import multer from 'multer';
@@ -18,13 +19,32 @@ const log = createLogger('Merge route');
 export const mergerRoute: Router = Router();
 const projectRoot = path.resolve(__dirname, '../../');
 const mergerBaseDir = path.join(projectRoot, 'output/file-merger-temps');
-const uploadDir = path.join(mergerBaseDir, 'uploads');
+//const sessionId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+const uploadDir = path.join(mergerBaseDir, `uploads`);
 const outputDir = path.join(mergerBaseDir, 'outputs');
+
 fs.mkdirSync(uploadDir, { recursive: true });
 fs.mkdirSync(outputDir, { recursive: true });
+/**
+ * i ran into an issue where upload number 1 collides with files uploaded from upload number 2
+ * ##SOLUTION
+ * have a subfolders for each session with a unique session id that allows each upload to be independent of each other
+ */
+const initSession = (req: Request, _res: Response, next: NextFunction) => {
+    const sessionId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+    req.sessionPath = path.join(mergerBaseDir, 'uploads', sessionId);
+    next();
+};
 const storage = multer.diskStorage({
-    destination: async (_req, _file, cb) => {
-        cb(null, uploadDir);
+    destination: async (req, _file, cb) => {
+        try {
+            // Use the path already created by initSession
+            const sessionPath = req.sessionPath!;
+            await fs.ensureDir(sessionPath);
+            cb(null, sessionPath);
+        } catch (err) {
+            cb(err instanceof Error ? err : new Error(String(err)), '');
+        }
     },
     filename: (_req, file, cb) => {
         const safeName = path.basename(file.originalname);
@@ -35,11 +55,12 @@ const upload = multer({ storage });
 mergerRoute.post(
     '/merge-files',
     uploadLimiter,
+    initSession,
     upload.array('files'),
     async (req, res, next) => {
+        const sessionPath = req.sessionPath;
         try {
             const tierId = req.query.tierId as keyof typeof TIER_CONFIG;
-
             const isWorkSheet = req.query.isWorkSheet === 'true';
             const CAN_MERGE = TIER_CONFIG[tierId].canMerge;
             if (!CAN_MERGE) {
@@ -61,13 +82,23 @@ mergerRoute.post(
                     message: 'Your subscription has expired',
                 });
             }
+
             const folderName = req.body.folderName;
             if (!folderName) {
                 return res.status(400).json({ error: 'Folder is required' });
             }
 
             console.log('[DEBUG] folder exists?', fs.existsSync(uploadDir));
-            const mergedQuestions = await processUploadedFiles(uploadDir);
+            if (!sessionPath) {
+                return next(
+                    new AppError(
+                        'Upload directory could not be initialized',
+                        500
+                    )
+                );
+            }
+            const mergedQuestions = await processUploadedFiles(sessionPath);
+
             if (!mergedQuestions || mergedQuestions.length === 0) {
                 return res.status(200).json({
                     success: true,
@@ -79,11 +110,14 @@ mergerRoute.post(
                     downloadURL: null,
                 });
             }
+            const safeFolderName = folderName.replace(/[^a-z0-9_-]/gi, '_');
+
             //creates the folder if missing
-            const outputFile = path.join(outputDir, `merged-${Date.now()}.pdf`);
+            const outputFile = path.join(outputDir, `${safeFolderName}.pdf`);
 
             await generatePDF(mergedQuestions, outputFile, isWorkSheet);
             log.warn('The pdf generator is done');
+
             // Build absolute download URL so frontend (different origin) can access it
             const host = req.get('host') || 'localhost:5000';
             const protocol = req.protocol || 'http';
@@ -98,6 +132,25 @@ mergerRoute.post(
         } catch (error) {
             console.error('Merge route error', error);
             res.status(500).json({ error: 'Failed to merge files' });
+        } finally {
+            //cleanup only this sessions files
+            if (sessionPath && fs.existsSync(sessionPath)) {
+                try {
+                    await fs.remove(sessionPath);
+                    log.debug(
+                        `[CLEANUP] Removed isolated session folder: ${sessionPath}`
+                    );
+                } catch (error) {
+                    log.error('Cleanup failed', {
+                        data: {
+                            error:
+                                error instanceof Error
+                                    ? error.message
+                                    : String(error),
+                        },
+                    });
+                }
+            }
         }
     }
 );

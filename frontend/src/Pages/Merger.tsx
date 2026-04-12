@@ -30,6 +30,7 @@ const FolderQuestionAnalyzer = () => {
         handleDragLeave,
         handleDragOver,
         handleDownload,
+        handleReset,
     } = useCleaner();
 
     const path = 'merge-files';
@@ -256,16 +257,25 @@ const FolderQuestionAnalyzer = () => {
                                             </p>
                                         </div>
                                     </div>
-
-                                    <motion.button
-                                        whileHover={{ scale: 1.05 }}
-                                        whileTap={{ scale: 0.95 }}
-                                        onClick={handleDownload}
-                                        className="flex w-full items-center justify-center gap-3 rounded-xl bg-linear-to-r from-purple-500 to-indigo-500 py-4 text-lg font-semibold text-white shadow-lg transition-all hover:from-purple-600 hover:to-indigo-600"
-                                    >
-                                        <Download className="h-6 w-6" />
-                                        Download PDF Report
-                                    </motion.button>
+                                    <div className="flex gap-6">
+                                        <motion.button
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 0.95 }}
+                                            onClick={handleDownload}
+                                            className="flex w-full items-center justify-center gap-3 rounded-xl bg-linear-to-r from-purple-500 to-indigo-500 py-4 text-lg font-semibold text-white shadow-lg transition-all hover:from-purple-600 hover:to-indigo-600"
+                                        >
+                                            <Download className="h-6 w-6" />
+                                            Download PDF Report
+                                        </motion.button>
+                                        <motion.button
+                                            whileHover={{ scale: 1.02 }}
+                                            whileTap={{ scale: 0.98 }}
+                                            onClick={handleReset}
+                                            className="rounded-xl bg-white/10 px-6 py-4 font-semibold text-white transition-colors hover:bg-white/20"
+                                        >
+                                            Clean Another
+                                        </motion.button>
+                                    </div>
                                 </motion.div>
                             </motion.div>
                         )}

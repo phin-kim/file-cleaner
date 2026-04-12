@@ -461,7 +461,7 @@ export default function Billing() {
                             phone={phoneToSend ?? ''}
                             name={email}
                             reference={`user_${user.id}|tier_${selectedTier?.id}|name_${email}|period_${selectedPeriod}|${Date.now()}`}
-                            channelID={6761}
+                            channelID={7067}
                             paymentUrl={'https://lipwa.link/7182'}
                             buttonColor={'#00a884'}
                             successUrl={SUCCESS_URL}

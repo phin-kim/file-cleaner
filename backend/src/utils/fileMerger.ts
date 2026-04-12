@@ -19,7 +19,7 @@ import {
     trimEmbeddingsCache,
 } from '../helpers/miniHelpers.js';
 import AppError from './appError.js';
-
+import { pdf } from 'pdf-to-img';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -192,7 +192,33 @@ Upload folder -> temp storage
         
 6). Return PDF download link
  */
+const visionPrompt = `
+Transcribe this exam page with absolute mathematical and structural precision.
 
+1. MATHEMATICAL OPERATORS (CRITICAL):
+   - Recognize numerical analysis symbols graphically. 
+   - Convert 'E' or 'u' to LaTeX operators if they represent shift or average operators.
+   - Convert 'A' or 'V' to \\Delta (forward difference) or \\nabla (backward difference) based on context.
+   - Use standard LaTeX for all formulas (e.g., \\int_{0}^{1}, \\frac{d}{dt}, \\sqrt{x}, \\delta^2).
+
+2. DATA TABLES:
+   - Identify all data grids and reconstruct them as clean Markdown tables.
+   - Do NOT return table data as a single string of text.
+   - Example format: 
+     | x | 0 | 1 | 2 |
+     |---|---|---|---|
+     | f(x) | 1 | 1 | 2 |
+
+3. EXAM HIERARCHY:
+   - Preserve headers exactly: "QUESTION ONE COMPULSORY (30 MARKS)".
+   - Maintain sub-part lettering: "a)", "b)", etc.
+   - Keep mark allocations at the end of each question: "(5 marks)".
+
+4. OUTPUT RULES:
+   - Return ONLY the transcribed text.
+   - No conversational filler or explanations.
+   - If a symbol is blurry, infer the most logical mathematical character based on the surrounding Numerical Analysis context.
+`;
 //extract the text from the files
 export const extractTextFromFile = async (
     filePath: string
@@ -202,7 +228,42 @@ export const extractTextFromFile = async (
         if (ext === '.txt') {
             return await fs.readFile(filePath, 'utf-8');
         }
+        /**
+         * there has been an issue on the numerical analysis  conversion
+         * So i have to convert it into a picture and then pass that to gemini to be able to read it accordingly
+         */
         if (ext === '.pdf') {
+            /*log.info(`[VISION] Converting pdf to image: ${filePath}`);
+            const outputImages = await pdf(filePath, { scale: 2 });
+            let fullTranscribedText = '';
+            //loop through the pages and send to gemini
+            for await (const imgBuffer of outputImages) {
+                const result = await AI.models.generateContent({
+                    model: 'gemini-2.5-flash',
+                    contents: [
+                        {
+                            role: 'user',
+                            parts: [
+                                {
+                                    inlineData: {
+                                        data: Buffer.from(
+                                            imgBuffer as Uint8Array
+                                        ).toString('base64'),
+                                        mimeType: 'image/jpeg',
+                                    },
+                                },
+                                {
+                                    text: visionPrompt,
+                                },
+                            ],
+                        },
+                    ],
+                });
+                // FIX 3: Wait for response and use .text()
+                const response = result.text;
+                fullTranscribedText += '\n' + response?.trim();
+            }
+            return fullTranscribedText;*/
             const buffer = await fs.readFile(filePath); // Buffer
             const uint8Array = new Uint8Array(buffer); // Convert to Uint8Array
             const parser = new PDFParse(uint8Array); // parse PDF
@@ -439,6 +500,10 @@ STRICT RULES:
 6. NEVER truncate or cut off the question mid-sentence
 7. Maximum length: 300 characters
 8. If input is garbage (just "Here's", "Please", etc.), output "INVALID"
+9. Preserve all mathematical notation and LaTeX formulas.
+10. If one version of a question has broken symbols (e.g., 'æPwton') and the other is clear ('Newton'), use the clear version.
+11. For Numerical Analysis questions, ensure formulas like Newton's forward interpolation or Simpson's rule are rendered in valid LaTeX.
+12. Output ONLY the merged question text.
 
 Examples of GOOD output:
 "a) Explain the concept of database normalization and its importance. (4 marks)"
@@ -451,7 +516,7 @@ ${questions.map((q, i) => `${i + 1}. ${q}`).join('\n')}
 Output only the single best merged question:
 
 `;
-    log.highlight('Start merging clusters');
+    //log.highlight('Start merging clusters');
 
     try {
         const response = await AI.models.generateContent({
@@ -486,7 +551,7 @@ Output only the single best merged question:
             // Fallback to best original question
             return questions.reduce((a, b) => (a.length > b.length ? a : b));
         }
-        log.highlight('Finalize merging clusters');
+        //log.highlight('Finalize merging clusters');
         if (!merged) throw new Error('No response from Gemini');
         //cleanup any remaining formatting issues
         return cleanMergedQuestions(merged, questions);
@@ -538,23 +603,15 @@ export async function processUploadedFiles(folderPath: string) {
             log.error(`Folder does not exist: ${folderPath}`);
             return [];
         }
-        const oldFiles = await fs.readdir(folderPath);
-        log.debug(`Old files found:`, { data: { oldFiles } });
-        for (const file of oldFiles) {
-            const filePath = path.join(folderPath, file);
-            const stat = await fs.stat(filePath);
-            //delete files older than 1 hour
-            if (Date.now() - stat.mtimeMs > 60 * 60 * 1000) {
-                await fs.remove(filePath);
-                log.debug(`Removed old file:${file}`);
-            }
-        }
+
         //get current files
         let files = await fs.readdir(folderPath);
+
         files = files.filter((file) => !file.startsWith('~$'));
         //check for duplicate name pa
         const uniqueFiles: string[] = [];
         const seen = new Set();
+
         for (const file of files) {
             //extract base name without timestamp
             const basename = file
@@ -653,6 +710,7 @@ export async function processUploadedFiles(folderPath: string) {
                         finalPathText = cluster[0].text;
                     } else {
                         // Call Gemini with the text array
+                        log.highlight('Clustering has started');
                         finalPathText = await mergeCluster(
                             clusterTexts.slice(0, 5)
                         );
@@ -669,7 +727,7 @@ export async function processUploadedFiles(folderPath: string) {
         );
         // after processing ,cleanup temp folder
         log.highlight('finalize the processing of files');
-        await cleanupByAge(folderPath, 'TEMP-CLEANUP');
+        //await cleanupByAge(folderPath, 'TEMP-CLEANUP');
         return mergedQuestions.filter((q) => q.text && isValidQuestion(q.text));
     } catch (error) {
         log.error(`Processing failed`, {

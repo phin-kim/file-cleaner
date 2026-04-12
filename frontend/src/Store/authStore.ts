@@ -3,13 +3,12 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import { setAccessToken as setApiToken } from '../library/authApi';
 import createClientLogger from '../utils/clientLogger';
 //remember to change is authenticated in the db and also in the routes
-import type { User, AuthResponse, LoginResponse } from '../types/auth';
+import type { AuthResponse, AuthState, LoginResponse } from '../types/auth';
 import authApi, { setAccessToken } from '../library/authApi';
 import useSuccessStore from './SuccessStore';
 import useErrorStore from './ErrorStore';
 import handleApiError from '../utils/apiError';
 import type { BackendError, UnknownApiError } from '../types/types';
-import type { AuthState } from '../types/auth';
 //import NotFound from '../components/NotFound';
 const log = createClientLogger('AUTH STORE');
 

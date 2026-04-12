@@ -265,7 +265,7 @@ const Pricing: React.FC = () => {
                     </span>
                     <br />
                     <span className="text-sm font-bold text-purple-100 italic">
-                        0113868425
+                        0140928190
                     </span>
                 </p>
             </div>
