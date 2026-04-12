@@ -19,7 +19,6 @@ import {
     trimEmbeddingsCache,
 } from '../helpers/miniHelpers.js';
 import AppError from './appError.js';
-import { pdf } from 'pdf-to-img';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -192,33 +191,7 @@ Upload folder -> temp storage
         
 6). Return PDF download link
  */
-const visionPrompt = `
-Transcribe this exam page with absolute mathematical and structural precision.
 
-1. MATHEMATICAL OPERATORS (CRITICAL):
-   - Recognize numerical analysis symbols graphically. 
-   - Convert 'E' or 'u' to LaTeX operators if they represent shift or average operators.
-   - Convert 'A' or 'V' to \\Delta (forward difference) or \\nabla (backward difference) based on context.
-   - Use standard LaTeX for all formulas (e.g., \\int_{0}^{1}, \\frac{d}{dt}, \\sqrt{x}, \\delta^2).
-
-2. DATA TABLES:
-   - Identify all data grids and reconstruct them as clean Markdown tables.
-   - Do NOT return table data as a single string of text.
-   - Example format: 
-     | x | 0 | 1 | 2 |
-     |---|---|---|---|
-     | f(x) | 1 | 1 | 2 |
-
-3. EXAM HIERARCHY:
-   - Preserve headers exactly: "QUESTION ONE COMPULSORY (30 MARKS)".
-   - Maintain sub-part lettering: "a)", "b)", etc.
-   - Keep mark allocations at the end of each question: "(5 marks)".
-
-4. OUTPUT RULES:
-   - Return ONLY the transcribed text.
-   - No conversational filler or explanations.
-   - If a symbol is blurry, infer the most logical mathematical character based on the surrounding Numerical Analysis context.
-`;
 //extract the text from the files
 export const extractTextFromFile = async (
     filePath: string
