@@ -301,7 +301,7 @@ cleanerRoute.post(
     handleUploadErrors,
     asyncHandler(async (req, res) => {
         log.highlight(
-            `🟢 [BACKEND] request received at: ${new Date().toISOString()}`
+            `🟢 [BACKEND] request received at: ${new Date().toLocaleDateString()}`
         );
         const tierId = (req.query.tierId as keyof typeof TIER_CONFIG) || 'free';
         const CAN_ORGANIZE = TIER_CONFIG[tierId].canOrganize;
@@ -345,7 +345,9 @@ cleanerRoute.post(
             for (const file of uploadedFiles) {
                 const destPath = path.join(tempDir, file.originalname);
                 await fs.move(file.path, destPath, { overwrite: true });
-                log.info(`[BACKEND] moved ${file.originalname} to temp`);
+                log.info(
+                    `[BACKEND] moved ${file.originalname} to temp with this destination path: ${destPath}`
+                );
             }
         } finally {
             for (const file of uploadedFiles) {
@@ -360,7 +362,7 @@ cleanerRoute.post(
         const tidyStart = Date.now();
         const tidyStats = await tidyFolder(tempDir);
         //setup logic to check if they are in tier 1 to enable the folder organization
-        log.info(
+        log.highlight(
             `[BACKEND] duplicate removal done in ${Date.now() - tidyStart} ms`
         );
         let fileOrgStats: ExtensionStats | null = null;
@@ -380,7 +382,7 @@ cleanerRoute.post(
             );
 
             log.info(`Zip created successfully at :${zipPath}`);
-            log.info(`[BACKEND]zipping done in ${Date.now() - zipStart} ms`);
+            log.info(`[BACKEND] zipping done in ${Date.now() - zipStart} ms`);
 
             log.info(`Ensured zipped directory at :${zippedDir}`);
 

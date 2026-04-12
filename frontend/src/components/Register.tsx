@@ -2,16 +2,21 @@ import useErrorStore from '../Store/ErrorStore';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../Store/authStore';
 import { useForm } from 'react-hook-form';
+import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type RegisterInput, registerSchema } from '../library/validatorSchema';
 import handleApiError from '../utils/apiError';
 import createClientLogger from '../utils/clientLogger';
 import { FaShieldHalved } from 'react-icons/fa6';
+import { Eye, EyeOff } from 'lucide-react';
+
 interface RegisterFormProps {
     onToggle: () => void;
 }
 const log = createClientLogger('AuthForm');
 const RegistrationForm = ({ onToggle }: RegisterFormProps) => {
+    const [showPassword, setShowPassword] = useState(false);
+
     const { setError } = useErrorStore();
 
     const navigate = useNavigate();
@@ -66,7 +71,7 @@ const RegistrationForm = ({ onToggle }: RegisterFormProps) => {
                         placeholder="name@example.com"
                     />
                     {errors.email && (
-                        <p className="font-blod text-red-600">
+                        <p className="font-bold text-red-600">
                             {errors.email.message}
                         </p>
                     )}
@@ -78,19 +83,25 @@ const RegistrationForm = ({ onToggle }: RegisterFormProps) => {
                     </label>
                     <div className="relative">
                         <input
-                            type="password"
+                            type={showPassword ? 'text' : 'password'}
                             {...register('password')}
                             className="w-full border-b-2 border-purple-200 bg-transparent px-1 py-3 text-lg text-purple-900 transition-all outline-none placeholder:text-purple-200 focus:border-purple-600"
                             placeholder="••••••••"
                         />
+
                         <button
                             type="button"
+                            onClick={() => setShowPassword(!showPassword)}
                             className="absolute top-1/2 right-2 -translate-y-1/2 text-purple-300 hover:text-purple-500"
                         >
-                            <i className="fa-solid fa-eye-slash"></i>
+                            {showPassword ? (
+                                <EyeOff size={20} />
+                            ) : (
+                                <Eye size={20} />
+                            )}
                         </button>
                         {errors.password && (
-                            <p className="font-blod text-red-600">
+                            <p className="font-bold text-red-600">
                                 {errors.password.message}
                             </p>
                         )}

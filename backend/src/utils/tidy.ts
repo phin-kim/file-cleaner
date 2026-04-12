@@ -1,6 +1,8 @@
 import fs from 'fs-extra';
 import path from 'path';
 import { hashFile } from './hashes.js';
+import createLogger from './logger.js';
+const log = createLogger('TidyUtil.ts');
 export interface TidyStats {
     finalFiles: string[];
     duplicatesRemoved: number;
@@ -15,11 +17,15 @@ export async function tidyFolder(folderPath: string): Promise<TidyStats> {
     const seenHashes = new Map<string, string>();
     const seenNames = new Map<string, string>();
     const files = await fs.readdir(folderPath);
+    log.debug(`what file name are we in ${folderPath} `);
     let duplicatesRemoved = 0;
     let spaceSaved = 0;
     const finalFiles: string[] = [];
     for (const fileName of files) {
         const filePath = path.join(folderPath, fileName);
+        log.debug(
+            `This is the filepath: ${filePath} and this is the file name: ${fileName}`
+        );
         const stats = await fs.stat(filePath);
         if (stats.isFile()) {
             // Normalize filename to collapse common duplicate naming patterns
