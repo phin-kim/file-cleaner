@@ -69,9 +69,29 @@ function App() {
                 const currentAuth = useAuthStore.getState().isAuthenticated;
                 if (currentAuth) {
                     log.info('Session restored');
-                    const response = await welcomePageApi.get('/get-tier');
+                    const response = await welcomePageApi.get('/fetch-profile');
+                    log.debug('The fetch profile response ', {
+                        data: response,
+                    });
                     setTierId(response.data.tierId);
                     log.info(`Tier synchronized: ${response.data.tierId}`);
+                    const syncProfile = async () => {
+                        const dbUser = response.data;
+
+                        // Overwrite LocalStorage with the fresh DB data
+                        const syncStats = {
+                            count: dbUser.dailyUsageCount,
+                            lastDate: new Date(
+                                dbUser.lastUsageDate
+                            ).toDateString(),
+                        };
+                        localStorage.setItem(
+                            'upload-stats',
+                            JSON.stringify(syncStats)
+                        );
+                    };
+
+                    syncProfile();
                 } else {
                     log.warn('Session restoration failed no valid session');
                     log.error('Failed to sync tier');

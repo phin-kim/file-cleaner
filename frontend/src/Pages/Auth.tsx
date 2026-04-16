@@ -93,16 +93,6 @@ const AuthForm = () => {
                                 )}
                             </motion.div>
                         </AnimatePresence>
-
-                        <div className="mt-10 text-center">
-                            <button
-                                onClick={() => navigate('/')}
-                                className="mx-auto flex items-center justify-center gap-2 text-sm font-bold text-purple-400 transition-colors hover:text-purple-600"
-                            >
-                                <ArrowLeft size={14} />
-                                Back to Dashboard
-                            </button>
-                        </div>
                     </div>
                 </div>
             </motion.div>

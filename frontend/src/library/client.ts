@@ -40,6 +40,7 @@ const attachAuth = (instance: AxiosInstance) => {
 attachAuth(paystackApi);
 attachAuth(subscriptionApi);
 attachAuth(welcomePageApi);
+attachAuth(fileCleanerApi);
 subscriptionApi.interceptors.response.use(
     (response) => response,
     (error) => {

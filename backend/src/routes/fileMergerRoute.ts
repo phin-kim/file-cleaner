@@ -12,7 +12,10 @@ import createLogger from '../utils/logger.js';
 import { TIER_CONFIG } from '../config/tiers.js';
 import AppError from '../utils/appError.js';
 import { sendEmailAlert } from '../utils/sendEmail.js';
-
+import { ConnectionCheckedOutEvent } from 'mongodb';
+import checkDailyLimit from '../middleware/limitCheck.js';
+import { UserModel } from '../schema/UsersSchema.js';
+import type { AuthenticatedRequest } from '../Types/authenticate.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const log = createLogger('Merge route');
@@ -57,10 +60,14 @@ mergerRoute.post(
     uploadLimiter,
     initSession,
     upload.array('files'),
+    checkDailyLimit,
     async (req, res, next) => {
         const sessionPath = req.sessionPath;
         try {
             const tierId = req.query.tierId as keyof typeof TIER_CONFIG;
+            const authReq = req as AuthenticatedRequest;
+            const userEmail = authReq?.user?.email;
+
             const isWorkSheet = req.query.isWorkSheet === 'true';
             const CAN_MERGE = TIER_CONFIG[tierId].canMerge;
             if (!CAN_MERGE) {
@@ -71,6 +78,10 @@ mergerRoute.post(
                         'ServiceUnavailable'
                     )
                 );
+            }
+            const user = await UserModel.findOne({ userEmail });
+            if (!user) {
+                return next(AppError.notFound('User not found'));
             }
             const subscriptionStatus = await sendEmailAlert(req);
             log.highlight('This is the subscription status', {
@@ -125,6 +136,9 @@ mergerRoute.post(
             log.highlight(
                 `Done generating the pdf and sent ${downloadURL} to front end`
             );
+            user.dailyUsageCount += 1;
+            user.lastUsageDate = new Date();
+            await user?.save();
             res.json({
                 success: true,
                 downloadURL,

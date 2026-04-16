@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { fileCleanerApi } from '../library/client';
+import { fileCleanerApi, welcomePageApi } from '../library/client';
 import type { UploadedFolder, Status, UploadLimitResult } from '../types/types';
 import traverseDirectory from '../utils/traverser';
 import type { AnalysisResult } from '../types/types';
@@ -150,11 +150,29 @@ export default function useCleaner() {
                 return;
             }*/
             if (uploadLimit.stats) {
-                const newStats = {
-                    ...uploadLimit.stats,
-                    count: uploadLimit.stats.count + 1,
+                const today = new Date().toDateString();
+                const stats = uploadLimit.stats || {
+                    count: 0,
+                    lastDate: today,
                 };
+
+                const newStats = {
+                    count: stats.count + 1,
+                    lastDate: today, // Always use a fresh Date object here
+                };
+
                 localStorage.setItem('upload-stats', JSON.stringify(newStats));
+                log.info('Local limit updated instantly');
+                // 2. Silent Backend Sync
+                try {
+                    await welcomePageApi.patch('/increment-usage');
+
+                    log.info('Usage count synced to cloud');
+                } catch (err) {
+                    log.error('Failed to sync usage count', { data: { err } });
+                    // Optional: If the cloud sync fails because the limit was actually
+                    // reached on another device, you could force a local reset here.
+                }
             }
 
             log.highlight(
@@ -332,6 +350,7 @@ export default function useCleaner() {
                                 return;
                             }
                             uploadLimit = uploadLimiter(dirFiles.length);
+                            log.debug('Upload limit', { data: uploadLimit });
                             if (!uploadLimit.allowed) {
                                 setError(
                                     'Daily limit reached for large files. Resets at midnight.'
@@ -377,11 +396,29 @@ export default function useCleaner() {
             });
 
             if (uploadLimit.stats) {
-                const newStats = {
-                    ...uploadLimit.stats,
-                    count: uploadLimit.stats.count + 1,
+                const today = new Date().toDateString();
+                const stats = uploadLimit.stats || {
+                    count: 0,
+                    lastDate: today,
                 };
+
+                const newStats = {
+                    count: stats.count + 1,
+                    lastDate: today, // Always use a fresh Date object here
+                };
+
                 localStorage.setItem('upload-stats', JSON.stringify(newStats));
+                log.info('Local limit updated instantly');
+                // 2. Silent Backend Sync
+                try {
+                    await welcomePageApi.patch('/increment-usage');
+
+                    log.info('Usage count synced to cloud');
+                } catch (err) {
+                    log.error('Failed to sync usage count', { data: { err } });
+                    // Optional: If the cloud sync fails because the limit was actually
+                    // reached on another device, you could force a local reset here.
+                }
             }
             if (response.data.expired) {
                 log.debug(

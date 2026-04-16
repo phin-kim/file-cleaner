@@ -20,7 +20,8 @@ export interface User_Type extends Document {
     'subscription-period': Subscription_Period;
     'subscription-status': Subscription_Status;
     'last-payment-date': Date;
-
+    dailyUsageCount: number;
+    lastUsageDate: Date;
     refreshTokens: RefreshToken[];
 }
 export interface tierId {
@@ -76,6 +77,15 @@ const UserSchema = new Schema<User_Type>(
         'last-payment-date': {
             type: Date,
             required: true,
+            default: Date.now,
+        },
+        dailyUsageCount: {
+            type: Number,
+            default: 0,
+        },
+
+        lastUsageDate: {
+            type: Date,
             default: Date.now,
         },
         role: {

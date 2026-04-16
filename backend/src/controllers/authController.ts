@@ -5,10 +5,16 @@ import { comparePasswords, hashPassword } from '../utils/hashes.js';
 import { validateRegisterInput } from '../config/validator.js';
 import { hashToken, signAccessToken, signRefreshToken } from '../utils/jwt.js';
 import createLogger from '../utils/logger.js';
+import validateAndNormalizeEmail from '../middleware/emailValidator.js';
+import { nextTick } from 'node:process';
 const log = createLogger('AUTH CONTROLLER');
 
 export async function register(req: Request, res: Response) {
     const { email, password } = validateRegisterInput(req.body);
+    const isValid = validateAndNormalizeEmail(email);
+    if (!isValid) {
+        throw AppError.validation('Invalid email format ');
+    }
     log.info('Data from the front end', { data: { email, password } });
     //check if user exists
     const existingUser = await UserModel.findOne({ email });
@@ -86,13 +92,17 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     if (!password) {
         return next(AppError.badRequest('Password is required'));
     }
+    const isValid = validateAndNormalizeEmail(email);
+    if (!isValid) {
+        throw AppError.validation('Invalid email format ');
+    }
     const user = await UserModel.findOne({ email });
     log.debug('This is the user records', {
         data: { user },
     });
     if (!user) {
         log.error('Theres no user in the data base');
-        throw AppError.notFound('User not found in the database');
+        throw AppError.notFound('User not found ');
     }
     const databaseHashedPassword = user.passwordHash;
     log.debug('Password hash from data base', {
