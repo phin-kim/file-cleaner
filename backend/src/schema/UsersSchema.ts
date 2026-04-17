@@ -22,6 +22,8 @@ export interface User_Type extends Document {
     'last-payment-date': Date;
     dailyUsageCount: number;
     lastUsageDate: Date;
+    resetPasswordToken: string | undefined;
+    resetPasswordExpires: Date | undefined;
     refreshTokens: RefreshToken[];
 }
 export interface tierId {
@@ -59,7 +61,8 @@ const UserSchema = new Schema<User_Type>(
             type: [refreshTokenSchema],
             default: [],
         },
-
+        resetPasswordToken: String,
+        resetPasswordExpires: Date,
         tierId: {
             type: String,
             required: true,

@@ -56,9 +56,16 @@ export default function FolderCleanerUI() {
                     animate={{ opacity: 1, y: 0 }}
                     className="mt-12 mb-8 text-center"
                 >
-                    <h1 className="mb-2 text-4xl font-bold text-slate-100">
-                        Tidy Up
-                    </h1>
+                    <div className="flex flex-row items-center justify-center gap-4">
+                        <h1 className="mb-2 text-4xl font-bold text-slate-100">
+                            Tidy Up
+                        </h1>
+                        <span className="rounded-3xl bg-white/50 px-2 text-base font-bold text-white italic backdrop-blur-xl">
+                            {' '}
+                            {tierId}
+                        </span>
+                    </div>
+
                     <p className="text-slate-400">
                         Remove duplicate files instantly
                     </p>

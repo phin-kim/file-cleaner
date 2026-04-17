@@ -4,11 +4,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff, ShieldCheck } from 'lucide-react';
 //import { type LoginInput, loginSchema } from '../library/validatorSchema';
 
-import { type RegisterInput, registerSchema } from '../library/validatorSchema';
-import { useAuthStore } from '../Store/authStore';
-import useErrorStore from '../Store/ErrorStore';
-import handleApiError from '../utils/apiError';
-import createClientLogger from '../utils/clientLogger';
+import {
+    type RegisterInput,
+    registerSchema,
+} from '../../library/validatorSchema';
+import { useAuthStore } from '../../Store/authStore';
+import useErrorStore from '../../Store/ErrorStore';
+import handleApiError from '../../utils/apiError';
+import createClientLogger from '../../utils/clientLogger';
 import { useNavigate } from 'react-router-dom';
 
 const log = createClientLogger('LoginForm');
@@ -96,6 +99,15 @@ const LoginForm = ({ onToggle }: LoginFormProps) => {
                             ) : (
                                 <Eye size={20} />
                             )}
+                        </button>
+                    </div>
+                    <div className="mt-2 flex justify-end">
+                        <button
+                            type="button"
+                            onClick={() => navigate('/auth/forgot-password')}
+                            className="text-xs font-semibold text-purple-400 transition-colors hover:text-purple-600"
+                        >
+                            Forgot password?
                         </button>
                     </div>
                     {errors.password && (

@@ -25,6 +25,9 @@ import ProtectedRoutes from './components/ProtectedRoutes';
 import AllTools from './Pages/Alltools';
 import { welcomePageApi } from './library/client';
 import { useTierStore } from './Store/tierStore';
+import ForgotPassword from './components/Auth/ForgotPassword';
+import ResetSuccess from './components/Auth/ResetSuccess';
+import ResetPassword from './components/Auth/ResetPassword';
 
 /** 
  
@@ -125,6 +128,18 @@ function App() {
                         /> */}
                 <Routes>
                     <Route path="/auth" element={<AuthForm />} />
+                    <Route
+                        path="/auth/forgot-password"
+                        element={<ForgotPassword />}
+                    />
+                    <Route
+                        path="/auth/reset-success"
+                        element={<ResetSuccess />}
+                    />
+                    <Route
+                        path="/auth/reset-password"
+                        element={<ResetPassword />}
+                    />
                     <Route element={<ProtectedRoutes />}>
                         <Route element={<AppLayout />}>
                             <Route path="/" element={<WelcomeModal />} />

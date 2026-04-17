@@ -10,6 +10,7 @@ import {
     MousePointerClick,
 } from 'lucide-react';
 import { SubscriptionExpiredModal, UpgradeModal } from '../components/Popup';
+import { useTierStore } from '../Store/tierStore';
 const FolderQuestionAnalyzer = () => {
     const {
         handleDrop,
@@ -34,7 +35,7 @@ const FolderQuestionAnalyzer = () => {
     } = useCleaner();
 
     const path = 'merge-files';
-
+    const tierId = useTierStore((state) => state.tierId);
     return (
         <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-purple-900 via-purple-800 to-indigo-900 p-6">
             <motion.div
@@ -57,9 +58,16 @@ const FolderQuestionAnalyzer = () => {
                         >
                             <FolderOpen className="h-12 w-12 text-purple-200" />
                         </motion.div>
-                        <h1 className="mb-2 text-4xl font-bold text-white">
-                            Tidy Up Analyzer
-                        </h1>
+                        <div className="flex flex-row items-center justify-center gap-4">
+                            <h1 className="mb-2 text-4xl font-bold text-white">
+                                Tidy Up Analyzer
+                            </h1>
+                            <span className="rounded-3xl bg-white/50 px-2 text-base font-bold text-white italic backdrop-blur-xl">
+                                {' '}
+                                {tierId}
+                            </span>
+                        </div>
+
                         <p className="text-purple-200">
                             Upload a folder to extract and merge questions
                         </p>

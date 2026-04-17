@@ -1,12 +1,15 @@
-import useErrorStore from '../Store/ErrorStore';
+import useErrorStore from '../../Store/ErrorStore';
 import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../Store/authStore';
+import { useAuthStore } from '../../Store/authStore';
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { type RegisterInput, registerSchema } from '../library/validatorSchema';
-import handleApiError from '../utils/apiError';
-import createClientLogger from '../utils/clientLogger';
+import {
+    type RegisterInput,
+    registerSchema,
+} from '../../library/validatorSchema';
+import handleApiError from '../../utils/apiError';
+import createClientLogger from '../../utils/clientLogger';
 import { FaShieldHalved } from 'react-icons/fa6';
 import { Eye, EyeOff } from 'lucide-react';
 

@@ -68,8 +68,8 @@ const WelcomeModal: React.FC = () => {
                                         Clean up files
                                     </h3>
                                     <p className="text-center text-xs text-slate-100/80">
-                                        AI-powered folder organization and
-                                        renaming strategies.
+                                        Folder reorganization and duplicate
+                                        removal
                                     </p>
                                 </button>
                             </div>

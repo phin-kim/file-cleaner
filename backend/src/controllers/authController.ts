@@ -6,7 +6,12 @@ import { validateRegisterInput } from '../config/validator.js';
 import { hashToken, signAccessToken, signRefreshToken } from '../utils/jwt.js';
 import createLogger from '../utils/logger.js';
 import validateAndNormalizeEmail from '../middleware/emailValidator.js';
-import { nextTick } from 'node:process';
+import axios from 'axios';
+import { request } from 'node:http';
+const BREVO_API_KEY = process.env.BREVO_API_KEY;
+if (!BREVO_API_KEY) {
+    throw AppError.badRequest('Brevo api key is missing');
+}
 const log = createLogger('AUTH CONTROLLER');
 
 export async function register(req: Request, res: Response) {
@@ -116,7 +121,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     }
     const isMatched = await comparePasswords(password, databaseHashedPassword);
     if (!isMatched) {
-        return next(AppError.unauthorized('Unauthorized user.Kindly Signup'));
+        return next(AppError.unauthorized('Wrong password input.'));
     }
     const accessToken = signAccessToken({ uid: user._id.toString() });
     const refreshToken = signRefreshToken({ uid: user._id.toString() });
@@ -161,4 +166,85 @@ export async function login(req: Request, res: Response, next: NextFunction) {
             role: user.role,
         },
     });
+}
+const TEMPLATE_ID = 6;
+const ADMIN_TEMPLATE_ID = 5;
+export async function forgotPassword(
+    req: Request,
+    res: Response,
+    next: NextFunction
+) {
+    const { email } = req.body;
+    const user = await UserModel.findOne({ email });
+    if (!user) {
+        return res.status(200);
+    }
+    const resetToken = crypto.randomUUID().toString();
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpires = new Date(Date.now() + 3600000);
+    await user.save();
+    const frontendBaseUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const resetURL = `${frontendBaseUrl}/auth/reset-password?token=${resetToken}`;
+    try {
+        await axios.post(
+            'https://api.brevo.com/v3/smtp/email',
+            {
+                to: [{ email: email }],
+                templateId: TEMPLATE_ID,
+                params: {
+                    resetLink: resetURL,
+                },
+            },
+            {
+                headers: {
+                    'api-key': BREVO_API_KEY,
+                    'Content-Type': 'application/json',
+                },
+            }
+        );
+        res.status(200).json({ success: true });
+    } catch (error) {
+        // send alert to me as the admin
+        await axios.post(
+            'https://api.brevo.com/v3/smtp/email',
+            {
+                to: [{ email: 'phinjugushdev@gmail.com' }],
+                templateId: ADMIN_TEMPLATE_ID,
+                params: {
+                    subject: `Failure for  ${email} in resetting password`,
+                    timestamp: new Date().toLocaleDateString(),
+                    priority: 'High',
+                    content: `${email} has had an error when we try reset the email `,
+                    year: new Date().getFullYear(),
+                },
+            },
+            {
+                headers: {
+                    'api-key': BREVO_API_KEY,
+                    'Content-Type': 'application/json',
+                },
+            }
+        );
+    }
+}
+export async function resetPassword(
+    req: Request,
+    res: Response,
+    next: NextFunction
+) {
+    const { password } = req.body;
+    const { token } = req.params;
+    const user = await UserModel.findOne({
+        resetPasswordExpires: { $gt: Date.now() }, //must not be expired
+        resetPasswordToken: token,
+    });
+    if (!user) {
+        return next(AppError.badRequest('Token is invalid or expired'));
+    }
+    const hashedPassword = await hashPassword(password);
+    user.passwordHash = hashedPassword;
+    user.resetPasswordExpires = undefined;
+    user.resetPasswordToken = undefined;
+    await user.save();
+    res.status(200).json({ success: true });
 }

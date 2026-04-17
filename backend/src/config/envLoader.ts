@@ -52,6 +52,10 @@ log.debug(
 log.debug(
     `BREVO_API_KEY:, ${process.env.BREVO_API_KEY ? '✅ Set' : '❌ Missing'}`
 );
+log.debug(
+    `FRONT_END_URL:,
+    ${process.env.FRONTEND_URL ? '✅ Set' : '❌ Missing'}`
+);
 
 // Export the keys with fallbacks
 export const GEMINI_API_KEY =
@@ -60,7 +64,7 @@ export const HF_API_KEY = process.env.HF_API_KEY;
 export const PAYHERO_AUTH_TOKEN = process.env.PAYHERO_AUTH_TOKEN;
 export const COOKIE_SECRET = process.env.COOKIE_SECRET;
 export const BREVO_API_KEY = process.env.BREVO_API_KEY;
-
+export const FRONTEND_URL = process.env.FRONTEND_URL;
 // Validate required keys
 if (!GEMINI_API_KEY) {
     log.error('❌ GEMINI_API_KEY or GOOGLE_API_KEY is required in .env file');
@@ -77,6 +81,10 @@ if (!HF_API_KEY) {
 }
 if (!PAYHERO_AUTH_TOKEN) {
     log.error('❌ PAYHERO_AUTH_TOKEN is required in .env file');
+    process.exit(1);
+}
+if (!FRONTEND_URL) {
+    log.error('❌ FRONTEND_URL is required in .env file');
     process.exit(1);
 }
 if (!COOKIE_SECRET) {

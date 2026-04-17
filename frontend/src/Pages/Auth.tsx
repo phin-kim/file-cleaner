@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Rocket, ArrowLeft } from 'lucide-react';
-import LoginForm from '../components/Login';
-import RegisterForm from '../components/Register';
+import LoginForm from '../components/Auth/Login';
+import RegisterForm from '../components/Auth/Register';
 import { useAuthStore } from '../Store/authStore';
 import NotFound from '../components/NotFound';
 
