@@ -11,7 +11,10 @@ import axios from 'axios';
 import type { Response, Request, NextFunction } from 'express';
 import createLogger from '../utils/logger.js';
 import AppError from '../utils/appError.js';
-import type { AuthenticatedRequest } from '../Types/authenticate.js';
+import type {
+    AuthenticatedRequest,
+    JWTUserPayload,
+} from '../Types/authenticate.js';
 import { TransactionsModel } from '../schema/TransactionSchema.js';
 import { UserModel } from '../schema/UsersSchema.js';
 const PAYHERO_AUTH_TOKEN = process.env.PAYHERO_AUTH_TOKEN;
@@ -22,7 +25,8 @@ export async function mpesaPayment(
     next: NextFunction
 ) {
     const authReq = req as AuthenticatedRequest;
-    const userId = authReq?.user?.uid;
+    const userPayload = authReq?.user;
+    const userId = (userPayload as JWTUserPayload)?.uid;
     const { amount, email, phoneNumber } = req.body;
 
     if (!amount) {

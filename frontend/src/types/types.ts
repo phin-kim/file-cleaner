@@ -1,6 +1,12 @@
 import type { ReactNode } from 'react';
 
-export type Status = 'idle' | 'uploading' | 'processing' | 'complete' | 'error';
+export type Status =
+    | 'idle'
+    | 'awaiting_payment'
+    | 'uploading'
+    | 'processing'
+    | 'complete'
+    | 'error';
 export type UploadedFolder = {
     name: string;
     files: File[];

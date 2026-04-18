@@ -20,11 +20,16 @@ import { useAuthStore } from './Store/authStore';
 const log = createClientLogger('App.tsx');
 //import { UpgradeModal } from './components/Popup';
 import WelcomeModal from './Pages/WelcomePage';
-import Breadcrumb from './components/Navbar';
 import ProtectedRoutes from './components/ProtectedRoutes';
-import AllTools from './Pages/Alltools';
 import { welcomePageApi } from './library/client';
 import { useTierStore } from './Store/tierStore';
+import ForgotPassword from './components/Auth/ForgotPassword';
+import ResetSuccess from './components/Auth/ResetSuccess';
+import ResetPassword from './components/Auth/ResetPassword';
+import Sidebar from './components/Sidebar';
+import { useWalletStore } from './Store/walletStore';
+import WalletPage from './Pages/Wallet';
+import HistoryPage from './Pages/History';
 
 /** 
  
@@ -69,9 +74,33 @@ function App() {
                 const currentAuth = useAuthStore.getState().isAuthenticated;
                 if (currentAuth) {
                     log.info('Session restored');
-                    const response = await welcomePageApi.get('/get-tier');
+                    const response = await welcomePageApi.get('/fetch-profile');
+                    log.debug('The fetch profile response ', {
+                        data: response,
+                    });
                     setTierId(response.data.tierId);
                     log.info(`Tier synchronized: ${response.data.tierId}`);
+                    const wb = response.data.walletBalance;
+                    if (typeof wb === 'number') {
+                        useWalletStore.getState().setBalanceFromServer(wb);
+                    }
+                    const syncProfile = async () => {
+                        const dbUser = response.data;
+
+                        // Overwrite LocalStorage with the fresh DB data
+                        const syncStats = {
+                            count: dbUser.dailyUsageCount,
+                            lastDate: new Date(
+                                dbUser.lastUsageDate
+                            ).toDateString(),
+                        };
+                        localStorage.setItem(
+                            'upload-stats',
+                            JSON.stringify(syncStats)
+                        );
+                    };
+
+                    syncProfile();
                 } else {
                     log.warn('Session restoration failed no valid session');
                     log.error('Failed to sync tier');
@@ -105,6 +134,18 @@ function App() {
                         /> */}
                 <Routes>
                     <Route path="/auth" element={<AuthForm />} />
+                    <Route
+                        path="/auth/forgot-password"
+                        element={<ForgotPassword />}
+                    />
+                    <Route
+                        path="/auth/reset-success"
+                        element={<ResetSuccess />}
+                    />
+                    <Route
+                        path="/auth/reset-password"
+                        element={<ResetPassword />}
+                    />
                     <Route element={<ProtectedRoutes />}>
                         <Route element={<AppLayout />}>
                             <Route path="/" element={<WelcomeModal />} />
@@ -117,7 +158,8 @@ function App() {
                                 path="/file-merger"
                                 element={<FolderQuestionAnalyzer />}
                             />
-                            <Route path="/all-tools" element={<AllTools />} />
+                            <Route path="/history" element={<HistoryPage />} />
+                            <Route path="/wallet" element={<WalletPage />} />
                             <Route path="/pricing" element={<Pricing />} />
                             <Route
                                 path="/pricing/billing"
@@ -135,9 +177,12 @@ export default App;
 
 function AppLayout() {
     return (
-        <>
-            <Breadcrumb />
-            <Outlet />
-        </>
+        <div className="flex h-screen min-h-0 w-full overflow-hidden">
+            {/*<Breadcrumb />*/}
+            <Sidebar />
+            <main className="min-h-0 min-w-0 flex-1 overflow-y-auto">
+                <Outlet />
+            </main>
+        </div>
     );
 }

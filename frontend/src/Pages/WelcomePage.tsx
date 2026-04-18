@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { FaMagic } from 'react-icons/fa';
-import { FaBroom, FaFilePdf, FaLayerGroup } from 'react-icons/fa6';
+import { FaBroom, FaFilePdf } from 'react-icons/fa6';
 import { useTierStore } from '../Store/tierStore';
 import createClientLogger from '../utils/clientLogger';
 import useErrorStore from '../Store/ErrorStore';
@@ -19,15 +19,6 @@ const WelcomeModal: React.FC = () => {
     const { setUpgradeModal, upgradeModal } = useCleaner();
 
     //const { setError } = useErrorStore();
-    const handleTier3 = () => {
-        if (tierId === 'tier-3') {
-            navigate('/all-tools');
-        } else {
-            setError('This is not in you current subscription plan');
-            setUpgradeModal(true);
-            return;
-        }
-    };
     return (
         <AnimatePresence>
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -68,8 +59,8 @@ const WelcomeModal: React.FC = () => {
                                         Clean up files
                                     </h3>
                                     <p className="text-center text-xs text-slate-100/80">
-                                        AI-powered folder organization and
-                                        renaming strategies.
+                                        Folder reorganization and duplicate
+                                        removal
                                     </p>
                                 </button>
                             </div>
@@ -94,26 +85,6 @@ const WelcomeModal: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* New All-in-One Action */}
-                        <div className="mt-8">
-                            <button
-                                onClick={() => handleTier3()}
-                                className="group relative flex w-full items-center justify-center gap-4 rounded-3xl border border-white/10 bg-linear-to-r from-indigo-600/20 to-purple-600/20 p-6 backdrop-blur-3xl transition-all duration-300 hover:border-white/20 hover:from-indigo-600/40 hover:to-purple-600/40 hover:shadow-2xl hover:shadow-indigo-500/20"
-                            >
-                                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-xl text-white transition-all duration-300 group-hover:scale-110 group-hover:bg-white group-hover:text-indigo-600">
-                                    <FaLayerGroup />
-                                </div>
-                                <div className="text-left">
-                                    <h3 className="font-bold text-slate-100">
-                                        Combined Workflow
-                                    </h3>
-                                    <p className="text-xs text-slate-300">
-                                        Access both organization and merging
-                                        tools in one view.
-                                    </p>
-                                </div>
-                            </button>
-                        </div>
                     </div>
                     {upgradeModal && (
                         <UpgradeModal onClose={() => setUpgradeModal(false)} />

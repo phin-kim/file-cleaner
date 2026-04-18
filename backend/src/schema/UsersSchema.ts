@@ -20,8 +20,12 @@ export interface User_Type extends Document {
     'subscription-period': Subscription_Period;
     'subscription-status': Subscription_Status;
     'last-payment-date': Date;
-
+    dailyUsageCount: number;
+    lastUsageDate: Date;
+    resetPasswordToken: string | undefined;
+    resetPasswordExpires: Date | undefined;
     refreshTokens: RefreshToken[];
+    walletBalance?: number;
 }
 export interface tierId {
     enum: ['free', 'tier-1', 'tier-2', 'tier-3'];
@@ -58,7 +62,8 @@ const UserSchema = new Schema<User_Type>(
             type: [refreshTokenSchema],
             default: [],
         },
-
+        resetPasswordToken: String,
+        resetPasswordExpires: Date,
         tierId: {
             type: String,
             required: true,
@@ -78,10 +83,24 @@ const UserSchema = new Schema<User_Type>(
             required: true,
             default: Date.now,
         },
+        dailyUsageCount: {
+            type: Number,
+            default: 0,
+        },
+
+        lastUsageDate: {
+            type: Date,
+            default: Date.now,
+        },
         role: {
             type: String,
             enum: ['user', 'admin'],
             default: 'user',
+        },
+        walletBalance: {
+            type: Number,
+            default: 0,
+            min: 0,
         },
     },
     { timestamps: true }

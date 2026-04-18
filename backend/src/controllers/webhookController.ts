@@ -10,6 +10,10 @@ import { UserModel } from '../schema/UsersSchema.js';
 import createLogger from '../utils/logger.js';
 //import AppError from '../utils/appError.js';
 import { TransactionsModel } from '../schema/TransactionSchema.js';
+import {
+    finalizeFolderCleanIfPendingByReference,
+    finalizeWalletTopupIfPendingByReference,
+} from './payHeroPayment.js';
 
 const log = createLogger('webhook.ts');
 export async function paystackWebhook(
@@ -18,8 +22,9 @@ export async function paystackWebhook(
     next: NextFunction
 ) {
     try {
+        const body = req.body || {};
         const { paymentSuccess, user_reference, providerReference, amount } =
-            req.body || {};
+            body;
 
         // 1. Check if paymentSuccess is true (based on your logs)
         if (paymentSuccess !== true) {
@@ -29,6 +34,54 @@ export async function paystackWebhook(
                 },
             });
             return res.status(200).json({ status: 'ignored' });
+        }
+
+        const externalRef =
+            (body as { external_reference?: string }).external_reference ??
+            (body as { data?: { external_reference?: string } }).data
+                ?.external_reference ??
+            user_reference;
+
+        if (
+            typeof externalRef === 'string' &&
+            externalRef.startsWith('MPESA_')
+        ) {
+            const mpesaTx = await TransactionsModel.findOne({
+                reference: externalRef,
+                paymentKind: { $in: ['folder_clean', 'wallet_topup'] },
+            });
+            if (mpesaTx?.paymentKind === 'folder_clean') {
+                await finalizeFolderCleanIfPendingByReference(
+                    externalRef,
+                    typeof providerReference === 'string'
+                        ? providerReference
+                        : undefined
+                );
+                log.info('Folder clean webhook finalized', {
+                    data: { reference: externalRef },
+                });
+                return res
+                    .status(200)
+                    .json({ success: true, kind: 'folder_clean' });
+            }
+            if (mpesaTx?.paymentKind === 'wallet_topup') {
+                await finalizeWalletTopupIfPendingByReference(
+                    externalRef,
+                    typeof providerReference === 'string'
+                        ? providerReference
+                        : undefined
+                );
+                log.info('Wallet top-up webhook finalized', {
+                    data: { reference: externalRef },
+                });
+                return res
+                    .status(200)
+                    .json({ success: true, kind: 'wallet_topup' });
+            }
+            return res.status(200).json({
+                success: true,
+                message: 'mpesa_reference_acknowledged',
+            });
         }
 
         // 2. Parse the metadata from 'user_reference'

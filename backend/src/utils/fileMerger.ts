@@ -125,7 +125,6 @@ if (fs.existsSync(embeddingCachePath)) {
 //Race condition proof saves with temp files and lks
 function saveMergeCache() {
     if (isSavingMerge) {
-        log.debug(`⏳ merge cache save already in progress, skipping`);
         return;
     }
     try {
@@ -683,7 +682,6 @@ export async function processUploadedFiles(folderPath: string) {
                         finalPathText = cluster[0].text;
                     } else {
                         // Call Gemini with the text array
-                        log.highlight('Clustering has started');
                         finalPathText = await mergeCluster(
                             clusterTexts.slice(0, 5)
                         );

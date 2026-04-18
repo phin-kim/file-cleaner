@@ -139,7 +139,7 @@ export const useAuthStore = create<AuthState>()(
                     log.debug(
                         `What is the server status code: ${serverStatus}`
                     );
-                    set({ notFound: true });
+                    // set({ notFound: true });
                     log.debug(
                         `Does it contain an expired flag: ${potentialError.type}`
                     );
@@ -186,6 +186,24 @@ export const useAuthStore = create<AuthState>()(
                     log.error('Error in refreshing', { data: error });
                 } finally {
                     set({ isLoading: false });
+                }
+            },
+            requestPasswordReset: async (email: string) => {
+                try {
+                    await authApi.post('/auth/forgot-password', { email });
+                } catch (error) {
+                    const { setError } = useErrorStore.getState();
+                    handleApiError(error, setError);
+                }
+            },
+            resetPassword: async (token: string, password: string) => {
+                try {
+                    // Send token in the URL and password in the body
+                    await authApi.patch(`/auth/reset-password/${token}`, {
+                        password,
+                    });
+                } catch (error) {
+                    throw error;
                 }
             },
             logout: async () => {

@@ -27,6 +27,8 @@ export type AuthState = {
     isAuthenticated: boolean;
     isLoading: boolean;
     notFound: boolean;
+    requestPasswordReset: (email: string) => Promise<void>;
+    resetPassword: (token: string, password: string) => Promise<void>;
     setNotFound: (state: boolean) => void;
     register: (email: string, password: string) => Promise<void>;
     login: (email: string, password: string) => Promise<void>;

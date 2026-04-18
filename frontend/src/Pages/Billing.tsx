@@ -283,9 +283,6 @@ export default function Billing() {
 
                         {/* Payment Method Selection */}
                         <div className="mb-8">
-                            <label className="mb-4 block text-sm font-semibold tracking-wider text-purple-200 uppercase">
-                                Select Method
-                            </label>
                             <div className="grid grid-cols-1 gap-3">
                                 {paymentMethods.map((method) => (
                                     <motion.button
@@ -520,8 +517,8 @@ export default function Billing() {
                                     a: 'Instantly! Once payment is confirmed, your account is upgraded immediately.',
                                 },
                                 {
-                                    q: 'Can I change plans later?',
-                                    a: 'Yes, you can upgrade or downgrade your plan at any time from your dashboard.',
+                                    q: 'Can I change plans later?', //implement an easier way to upgrade
+                                    a: 'Yes, you can upgrade or downgrade your plan at any time from your pricing page .',
                                 },
                             ].map((faq, i) => (
                                 <div key={i}>

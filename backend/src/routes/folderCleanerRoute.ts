@@ -18,6 +18,10 @@ import {
     organizeByExtension,
     type ExtensionStats,
 } from '../utils/organizeFolder.js';
+import checkDailyLimit from '../middleware/limitCheck.js';
+import { UserModel } from '../schema/UsersSchema.js';
+import type { AuthenticatedRequest } from '../Types/authenticate.js';
+import authenticate from '../middleware/authenticate.js';
 const log = createLogger('FolderCleaner.ts');
 export const cleanerRoute: Router = Router();
 const __filename = fileURLToPath(import.meta.url);
@@ -297,14 +301,24 @@ const storage = multer.diskStorage({
 
 cleanerRoute.post(
     '/processFolder',
+    authenticate,
     uploadLimiter,
     handleUploadErrors,
-    asyncHandler(async (req, res) => {
+    checkDailyLimit,
+    asyncHandler(async (req, res, next) => {
         log.highlight(
             `🟢 [BACKEND] request received at: ${new Date().toLocaleDateString()}`
         );
         const tierId = (req.query.tierId as keyof typeof TIER_CONFIG) || 'free';
         const CAN_ORGANIZE = TIER_CONFIG[tierId].canOrganize;
+        const authReq = req as AuthenticatedRequest;
+        const userEmail = authReq?.user?.email;
+        log.warn(`Whats the user email ${userEmail}`);
+
+        const user = await UserModel.findOne({ email: userEmail });
+        if (!user) {
+            return next(AppError.notFound('User not found'));
+        }
         const uploadedFiles = req.files as Express.Multer.File[];
         const uploadedFolderName = req.body.folderName; //fallback
         const subscriptionStatus = await sendEmailAlert(req);
@@ -409,6 +423,9 @@ cleanerRoute.post(
                     },
                 },
             });
+            user.dailyUsageCount += 1;
+            user.lastUsageDate = new Date();
+            await user.save();
             res.json({
                 downloadURL,
                 stats: {

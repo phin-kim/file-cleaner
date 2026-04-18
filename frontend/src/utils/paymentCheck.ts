@@ -1,0 +1,1 @@
+function paymentCheck(fileCount: number) {}
