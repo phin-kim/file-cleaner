@@ -215,11 +215,18 @@ const FolderQuestionAnalyzer = () => {
                                     <div className="h-3 overflow-hidden rounded-full bg-purple-900/50">
                                         <motion.div
                                             animate={{
-                                                width: `${status === 'uploading' ? progress : 96}%`,
+                                                // If uploading, use progress. If success, jump to 100%.
+                                                width:
+                                                    status === 'uploading' ||
+                                                    'processing'
+                                                        ? `${progress}%`
+                                                        : '100%',
                                             }}
                                             transition={{
-                                                duration: 0.35,
-                                                ease: 'easeOut',
+                                                // Duration should be slightly longer than the interval
+                                                // to "stretch" the animation between updates
+                                                duration: 0.8,
+                                                ease: 'linear', // Linear is better when the state updates frequently
                                             }}
                                             className="h-full rounded-full bg-linear-to-r from-purple-400 to-indigo-400"
                                         />

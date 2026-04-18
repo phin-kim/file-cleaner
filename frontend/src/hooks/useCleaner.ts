@@ -497,7 +497,7 @@ export default function useCleaner() {
             const folderName = firstFile.webkitRelativePath.split('/')[0];
             log.highlight('Folder name', { data: folderName });
             const fileArray = Array.from(files);
-            const uploadLimit = uploadLimiter(fileArray.length);
+            const uploadLimit = uploadLimiter();
             if (!uploadLimit.allowed) {
                 setError(
                     'Daily limit reached for large files. Resets at midnight.'
@@ -573,13 +573,28 @@ export default function useCleaner() {
         };
         const progressInterval = setInterval(() => {
             setProgress((prev) => {
-                if (prev >= 95) return prev;
-                return prev + 3;
+                if (prev >= 96) return prev;
+
+                // Realistic variable logic:
+                // - Fast at the start
+                // - Tiny increments after 80% (simulating server waiting)
+                let increment = 0;
+                if (prev < 30) {
+                    increment = Math.floor(Math.random() * 5) + 2; // Fast (2-7%)
+                } else if (prev < 70) {
+                    increment = Math.floor(Math.random() * 3) + 1; // Medium (1-4%)
+                } else if (prev < 90) {
+                    increment = Math.random() * 1; // Slow (0-1%)
+                } else {
+                    increment = 0.1; // Crawl (waiting for server)
+                }
+
+                return Math.min(prev + increment, 96);
             });
-        }, 100);
+        }, 200); // Increased interval slightly for a smoother feel
 
         try {
-            const startTime = Date.now();
+            //const startTime = Date.now();
             const files: File[] = [];
             let folderName = 'folder';
             const items = event.dataTransfer.items;
@@ -626,7 +641,7 @@ export default function useCleaner() {
                                 setIsDragging(false);
                                 return;
                             }*/
-                            uploadLimit = uploadLimiter(dirFiles.length);
+                            uploadLimit = uploadLimiter();
                             log.debug('Upload limit', { data: uploadLimit });
                             if (!uploadLimit.allowed) {
                                 setError(

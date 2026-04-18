@@ -22,7 +22,7 @@ const WalletWidget = () => {
     const [loading, setLoading] = useState(false);
     const [inlineError, setInlineError] = useState<string | null>(null);
 
-    const mpesaDigitsOk = mpesaPhone.replace(/\D/g, '').length >= 9;
+    const mpesaDigitsOk = mpesaPhone.replace(/\D/g, '').length >= 10;
 
     useEffect(() => {
         let mounted = true;
