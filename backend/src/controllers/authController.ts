@@ -7,7 +7,6 @@ import { hashToken, signAccessToken, signRefreshToken } from '../utils/jwt.js';
 import createLogger from '../utils/logger.js';
 import validateAndNormalizeEmail from '../middleware/emailValidator.js';
 import axios from 'axios';
-import { request } from 'node:http';
 const BREVO_API_KEY = process.env.BREVO_API_KEY;
 if (!BREVO_API_KEY) {
     throw AppError.badRequest('Brevo api key is missing');
@@ -160,11 +159,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
 }
 const TEMPLATE_ID = 6;
 const ADMIN_TEMPLATE_ID = 5;
-export async function forgotPassword(
-    req: Request,
-    res: Response,
-    next: NextFunction
-) {
+export async function forgotPassword(req: Request, res: Response) {
     const { email } = req.body;
     const user = await UserModel.findOne({ email });
     if (!user) {

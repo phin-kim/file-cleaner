@@ -12,7 +12,6 @@ import createLogger from '../utils/logger.js';
 import { TIER_CONFIG } from '../config/tiers.js';
 import AppError from '../utils/appError.js';
 import { sendEmailAlert } from '../utils/sendEmail.js';
-import { ConnectionCheckedOutEvent } from 'mongodb';
 import checkDailyLimit from '../middleware/limitCheck.js';
 import { UserModel } from '../schema/UsersSchema.js';
 import type { AuthenticatedRequest } from '../Types/authenticate.js';
