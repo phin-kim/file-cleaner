@@ -9,7 +9,7 @@ import { processUploadedFiles } from '../utils/fileMerger.js';
 import generatePDF from '../utils/generatePDF.js';
 import uploadLimiter from '../utils/rateLimiter.js';
 import createLogger from '../utils/logger.js';
-import { TIER_CONFIG } from '../config/tiers.js';
+//import { TIER_CONFIG } from '../config/tiers.js';
 import AppError from '../utils/appError.js';
 import { sendEmailAlert } from '../utils/sendEmail.js';
 import checkDailyLimit from '../middleware/limitCheck.js';
@@ -66,12 +66,12 @@ mergerRoute.post(
     async (req, res, next) => {
         const sessionPath = req.sessionPath;
         try {
-            const tierId = req.query.tierId as keyof typeof TIER_CONFIG;
+            //const tierId = req.query.tierId as keyof typeof TIER_CONFIG;
             const authReq = req as AuthenticatedRequest;
             const userEmail = authReq?.user?.email;
 
             const isWorkSheet = req.query.isWorkSheet === 'true';
-            const CAN_MERGE = TIER_CONFIG[tierId].canMerge;
+            /*const CAN_MERGE = TIER_CONFIG[tierId].canMerge;
             if (!CAN_MERGE) {
                 return next(
                     new AppError(
@@ -80,7 +80,7 @@ mergerRoute.post(
                         'ServiceUnavailable'
                     )
                 );
-            }
+            }*/
             const user = await UserModel.findOne({ email: userEmail });
             if (!user) {
                 return next(AppError.notFound('User not found'));

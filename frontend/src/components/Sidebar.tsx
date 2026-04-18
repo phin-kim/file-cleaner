@@ -59,18 +59,17 @@ const Sidebar = () => {
                 )}
             </button>
 
-            {/* Brand */}
-            <div className="flex items-center gap-3 overflow-hidden p-8 pb-12">
+            <div className="flex items-center gap-1.5 overflow-hidden p-8 pb-12">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-purple-600 text-white shadow-lg shadow-purple-500/20">
                     <span className="text-xl font-black">T</span>
                 </div>
                 {!isCollapsed && (
                     <motion.div
-                        initial={{ opacity: 0, x: -2 }}
+                        initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
                         className="flex items-center"
                     >
-                        <span className="text-xl font-black tracking-tight text-slate-900">
+                        <span className="text-xl leading-none font-black tracking-tight text-slate-900">
                             idy Up
                         </span>
                     </motion.div>

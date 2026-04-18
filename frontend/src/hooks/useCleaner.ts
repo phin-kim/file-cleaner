@@ -9,7 +9,7 @@ import useErrorStore from '../Store/ErrorStore';
 import createClientLogger from '../utils/clientLogger';
 import handleApiError from '../utils/apiError';
 import { useTierStore } from '../Store/tierStore';
-import { TIER_CONFIG } from '../library/tier';
+//import { TIER_CONFIG } from '../library/tier';
 //import { AxiosError } from 'axios';
 import { useGeneralStore } from '../Store/generalStore';
 import type { BackendError, UnknownApiError } from '../types/types';
@@ -101,8 +101,8 @@ export default function useCleaner() {
     const payProcessInFlight = useRef(false);
     const tierId = useTierStore((state) => state.tierId);
     const fileNoCheck = useTransactions((state) => state.fileNoCheck);
-    const CURRENT_LIMIT =
-        TIER_CONFIG[tierId as keyof typeof TIER_CONFIG]?.maxUploads;
+    /*const CURRENT_LIMIT =
+        TIER_CONFIG[tierId as keyof typeof TIER_CONFIG]?.maxUploads;*/
 
     /* ---------- Handlers ---------- */
     const handleDragEnter = (event: React.DragEvent<HTMLDivElement>) => {
@@ -200,9 +200,7 @@ export default function useCleaner() {
         path: string,
         uploadLimit: UploadLimitResult,
         progressInterval: ReturnType<typeof setInterval>,
-        chargedWallet:
-            | { amount: number; chargeReference: string }
-            | null,
+        chargedWallet: { amount: number; chargeReference: string } | null,
         resumeAwaitingPaymentOnError: boolean,
         clearPendingCleanOnSuccess: boolean
     ) => {
@@ -289,14 +287,10 @@ export default function useCleaner() {
                         chargeReference: chargedWallet.chargeReference,
                         reason: 'upload_failed',
                     });
-                    if (
-                        typeof refundRes.data?.walletBalance === 'number'
-                    ) {
+                    if (typeof refundRes.data?.walletBalance === 'number') {
                         useWalletStore
                             .getState()
-                            .setBalanceFromServer(
-                                refundRes.data.walletBalance
-                            );
+                            .setBalanceFromServer(refundRes.data.walletBalance);
                     }
                 } catch (refundErr) {
                     log.error('Wallet refund failed after upload failure', {
@@ -338,7 +332,11 @@ export default function useCleaner() {
     const confirmPayAndProcessFolder = async (mpesaPhone: string) => {
         if (payProcessInFlight.current) return;
         const pending = pendingCleanRef.current;
-        if (!pending || !PAID_UPLOAD_PATHS.has(pending.path) || pending.files.length === 0) {
+        if (
+            !pending ||
+            !PAID_UPLOAD_PATHS.has(pending.path) ||
+            pending.files.length === 0
+        ) {
             setError('Select a folder first.');
             return;
         }
@@ -374,8 +372,7 @@ export default function useCleaner() {
                 const { hasSufficientFunds } = useWalletStore.getState();
 
                 if (hasSufficientFunds(totalCost)) {
-                    const chargedWallet =
-                        await chargeWalletForCleanerUpload(
+                    const chargedWallet = await chargeWalletForCleanerUpload(
                         pending.files.length
                     );
                     if (chargedWallet === null) {
@@ -491,9 +488,8 @@ export default function useCleaner() {
             return;
         }
 
-        const MAX_UPLOADS =
-            TIER_CONFIG[tierId as keyof typeof TIER_CONFIG].maxUploads;
-        log.info(`Confirming the max uploads based on the tier ${MAX_UPLOADS}`);
+        /*const MAX_UPLOADS =
+            TIER_CONFIG[tierId as keyof typeof TIER_CONFIG].maxUploads;*/
 
         try {
             const firstFile = files[0];
@@ -509,14 +505,14 @@ export default function useCleaner() {
                 setStatus('idle');
                 return;
             }
-            if (fileArray.length > CURRENT_LIMIT) {
+            /*if (fileArray.length > CURRENT_LIMIT) {
                 setError(
                     `You're trying to upload ${fileArray.length} files, but your current plan supports ${CURRENT_LIMIT}.`
                 );
                 setUpgradeModal(true);
                 setStatus('idle');
                 return;
-            }
+            }*/
 
             if (PAID_UPLOAD_PATHS.has(path)) {
                 log.info(`Folder selected via input — staging for payment`);
@@ -617,8 +613,7 @@ export default function useCleaner() {
                                 `[FRONTEND] processing folder ${dirEntry.name}`
                             );
                             const dirFiles = await traverseDirectory(dirEntry);
-                            log.debug(`current limit ${CURRENT_LIMIT}`);
-                            if (dirFiles.length > CURRENT_LIMIT) {
+                            /*if (dirFiles.length > CURRENT_LIMIT) {
                                 log.debug(
                                     `The limit detected after ${Date.now() - startTime}ms`
                                 );
@@ -630,7 +625,7 @@ export default function useCleaner() {
                                 setStatus('idle');
                                 setIsDragging(false);
                                 return;
-                            }
+                            }*/
                             uploadLimit = uploadLimiter(dirFiles.length);
                             log.debug('Upload limit', { data: uploadLimit });
                             if (!uploadLimit.allowed) {

@@ -15,7 +15,7 @@ import useCleaner from '../hooks/useCleaner';
 import { UpgradeModal, SuccessPopup } from '../components/Popup';
 import BreakdownPie from '../components/FilePie';
 import { useGeneralStore } from '../Store/generalStore';
-import { TIER_CONFIG } from '../library/tier';
+//import { TIER_CONFIG } from '../library/tier';
 import { useTierStore } from '../Store/tierStore';
 import { CLEANER_COST_PER_FILE_KES } from '../constants/cleanerPricing';
 import { cleanerChargeAmountKes } from '../constants/cleanerPricing';
@@ -51,8 +51,8 @@ export default function FolderCleanerUI() {
     const cleaningStats = useGeneralStore((state) => state.cleaningStats);
     const path = 'processFolder';
     const tierId = useTierStore((state) => state.tierId);
-    const CAN_ORGANIZE =
-        TIER_CONFIG[tierId as keyof typeof TIER_CONFIG].canOrganize;
+    /*const CAN_ORGANIZE =
+        TIER_CONFIG[tierId as keyof typeof TIER_CONFIG].canOrganize;*/
     const fileCount = useTransactions((state) => state.fileCount);
     const totalCost = cleanerChargeAmountKes(fileCount);
     const walletBalance = useWalletStore((s) => s.balance);
@@ -79,8 +79,8 @@ export default function FolderCleanerUI() {
                         <p className="font-bold text-slate-200">
                             Remove duplicate files instantly. KES{' '}
                             {CLEANER_COST_PER_FILE_KES.toFixed(2)} per file
-                            (rounded to 2 decimals) — select a
-                            folder, review the total, then Pay & Process.
+                            (rounded to 2 decimals) — select a folder, review
+                            the total, then Pay & Process.
                         </p>
                     </motion.div>
                     <input
@@ -315,11 +315,7 @@ export default function FolderCleanerUI() {
                                         </motion.div>
                                     </div>
                                     <div>
-                                        {CAN_ORGANIZE && (
-                                            <BreakdownPie
-                                                CAN_ORGANIZE={CAN_ORGANIZE}
-                                            />
-                                        )}
+                                        <BreakdownPie />
                                     </div>
 
                                     <div className="flex gap-3">
@@ -424,8 +420,8 @@ export default function FolderCleanerUI() {
                                 <div className="rounded-2xl border border-emerald-200 bg-emerald-50/90 p-4 text-sm text-emerald-900 shadow-sm">
                                     Your wallet covers this job (
                                     {totalCost.toFixed(2)}). Tap{' '}
-                                    <strong>Pay &amp; Process</strong> to
-                                    deduct from your wallet — no M-Pesa step.
+                                    <strong>Pay &amp; Process</strong> to deduct
+                                    from your wallet — no M-Pesa step.
                                 </div>
                             ) : (
                                 <div className="rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm">

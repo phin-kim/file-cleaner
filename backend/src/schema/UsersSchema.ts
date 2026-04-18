@@ -99,7 +99,7 @@ const UserSchema = new Schema<User_Type>(
         },
         walletBalance: {
             type: Number,
-            default: 0,
+            default: 50,
             min: 0,
         },
     },

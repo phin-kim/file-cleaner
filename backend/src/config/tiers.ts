@@ -1,4 +1,4 @@
-export const TIER_CONFIG = {
+/*export const TIER_CONFIG = {
     free: {
         name: 'Free',
         maxUploads: 70, //might change
@@ -43,3 +43,4 @@ export const TIER_CONFIG = {
         priority: true,
     },
 };
+*/
