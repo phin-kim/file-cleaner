@@ -16,6 +16,7 @@ import { ConnectionCheckedOutEvent } from 'mongodb';
 import checkDailyLimit from '../middleware/limitCheck.js';
 import { UserModel } from '../schema/UsersSchema.js';
 import type { AuthenticatedRequest } from '../Types/authenticate.js';
+import authenticate from '../middleware/authenticate.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const log = createLogger('Merge route');
@@ -57,6 +58,8 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 mergerRoute.post(
     '/merge-files',
+    authenticate,
+
     uploadLimiter,
     initSession,
     upload.array('files'),
@@ -79,7 +82,7 @@ mergerRoute.post(
                     )
                 );
             }
-            const user = await UserModel.findOne({ userEmail });
+            const user = await UserModel.findOne({ email: userEmail });
             if (!user) {
                 return next(AppError.notFound('User not found'));
             }

@@ -28,6 +28,10 @@ import { useTierStore } from './Store/tierStore';
 import ForgotPassword from './components/Auth/ForgotPassword';
 import ResetSuccess from './components/Auth/ResetSuccess';
 import ResetPassword from './components/Auth/ResetPassword';
+import Sidebar from './components/Sidebar';
+import { useWalletStore } from './Store/walletStore';
+import WalletPage from './Pages/Wallet';
+import HistoryPage from './Pages/History';
 
 /** 
  
@@ -78,6 +82,10 @@ function App() {
                     });
                     setTierId(response.data.tierId);
                     log.info(`Tier synchronized: ${response.data.tierId}`);
+                    const wb = response.data.walletBalance;
+                    if (typeof wb === 'number') {
+                        useWalletStore.getState().setBalanceFromServer(wb);
+                    }
                     const syncProfile = async () => {
                         const dbUser = response.data;
 
@@ -153,6 +161,8 @@ function App() {
                                 element={<FolderQuestionAnalyzer />}
                             />
                             <Route path="/all-tools" element={<AllTools />} />
+                            <Route path="/history" element={<HistoryPage />} />
+                            <Route path="/wallet" element={<WalletPage />} />
                             <Route path="/pricing" element={<Pricing />} />
                             <Route
                                 path="/pricing/billing"
@@ -170,9 +180,12 @@ export default App;
 
 function AppLayout() {
     return (
-        <>
-            <Breadcrumb />
-            <Outlet />
-        </>
+        <div className="flex h-screen min-h-0 w-full overflow-hidden">
+            {/*<Breadcrumb />*/}
+            <Sidebar />
+            <main className="min-h-0 min-w-0 flex-1 overflow-y-auto">
+                <Outlet />
+            </main>
+        </div>
     );
 }

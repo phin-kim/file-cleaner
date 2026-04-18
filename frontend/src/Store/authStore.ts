@@ -139,7 +139,7 @@ export const useAuthStore = create<AuthState>()(
                     log.debug(
                         `What is the server status code: ${serverStatus}`
                     );
-                    set({ notFound: true });
+                    // set({ notFound: true });
                     log.debug(
                         `Does it contain an expired flag: ${potentialError.type}`
                     );

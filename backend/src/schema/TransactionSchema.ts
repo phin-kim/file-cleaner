@@ -2,14 +2,20 @@ import { Schema } from 'mongoose';
 import { TidyUpConnection } from '../config/DB.js';
 import type { Document } from 'mongoose';
 
+export type PaymentKind =
+    | 'subscription'
+    | 'folder_clean'
+    | 'billing'
+    | 'wallet_topup';
+
 export interface Transaction_Type extends Document {
     userId: string;
     reference: string;
     amount: number;
     email: string;
-    phoneNumberHash: string;
-    tierId: string;
-    tierName: string;
+    phoneNumberHash?: string;
+    tierId?: string;
+    tierName?: string;
     metadata?: Metadata;
     status: 'pending' | 'success' | 'failed' | 'processing';
     mpesaReceipt?: string;
@@ -17,6 +23,9 @@ export interface Transaction_Type extends Document {
     project: string;
     provider: string;
     updatedAt?: Date;
+    paymentKind?: PaymentKind;
+    folderCleanFileCount?: number;
+    payheroInternalRef?: string;
 }
 export interface Metadata {
     period: 'monthly' | '3 months';
@@ -89,6 +98,12 @@ const TransactionsSchema = new Schema<Transaction_Type>(
         },
         provider: String,
         project: String,
+        paymentKind: {
+            type: String,
+            enum: ['subscription', 'folder_clean', 'billing', 'wallet_topup'],
+        },
+        folderCleanFileCount: { type: Number },
+        payheroInternalRef: { type: String, sparse: true },
         createdAt: {
             type: Date,
             default: Date.now,

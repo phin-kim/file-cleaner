@@ -27,6 +27,7 @@ const ForgotPassword = () => {
         try {
             await requestPasswordReset(data.email);
             navigate('/auth/reset-success', { state: { email: data.email } });
+            return;
         } catch (error) {
             handleApiError(error, setError);
         }

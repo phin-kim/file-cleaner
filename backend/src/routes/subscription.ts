@@ -37,6 +37,7 @@ subRouter.get('/fetch-profile', authenticate, async (req, res, next) => {
             tierId: user.tierId,
             lastUsageDate: user.lastUsageDate,
             dailyUsageCount: user.dailyUsageCount,
+            walletBalance: user.walletBalance ?? 0,
         });
         //res.status(200).json({ tierId: tierId, dailyUsageCount });
     } catch (error) {

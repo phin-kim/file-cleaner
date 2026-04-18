@@ -25,6 +25,7 @@ export interface User_Type extends Document {
     resetPasswordToken: string | undefined;
     resetPasswordExpires: Date | undefined;
     refreshTokens: RefreshToken[];
+    walletBalance?: number;
 }
 export interface tierId {
     enum: ['free', 'tier-1', 'tier-2', 'tier-3'];
@@ -95,6 +96,11 @@ const UserSchema = new Schema<User_Type>(
             type: String,
             enum: ['user', 'admin'],
             default: 'user',
+        },
+        walletBalance: {
+            type: Number,
+            default: 0,
+            min: 0,
         },
     },
     { timestamps: true }

@@ -102,17 +102,13 @@ export async function login(req: Request, res: Response, next: NextFunction) {
         throw AppError.validation('Invalid email format ');
     }
     const user = await UserModel.findOne({ email });
-    log.debug('This is the user records', {
-        data: { user },
-    });
+    log.debug(`This is the user records`, { data: { user } });
     if (!user) {
         log.error('Theres no user in the data base');
         throw AppError.notFound('User not found ');
     }
     const databaseHashedPassword = user.passwordHash;
-    log.debug('Password hash from data base', {
-        data: { passwordHashed: databaseHashedPassword },
-    });
+
     if (!databaseHashedPassword) {
         log.error('User found but has no password hash stored');
         return next(
@@ -127,12 +123,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     const refreshToken = signRefreshToken({ uid: user._id.toString() });
 
     const refreshTokenHash = hashToken(refreshToken!);
-    log.info('Storing refresh token hash in DB', {
-        data: {
-            hash: refreshTokenHash.substring(0, 20) + '...',
-            token: refreshToken!.substring(0, 20) + '...',
-        },
-    });
+
     user.refreshTokens.push({
         tokenHash: refreshTokenHash,
         createdAt: new Date(),
@@ -181,10 +172,23 @@ export async function forgotPassword(
     }
     const resetToken = crypto.randomUUID().toString();
     user.resetPasswordToken = resetToken;
-    user.resetPasswordExpires = new Date(Date.now() + 3600000);
+    // Sets expiration to 10 minutes from now
+    user.resetPasswordExpires = new Date(Date.now() + 600000);
     await user.save();
-    const frontendBaseUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const incomingOrigin = req.get('origin') || req.get('referer');
+
+    let frontendBaseUrl = process.env.FRONTEND_URL;
+
+    if (incomingOrigin) {
+        // Remove trailing slashes if they exist to prevent // in the URL
+        frontendBaseUrl = incomingOrigin.replace(/\/$/, '');
+    } else if (!frontendBaseUrl) {
+        frontendBaseUrl = 'http://localhost:5173';
+    }
+
     const resetURL = `${frontendBaseUrl}/auth/reset-password?token=${resetToken}`;
+
+    log.info(`Reset link generated for origin: ${frontendBaseUrl}`);
     try {
         await axios.post(
             'https://api.brevo.com/v3/smtp/email',
