@@ -303,7 +303,7 @@ const FolderQuestionAnalyzer = () => {
                                             onClick={handleReset}
                                             className="rounded-xl bg-white/10 px-6 py-4 font-semibold text-white transition-colors hover:bg-white/20"
                                         >
-                                            Clean Another
+                                            Merge Another
                                         </motion.button>
                                     </div>
                                 </motion.div>

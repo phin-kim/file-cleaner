@@ -6,7 +6,12 @@ import './config/envLoader.js';
 import cookieParser from 'cookie-parser';
 import { cleanerRoute } from './routes/folderCleanerRoute.js';
 import { subRouter } from './routes/subscription.js';
-import { startPeriodicCleanup, cleanupOrphanedFiles } from './utils/cleanUp.js';
+import {
+    startPeriodicCleanup,
+    cleanupOrphanedFiles,
+    cleanupEmbeddings,
+} from './utils/cleanUp.js';
+import fs from 'fs-extra';
 import { mergerRoute } from './routes/fileMergerRoute.js';
 import createLogger from './utils/logger.js';
 import { authRoute } from './routes/auth.js';
@@ -50,6 +55,7 @@ app.use('/api/payment', paymentRoute);
 app.use('/downloads', express.static(path.join(process.cwd(), 'backend/temp')));
 
 const PROJECT_ROOT = path.resolve(__dirname, '../');
+const EMBEDDINGS_FILE = path.join(PROJECT_ROOT, 'embeddings-cache.json');
 const MERGER_BASE_DIR = path.join(PROJECT_ROOT, 'output/file-merger-temps');
 const CLEANER_BASE_DIR = path.join(PROJECT_ROOT, 'output/folder-cleaner-temps');
 
@@ -72,7 +78,10 @@ const CLEAN_UP_DIRS = [
     FOLDER_STORAGE_TEMPS,
     FOLDER_UPLOADS,
 ];
-
+const pathExists = await fs.pathExists(EMBEDDINGS_FILE);
+if (pathExists) {
+    cleanupEmbeddings(EMBEDDINGS_FILE);
+}
 // ───── startup cleanup ─────1
 log.highlight('CLEANUP STARTING', { context: 'Cleanup' });
 startPeriodicCleanup(CLEAN_UP_DIRS);

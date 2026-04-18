@@ -1,9 +1,11 @@
 import type { Request, Response, NextFunction } from 'express';
-import { UserModel } from '../schema/UsersSchema';
-import AppError from '../utils/appError';
-import type { JWTUserPayload } from '../Types/authenticate';
-import type { AuthenticatedRequest } from '../Types/authenticate';
-import createLogger from '../utils/logger';
+import { UserModel } from '../schema/UsersSchema.js';
+import AppError from '../utils/appError.js';
+import type {
+    JWTUserPayload,
+    AuthenticatedRequest,
+} from '../Types/authenticate.js';
+import createLogger from '../utils/logger.js';
 const log = createLogger('Limitcheck.ts');
 const checkDailyLimit = async (
     req: Request,

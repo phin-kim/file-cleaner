@@ -12,12 +12,13 @@ import {
     BrushCleaning,
     Combine,
 } from 'lucide-react';
-
+import { useAuthStore } from '../Store/authStore';
 const Sidebar = () => {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
     const isAuthRoute = location.pathname.startsWith('/auth');
+    const currentUser = useAuthStore.getState()?.user;
 
     if (isAuthRoute) return null;
 
@@ -33,12 +34,12 @@ const Sidebar = () => {
         { icon: History, label: 'History', path: '/history' },
     ];
 
-    const bottomItems = [
+    /*const bottomItems = [
         { icon: User, label: 'Profile', path: '/profile' },
         { icon: Settings, label: 'Settings', path: '/settings' },
-    ];
+    ];*/
 
-    const userEmail = 'phinehasnjuguna1@gmail.com';
+    const userEmail = currentUser?.email;
 
     return (
         <motion.aside
@@ -123,7 +124,7 @@ const Sidebar = () => {
                 })}
             </nav>
 
-            {/* Bottom Nav */}
+            {/* Bottom Nav 
             <div className="space-y-2 px-4 py-8">
                 {bottomItems.map((item) => {
                     const isActive = location.pathname === item.path;
@@ -157,7 +158,7 @@ const Sidebar = () => {
                         </button>
                     );
                 })}
-            </div>
+            </div>*/}
 
             {/* User Section */}
             <div className="mt-auto border-t border-slate-100 p-4">
@@ -165,7 +166,7 @@ const Sidebar = () => {
                     className={`flex items-center gap-3 overflow-hidden rounded-2xl bg-slate-50 p-3 ${isCollapsed ? 'justify-center' : ''}`}
                 >
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-300 bg-slate-200 text-sm font-black text-slate-900">
-                        {userEmail.substring(0, 2).toUpperCase()}
+                        {userEmail?.substring(0, 2).toUpperCase()}
                     </div>
                     {!isCollapsed && (
                         <div className="min-w-0 flex-1 overflow-hidden">
