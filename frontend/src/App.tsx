@@ -12,7 +12,7 @@ import {
     Outlet,
     //Navigate,
 } from 'react-router-dom';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import createClientLogger from './utils/clientLogger';
 import handleApiError from './utils/apiError';
 import useErrorStore from './Store/ErrorStore';
@@ -146,10 +146,10 @@ function App() {
                         path="/auth/reset-password"
                         element={<ResetPassword />}
                     />
-                    <Route element={<ProtectedRoutes />}>
-                        <Route element={<AppLayout />}>
-                            <Route path="/" element={<WelcomeModal />} />
+                    <Route element={<AppLayout />}>
+                        <Route path="/" element={<WelcomeModal />} />
 
+                        <Route element={<ProtectedRoutes />}>
                             <Route
                                 path="/folder-cleaner"
                                 element={<FolderCleanerUI />}
@@ -176,10 +176,14 @@ function App() {
 export default App;
 
 function AppLayout() {
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     return (
         <div className="flex h-screen min-h-0 w-full overflow-hidden">
             {/*<Breadcrumb />*/}
-            <Sidebar />
+            <Sidebar
+                isOpen={isSidebarOpen}
+                onToggle={(val) => setIsSidebarOpen(val)}
+            />
             <main className="min-h-0 min-w-0 flex-1 overflow-y-auto">
                 <Outlet />
             </main>

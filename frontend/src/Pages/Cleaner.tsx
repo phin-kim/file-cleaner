@@ -9,6 +9,7 @@ import {
     Loader2,
     X,
     Coins,
+    AlertTriangle,
     MousePointerClick,
 } from 'lucide-react';
 import useCleaner from '../hooks/useCleaner';
@@ -67,6 +68,52 @@ export default function FolderCleanerUI() {
     return (
         <div>
             <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-purple-600 to-violet-800 p-6">
+                <AnimatePresence>
+                    {status === 'uploading' ||
+                        (status === 'processing' && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -20 }}
+                                className="fixed top-4 left-1/2 z-[200] w-full max-w-lg -translate-x-1/2 px-6"
+                            >
+                                <div className="relative flex items-center gap-6 overflow-hidden rounded-3xl border border-amber-500/30 bg-white bg-white/90 p-6 shadow-2xl backdrop-blur-xl">
+                                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-amber-100 text-amber-600">
+                                        <AlertTriangle
+                                            size={24}
+                                            className="animate-pulse"
+                                        />
+                                    </div>
+
+                                    <div className="flex-1">
+                                        <h3 className="text-lg leading-tight font-black text-slate-900">
+                                            Processing in Progress
+                                        </h3>
+                                        <p className="text-sm font-bold text-slate-500">
+                                            Please keep this tab open until
+                                            finished.
+                                        </p>
+                                        <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+                                            <motion.div
+                                                initial={{ x: '-100%' }}
+                                                animate={{ x: '100%' }}
+                                                transition={{
+                                                    repeat: Infinity,
+                                                    duration: 2,
+                                                    ease: 'linear',
+                                                }}
+                                                className="h-full w-1/3 rounded-full bg-amber-500"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="rounded-lg border border-amber-100 bg-amber-50 px-3 py-1.5 text-[10px] font-black tracking-widest text-amber-600 uppercase">
+                                        Active
+                                    </div>
+                                </div>
+                            </motion.div>
+                        ))}
+                </AnimatePresence>
                 <div className="w-full max-w-2xl">
                     <motion.div
                         initial={{ opacity: 0, y: -20 }}

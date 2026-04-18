@@ -11,9 +11,11 @@ import {
     Sparkles,
     ArrowRight,
 } from 'lucide-react';
-
+import { useAuthStore } from '../Store/authStore';
 const LandingPage = () => {
     const navigate = useNavigate();
+    const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+
     const year = new Date().getFullYear();
     return (
         <div className="min-h-screen bg-slate-50">
@@ -39,14 +41,16 @@ const LandingPage = () => {
                             professionals. Organize files, remove duplicates,
                             and master your documents with precision.
                         </p>
-                        <div className="flex flex-col justify-center gap-4 sm:flex-row">
-                            <button
-                                onClick={() => navigate('/auth')}
-                                className="rounded-3xl bg-purple-600 px-10 py-5 font-bold text-white shadow-xl shadow-purple-500/20 transition-all hover:scale-105 hover:bg-purple-700"
-                            >
-                                Join Now Free
-                            </button>
-                        </div>
+                        {!isAuthenticated && (
+                            <div className="flex flex-col justify-center gap-4 sm:flex-row">
+                                <button
+                                    onClick={() => navigate('/auth')}
+                                    className="rounded-3xl bg-purple-600 px-10 py-5 font-bold text-white shadow-xl shadow-purple-500/20 transition-all hover:scale-105 hover:bg-purple-700"
+                                >
+                                    Join Now Free
+                                </button>
+                            </div>
+                        )}
                     </motion.div>
                 </div>
 
@@ -174,14 +178,14 @@ const LandingPage = () => {
                             viewport={{ once: true }}
                             className="relative"
                         >
-                            <div className="rounded-[3rem] border border-white/10 bg-white/10 p-10 backdrop-blur-md">
+                            <div className="rounded-[3rem] border border-white/10 bg-white/10 p-6 backdrop-blur-md">
                                 <div className="flex flex-col gap-6">
                                     {[2023, 2024, 2025].map((year) => (
                                         <div
                                             key={year}
                                             className="flex items-center gap-4 rounded-2xl border border-white/5 bg-white/5 p-4"
                                         >
-                                            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-600 font-black">
+                                            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-600 px-1 font-black">
                                                 {year}
                                             </div>
                                             <div className="flex-1">
@@ -268,12 +272,14 @@ const LandingPage = () => {
                                     </div>
                                 </div>
                             </div>
-                            <button
-                                onClick={() => navigate('/auth')}
-                                className="inline-flex items-center gap-3 rounded-2xl bg-purple-600 px-8 py-4 font-bold text-white transition-all hover:gap-5 hover:bg-purple-700"
-                            >
-                                Join Study Program <ArrowRight size={20} />
-                            </button>
+                            {!isAuthenticated && (
+                                <button
+                                    onClick={() => navigate('/auth')}
+                                    className="inline-flex items-center gap-3 rounded-2xl bg-purple-600 px-8 py-4 font-bold text-white transition-all hover:gap-5 hover:bg-purple-700"
+                                >
+                                    Join Study Program <ArrowRight size={20} />
+                                </button>
+                            )}
                         </motion.div>
                     </div>
                 </div>
@@ -283,25 +289,28 @@ const LandingPage = () => {
             </section>
 
             {/* Final CTA */}
-            <section className="bg-slate-50 py-32">
-                <div className="container mx-auto px-6 text-center">
-                    <h2 className="mb-8 text-5xl font-black tracking-tight text-slate-900">
-                        Ready to Tidy Up?
-                    </h2>
-                    <p className="mx-auto mb-12 max-w-xl text-slate-500">
-                        Join thousands of students and developers who use Tidy
-                        Up to master their filesystem.
-                    </p>
-                    <div className="flex flex-col justify-center gap-4 sm:flex-row">
-                        <button
-                            onClick={() => navigate('/auth')}
-                            className="rounded-[2rem] bg-slate-900 px-12 py-5 font-black text-white transition-all hover:bg-slate-800 active:scale-95"
-                        >
-                            Create Account
-                        </button>
+            {!isAuthenticated && (
+                <section className="bg-slate-50 py-32">
+                    <div className="container mx-auto px-6 text-center">
+                        <h2 className="mb-8 text-5xl font-black tracking-tight text-slate-900">
+                            Ready to Tidy Up?
+                        </h2>
+                        <p className="mx-auto mb-12 max-w-xl text-slate-500">
+                            Join thousands of students and developers who use
+                            Tidy Up to master their filesystem.
+                        </p>
+
+                        <div className="flex flex-col justify-center gap-4 sm:flex-row">
+                            <button
+                                onClick={() => navigate('/auth')}
+                                className="rounded-[2rem] bg-slate-900 px-12 py-5 font-black text-white transition-all hover:bg-slate-800 active:scale-95"
+                            >
+                                Create Account
+                            </button>
+                        </div>
                     </div>
-                </div>
-            </section>
+                </section>
+            )}
 
             <footer className="border-t border-slate-200 bg-white py-12">
                 <div className="container mx-auto flex flex-col items-center justify-between gap-6 px-6 md:flex-row">
