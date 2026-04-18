@@ -11,9 +11,6 @@ import {
     ChevronRight,
     BrushCleaning,
     Combine,
-    Toolbox,
-    LogOut,
-    Sparkles,
 } from 'lucide-react';
 
 const Sidebar = () => {
@@ -32,7 +29,6 @@ const Sidebar = () => {
             path: '/folder-cleaner',
         },
         { icon: Combine, label: 'Question Merger', path: '/file-merger' },
-        { icon: Toolbox, label: 'All Tools', path: '/all-tools' },
         { icon: Wallet, label: 'Wallet', path: '/wallet' },
         { icon: History, label: 'History', path: '/history' },
     ];
@@ -48,7 +44,7 @@ const Sidebar = () => {
         <motion.aside
             initial={false}
             animate={{ width: isCollapsed ? 88 : 280 }}
-            className="relative z-[100] flex h-full shrink-0 flex-col self-stretch border-r border-slate-100 bg-white"
+            className="relative z-100 flex h-full shrink-0 flex-col self-stretch border-r border-slate-100 bg-white"
         >
             {/* Toggle Button */}
             <button

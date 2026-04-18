@@ -1,13 +1,56 @@
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { History, ArrowUpRight, ArrowDownLeft, RefreshCcw } from 'lucide-react';
 import { useWalletStore } from '../Store/walletStore';
+import { welcomePageApi } from '../library/client';
 
 const HistoryPage = () => {
-    const { transactions } = useWalletStore();
+    const { transactions, setBalanceFromServer, setTransactionsFromServer } =
+        useWalletStore();
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState<string | null>(null);
+
+    useEffect(() => {
+        let mounted = true;
+        const load = async () => {
+            try {
+                setLoading(true);
+                setLoadError(null);
+                const { data } = await welcomePageApi.get<{
+                    walletBalance: number;
+                    history: Array<{
+                        id: string;
+                        amount: number;
+                        type: 'top-up' | 'refund' | 'payment';
+                        date: string;
+                        reference?: string | null;
+                        mpesaReference?: string | null;
+                        source?: 'wallet-topup' | 'in-app-payment' | 'local';
+                    }>;
+                }>('/wallet-history');
+                if (!mounted) return;
+                setBalanceFromServer(Number(data.walletBalance ?? 0));
+                setTransactionsFromServer(
+                    Array.isArray(data.history) ? data.history : []
+                );
+            } catch (err) {
+                if (!mounted) return;
+                setLoadError(
+                    'Could not load full wallet history right now. Showing local activity only.'
+                );
+            } finally {
+                if (mounted) setLoading(false);
+            }
+        };
+        void load();
+        return () => {
+            mounted = false;
+        };
+    }, [setBalanceFromServer, setTransactionsFromServer]);
 
     return (
-        <div className="mx-auto max-w-5xl px-6 py-12">
-            <header className="mb-12">
+        <div className="mx-auto flex h-full max-w-5xl min-h-0 flex-col px-6 py-6">
+            <header className="mb-6 shrink-0">
                 <div className="mb-2 flex items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-600 text-white shadow-lg shadow-purple-500/20">
                         <History size={20} />
@@ -21,18 +64,33 @@ const HistoryPage = () => {
                 </p>
             </header>
 
-            <div className="overflow-hidden rounded-[2.5rem] border border-slate-200 bg-white shadow-sm">
+            <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[2.5rem] border border-slate-200 bg-white shadow-sm">
                 <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 p-8">
                     <h2 className="text-xl font-bold text-slate-900">
-                        Recent Transactions
+                        All Transactions
                     </h2>
                     <div className="text-xs font-bold tracking-widest text-slate-400 uppercase">
                         {transactions.length} total events
                     </div>
                 </div>
+                {loadError && (
+                    <div className="border-b border-slate-100 bg-amber-50 px-8 py-3 text-sm text-amber-700">
+                        {loadError}
+                    </div>
+                )}
 
-                <div className="divide-y divide-slate-100">
-                    {transactions.length === 0 ? (
+                <div className="min-h-0 flex-1 divide-y divide-slate-100 overflow-y-auto">
+                    {loading ? (
+                        <div className="flex flex-col items-center justify-center py-20 text-center opacity-60">
+                            <RefreshCcw
+                                size={36}
+                                className="animate-spin mb-3"
+                            />
+                            <p className="text-sm font-semibold">
+                                Loading transaction history...
+                            </p>
+                        </div>
+                    ) : transactions.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-32 text-center opacity-30">
                             <RefreshCcw size={48} className="mb-4" />
                             <p className="text-xl font-bold">
@@ -100,6 +158,34 @@ const HistoryPage = () => {
                                             }
                                         )}
                                     </div>
+                                    {(tx.reference || tx.mpesaReference) && (
+                                        <div className="mt-2 space-y-1 text-xs text-slate-500">
+                                            {tx.source && (
+                                                <p>
+                                                    Channel:{' '}
+                                                    <span className="font-semibold text-slate-700">
+                                                        {tx.source ===
+                                                        'wallet-topup'
+                                                            ? 'Wallet Top-up'
+                                                            : tx.source ===
+                                                                'in-app-payment'
+                                                              ? 'In-app Service'
+                                                              : 'Local'}
+                                                    </span>
+                                                </p>
+                                            )}
+                                            {tx.reference && (
+                                                <p>
+                                                    Ref: <span className="font-semibold text-slate-700">{tx.reference}</span>
+                                                </p>
+                                            )}
+                                            {tx.mpesaReference && (
+                                                <p>
+                                                    M-Pesa: <span className="font-semibold text-slate-700">{tx.mpesaReference}</span>
+                                                </p>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div

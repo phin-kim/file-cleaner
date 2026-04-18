@@ -1011,3 +1011,140 @@ export async function pollWalletTopupPaymentStatus(
         return next(error);
     }
 }
+
+export async function chargeWalletForFolderCleaner(
+    req: Request,
+    res: Response,
+    next: NextFunction
+) {
+    const authReq = req as AuthenticatedRequest;
+    const userPayload = authReq?.user as JWTUserPayload | undefined;
+    const userId = userPayload?.uid;
+    if (!userId) {
+        return next(AppError.unauthorized('Authentication required'));
+    }
+
+    const { fileCount } = req.body as { fileCount?: number };
+    const count = Number(fileCount);
+    if (!Number.isFinite(count) || count < 1) {
+        return next(
+            AppError.badRequest('fileCount must be a positive integer')
+        );
+    }
+
+    const amount = cleanerChargeAmountKes(count);
+    if (amount <= 0) {
+        return next(AppError.badRequest('Invalid charge amount'));
+    }
+
+    const userAfterDebit = await UserModel.findOneAndUpdate(
+        { _id: userId, walletBalance: { $gte: amount } },
+        { $inc: { walletBalance: -amount } },
+        { new: true, select: 'walletBalance email' }
+    );
+    if (!userAfterDebit) {
+        return next(
+            AppError.badRequest(
+                `Insufficient wallet balance for this service (KES ${amount.toFixed(2)}).`
+            )
+        );
+    }
+
+    const chargeReference = `WALLET_CHARGE_${crypto.randomUUID()}`;
+    try {
+        await TransactionsModel.create({
+            userId,
+            amount,
+            email: userAfterDebit.email,
+            status: 'success',
+            reference: chargeReference,
+            project: 'tidy-up',
+            provider: 'wallet',
+            paymentKind: 'billing',
+            folderCleanFileCount: count,
+            createdAt: new Date(),
+        });
+    } catch (error) {
+        await UserModel.findByIdAndUpdate(userId, {
+            $inc: { walletBalance: amount },
+        });
+        throw error;
+    }
+
+    return res.status(200).json({
+        status: 'success',
+        walletBalance: userAfterDebit.walletBalance ?? 0,
+        amount,
+        chargeReference,
+    });
+}
+
+export async function refundWalletCharge(
+    req: Request,
+    res: Response,
+    next: NextFunction
+) {
+    const authReq = req as AuthenticatedRequest;
+    const userPayload = authReq?.user as JWTUserPayload | undefined;
+    const userId = userPayload?.uid;
+    if (!userId) {
+        return next(AppError.unauthorized('Authentication required'));
+    }
+
+    const { chargeReference, reason } = req.body as {
+        chargeReference?: string;
+        reason?: string;
+    };
+    if (!chargeReference || typeof chargeReference !== 'string') {
+        return next(AppError.badRequest('chargeReference is required'));
+    }
+
+    const chargeTx = await TransactionsModel.findOne({
+        userId,
+        reference: chargeReference,
+        paymentKind: 'billing',
+    });
+    if (!chargeTx) {
+        return next(AppError.notFound('Original service charge not found'));
+    }
+
+    const refundReference = `WALLET_REFUND_${chargeReference}`;
+    const existingRefund = await TransactionsModel.findOne({
+        reference: refundReference,
+        userId,
+    });
+    if (existingRefund) {
+        const user = await UserModel.findById(userId).select('walletBalance');
+        return res.status(200).json({
+            status: 'success',
+            walletBalance: user?.walletBalance ?? 0,
+            refundReference,
+            amount: chargeTx.amount,
+        });
+    }
+
+    const user = await UserModel.findByIdAndUpdate(
+        userId,
+        { $inc: { walletBalance: chargeTx.amount } },
+        { new: true, select: 'walletBalance email' }
+    );
+
+    await TransactionsModel.create({
+        userId,
+        amount: chargeTx.amount,
+        email: user?.email ?? chargeTx.email,
+        status: 'success',
+        reference: refundReference,
+        project: reason ? `refund:${reason}` : 'refund:upload_failed',
+        provider: 'wallet',
+        paymentKind: 'billing',
+        createdAt: new Date(),
+    });
+
+    return res.status(200).json({
+        status: 'success',
+        walletBalance: user?.walletBalance ?? 0,
+        refundReference,
+        amount: chargeTx.amount,
+    });
+}

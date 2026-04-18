@@ -18,6 +18,7 @@ import { useGeneralStore } from '../Store/generalStore';
 import { TIER_CONFIG } from '../library/tier';
 import { useTierStore } from '../Store/tierStore';
 import { CLEANER_COST_PER_FILE_KES } from '../constants/cleanerPricing';
+import { cleanerChargeAmountKes } from '../constants/cleanerPricing';
 import { SubscriptionExpiredModal } from '../components/Popup';
 import { useTransactions } from '../Store/TransactionStore';
 import { useWalletStore } from '../Store/walletStore';
@@ -53,7 +54,7 @@ export default function FolderCleanerUI() {
     const CAN_ORGANIZE =
         TIER_CONFIG[tierId as keyof typeof TIER_CONFIG].canOrganize;
     const fileCount = useTransactions((state) => state.fileCount);
-    const totalCost = fileCount * CLEANER_COST_PER_FILE_KES;
+    const totalCost = cleanerChargeAmountKes(fileCount);
     const walletBalance = useWalletStore((s) => s.balance);
     const walletCoversJob =
         fileCount > 0 &&
@@ -77,7 +78,8 @@ export default function FolderCleanerUI() {
                         </h1>
                         <p className="font-bold text-slate-200">
                             Remove duplicate files instantly. KES{' '}
-                            {CLEANER_COST_PER_FILE_KES} per file — select a
+                            {CLEANER_COST_PER_FILE_KES.toFixed(2)} per file
+                            (rounded to 2 decimals) — select a
                             folder, review the total, then Pay & Process.
                         </p>
                     </motion.div>
@@ -477,7 +479,7 @@ export default function FolderCleanerUI() {
                                 {fileCount > 0 && (
                                     <span className="text-xs font-medium whitespace-nowrap text-slate-400">
                                         ({fileCount} ×{' '}
-                                        {CLEANER_COST_PER_FILE_KES.toFixed(0)})
+                                        {CLEANER_COST_PER_FILE_KES.toFixed(2)})
                                     </span>
                                 )}
                             </div>

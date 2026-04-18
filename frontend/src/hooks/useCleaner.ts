@@ -21,13 +21,17 @@ import { pollFolderCleanPayment } from '../utils/pollPayHeroPayment';
 
 const log = createClientLogger('UseCleaner.tsx');
 
-/** Backend route for folder cleaner — wallet charge applies only here. */
+/** Routes that require Pay & Process (wallet-first with STK fallback). */
 const FOLDER_CLEANER_PATH = 'processFolder';
+const QUESTION_MERGER_PATH = 'merge-files';
+const PAID_UPLOAD_PATHS = new Set([FOLDER_CLEANER_PATH, QUESTION_MERGER_PATH]);
 
-/** Returns amount charged (KES) or null if blocked (error already set). */
-function tryChargeWalletForCleanerUpload(fileCount: number): number | null {
+/** Returns charge payload or null if blocked (error already set). */
+async function chargeWalletForCleanerUpload(
+    fileCount: number
+): Promise<{ amount: number; chargeReference: string } | null> {
     const amount = cleanerChargeAmountKes(fileCount);
-    const { hasSufficientFunds, spendFunds, balance } =
+    const { hasSufficientFunds, balance, setBalanceFromServer } =
         useWalletStore.getState();
     const { setError } = useErrorStore.getState();
     if (!hasSufficientFunds(amount)) {
@@ -36,11 +40,39 @@ function tryChargeWalletForCleanerUpload(fileCount: number): number | null {
         );
         return null;
     }
-    if (!spendFunds(amount)) {
-        setError('Transaction failed. Please check your wallet.');
+    try {
+        const { data } = await authApi.post<{
+            status: string;
+            amount: number;
+            chargeReference: string;
+            walletBalance: number;
+        }>('/payment/wallet/charge-folder-clean', { fileCount });
+        setBalanceFromServer(Number(data.walletBalance ?? 0));
+        if (!data.chargeReference) {
+            setError('Could not confirm wallet charge reference.');
+            return null;
+        }
+        return {
+            amount: Number(data.amount ?? amount),
+            chargeReference: data.chargeReference,
+        };
+    } catch (error) {
+        let msg = 'Could not charge wallet for this service.';
+        if (axios.isAxiosError(error)) {
+            const d = error.response?.data as
+                | { message?: string; error?: { message?: string } }
+                | undefined;
+            msg =
+                d?.error?.message ||
+                (typeof d?.message === 'string' ? d.message : null) ||
+                error.message ||
+                msg;
+        } else if (error instanceof Error) {
+            msg = error.message;
+        }
+        setError(msg);
         return null;
     }
-    return amount;
 }
 
 export default function useCleaner() {
@@ -168,7 +200,9 @@ export default function useCleaner() {
         path: string,
         uploadLimit: UploadLimitResult,
         progressInterval: ReturnType<typeof setInterval>,
-        chargedKes: number | null,
+        chargedWallet:
+            | { amount: number; chargeReference: string }
+            | null,
         resumeAwaitingPaymentOnError: boolean,
         clearPendingCleanOnSuccess: boolean
     ) => {
@@ -182,9 +216,6 @@ export default function useCleaner() {
             log.info('Sending files to backend');
             const storage = localStorage.getItem('auth-storage');
             if (!storage) {
-                if (chargedKes !== null) {
-                    useWalletStore.getState().processPaymentFailure(chargedKes);
-                }
                 stopProgressInterval(progressInterval);
                 setError('Not authenticated');
                 setStatus(
@@ -250,8 +281,28 @@ export default function useCleaner() {
         } catch (error) {
             clearInterval(progressInterval);
             log.error('Error in processing files', { data: { error } });
-            if (chargedKes !== null) {
-                useWalletStore.getState().processPaymentFailure(chargedKes);
+            if (chargedWallet !== null) {
+                try {
+                    const refundRes = await authApi.post<{
+                        walletBalance?: number;
+                    }>('/payment/wallet/refund-charge', {
+                        chargeReference: chargedWallet.chargeReference,
+                        reason: 'upload_failed',
+                    });
+                    if (
+                        typeof refundRes.data?.walletBalance === 'number'
+                    ) {
+                        useWalletStore
+                            .getState()
+                            .setBalanceFromServer(
+                                refundRes.data.walletBalance
+                            );
+                    }
+                } catch (refundErr) {
+                    log.error('Wallet refund failed after upload failure', {
+                        data: { refundErr },
+                    });
+                }
             }
             applyUploadApiError(error, resumeAwaitingPaymentOnError);
         }
@@ -287,11 +338,7 @@ export default function useCleaner() {
     const confirmPayAndProcessFolder = async (mpesaPhone: string) => {
         if (payProcessInFlight.current) return;
         const pending = pendingCleanRef.current;
-        if (
-            !pending ||
-            pending.path !== FOLDER_CLEANER_PATH ||
-            pending.files.length === 0
-        ) {
+        if (!pending || !PAID_UPLOAD_PATHS.has(pending.path) || pending.files.length === 0) {
             setError('Select a folder first.');
             return;
         }
@@ -327,10 +374,11 @@ export default function useCleaner() {
                 const { hasSufficientFunds } = useWalletStore.getState();
 
                 if (hasSufficientFunds(totalCost)) {
-                    const chargedKes = tryChargeWalletForCleanerUpload(
+                    const chargedWallet =
+                        await chargeWalletForCleanerUpload(
                         pending.files.length
                     );
-                    if (chargedKes === null) {
+                    if (chargedWallet === null) {
                         stopProgressInterval(progressInterval);
                         setStatus('awaiting_payment');
                         return;
@@ -341,7 +389,7 @@ export default function useCleaner() {
                         pending.path,
                         pending.uploadLimit,
                         progressInterval,
-                        chargedKes,
+                        chargedWallet,
                         true,
                         true
                     );
@@ -384,10 +432,10 @@ export default function useCleaner() {
                     await pollFolderCleanPayment(reference);
                 useWalletStore.getState().setBalanceFromServer(walletBalance);
 
-                const chargedKes = tryChargeWalletForCleanerUpload(
+                const chargedWallet = await chargeWalletForCleanerUpload(
                     pending.files.length
                 );
-                if (chargedKes === null) {
+                if (chargedWallet === null) {
                     stopProgressInterval(progressInterval);
                     setStatus('awaiting_payment');
                     return;
@@ -399,7 +447,7 @@ export default function useCleaner() {
                     pending.path,
                     pending.uploadLimit,
                     progressInterval,
-                    chargedKes,
+                    chargedWallet,
                     true,
                     true
                 );
@@ -470,7 +518,7 @@ export default function useCleaner() {
                 return;
             }
 
-            if (path === FOLDER_CLEANER_PATH) {
+            if (PAID_UPLOAD_PATHS.has(path)) {
                 log.info(`Folder selected via input — staging for payment`);
                 useErrorStore.getState().clearError();
                 fileNoCheck(fileArray.length);
@@ -611,7 +659,7 @@ export default function useCleaner() {
                 return;
             }
 
-            if (path === FOLDER_CLEANER_PATH) {
+            if (PAID_UPLOAD_PATHS.has(path)) {
                 stopProgressInterval(progressInterval);
                 useErrorStore.getState().clearError();
                 fileNoCheck(files.length);

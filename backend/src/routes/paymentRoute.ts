@@ -2,10 +2,12 @@ import { Router } from 'express';
 import asyncHandler from '../middleware/asyncHandler.js';
 import { mpesaPayment } from '../controllers/paymentContoller.js';
 import {
+    chargeWalletForFolderCleaner,
     initiateFolderCleanStk,
     initiateWalletTopupStk,
     pollFolderCleanPaymentStatus,
     pollWalletTopupPaymentStatus,
+    refundWalletCharge,
 } from '../controllers/payHeroPayment.js';
 import authenticate from '../middleware/authenticate.js';
 
@@ -34,4 +36,14 @@ paymentRoute.get(
     '/wallet-topup/status/:reference',
     authenticate,
     asyncHandler(pollWalletTopupPaymentStatus)
+);
+paymentRoute.post(
+    '/wallet/charge-folder-clean',
+    authenticate,
+    asyncHandler(chargeWalletForFolderCleaner)
+);
+paymentRoute.post(
+    '/wallet/refund-charge',
+    authenticate,
+    asyncHandler(refundWalletCharge)
 );

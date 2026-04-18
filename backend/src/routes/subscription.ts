@@ -4,9 +4,9 @@ import createLogger from '../utils/logger.js';
 import authenticate from '../middleware/authenticate.js';
 import type {
     AuthenticatedRequest,
-    UserDocument,
 } from '../Types/authenticate.js';
 import { UserModel } from '../schema/UsersSchema.js';
+import { TransactionsModel } from '../schema/TransactionSchema.js';
 import AppError from '../utils/appError.js';
 import type { JWTUserPayload } from '../Types/authenticate.js';
 export const subRouter: Router = Router();
@@ -62,6 +62,82 @@ subRouter.patch('/increment-usage', authenticate, async (req, res, next) => {
         });
     } catch (error) {
         log.error('Error in incrementing the usage ', { data: { error } });
+        next(error);
+    }
+});
+
+subRouter.get('/wallet-history', authenticate, async (req, res, next) => {
+    try {
+        const authReq = req as AuthenticatedRequest;
+        const userPayload = authReq.user as JWTUserPayload | undefined;
+        if (!userPayload?.uid) {
+            return next(AppError.unauthorized('Not authenticated'));
+        }
+
+        const user = await UserModel.findById(userPayload.uid).select(
+            'walletBalance'
+        );
+        if (!user) {
+            return next(AppError.notFound('User not found'));
+        }
+
+        const txs = await TransactionsModel.find({
+            userId: userPayload.uid,
+            status: 'success',
+        })
+            .sort({ createdAt: -1 })
+            .select(
+                'amount paymentKind reference mpesaReceipt provider createdAt updatedAt payheroInternalRef'
+            )
+            .lean();
+
+        const history = txs.map((tx) => {
+            const isWalletCredit =
+                tx.paymentKind === 'wallet_topup' ||
+                tx.paymentKind === 'folder_clean';
+            const isWalletRefund =
+                tx.paymentKind === 'billing' &&
+                typeof tx.reference === 'string' &&
+                tx.reference.startsWith('WALLET_REFUND_');
+            const numericAmount = Number(tx.amount || 0);
+            return {
+                id: String(tx._id),
+                amount: isWalletCredit || isWalletRefund
+                    ? Math.abs(numericAmount)
+                    : -Math.abs(numericAmount),
+                type: (
+                    isWalletRefund
+                        ? 'refund'
+                        : isWalletCredit
+                          ? 'top-up'
+                          : 'payment'
+                ) as
+                    | 'top-up'
+                    | 'refund'
+                    | 'payment',
+                source:
+                    tx.paymentKind === 'wallet_topup'
+                        ? 'wallet-topup'
+                        : tx.paymentKind === 'folder_clean' ||
+                            tx.paymentKind === 'billing'
+                          ? 'in-app-payment'
+                          : 'local',
+                date: (tx.createdAt || tx.updatedAt || new Date()).toISOString(),
+                reference: tx.reference || null,
+                mpesaReference: tx.mpesaReceipt || null,
+                payheroReference: tx.payheroInternalRef || null,
+                provider: tx.provider || 'mpesa',
+            };
+        });
+
+        return res.status(200).json({
+            status: 'success',
+            walletBalance: user.walletBalance ?? 0,
+            total: history.length,
+            history,
+        });
+    } catch (error) {
+        log.error('Error fetching wallet history', { data: { error } });
         next(error);
     }
 });

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -10,6 +10,7 @@ import {
     Loader2,
 } from 'lucide-react';
 import authApi from '../library/authApi';
+import { welcomePageApi } from '../library/client';
 import { pollWalletTopupPayment } from '../utils/pollPayHeroPayment';
 import { useWalletStore } from '../Store/walletStore';
 
@@ -22,6 +23,29 @@ const WalletWidget = () => {
     const [inlineError, setInlineError] = useState<string | null>(null);
 
     const mpesaDigitsOk = mpesaPhone.replace(/\D/g, '').length >= 9;
+
+    useEffect(() => {
+        let mounted = true;
+        const syncBalance = async () => {
+            try {
+                const prof = await welcomePageApi.get<{ walletBalance?: number }>(
+                    '/fetch-profile'
+                );
+                if (
+                    mounted &&
+                    typeof prof.data?.walletBalance === 'number'
+                ) {
+                    setBalanceFromServer(prof.data.walletBalance);
+                }
+            } catch {
+                // Non-blocking: keep last known value in store.
+            }
+        };
+        void syncBalance();
+        return () => {
+            mounted = false;
+        };
+    }, [setBalanceFromServer]);
 
     const handleTopUp = async () => {
         setInlineError(null);

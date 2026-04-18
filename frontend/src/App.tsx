@@ -20,9 +20,7 @@ import { useAuthStore } from './Store/authStore';
 const log = createClientLogger('App.tsx');
 //import { UpgradeModal } from './components/Popup';
 import WelcomeModal from './Pages/WelcomePage';
-import Breadcrumb from './components/Navbar';
 import ProtectedRoutes from './components/ProtectedRoutes';
-import AllTools from './Pages/Alltools';
 import { welcomePageApi } from './library/client';
 import { useTierStore } from './Store/tierStore';
 import ForgotPassword from './components/Auth/ForgotPassword';
@@ -160,7 +158,6 @@ function App() {
                                 path="/file-merger"
                                 element={<FolderQuestionAnalyzer />}
                             />
-                            <Route path="/all-tools" element={<AllTools />} />
                             <Route path="/history" element={<HistoryPage />} />
                             <Route path="/wallet" element={<WalletPage />} />
                             <Route path="/pricing" element={<Pricing />} />
