@@ -227,7 +227,12 @@ export default function useCleaner() {
                 `/${path}?tierId=${tierId}&isWorkSheet=${isWorkSheet}&userId=${userId}`,
                 formData,
                 {
-                    headers: { 'Content-Type': 'multipart/form-data' },
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        'x-timezone-offset': new Date()
+                            .getTimezoneOffset()
+                            .toString(),
+                    },
                 }
             );
             const res = response.data;
@@ -499,9 +504,7 @@ export default function useCleaner() {
             const fileArray = Array.from(files);
             const uploadLimit = uploadLimiter();
             if (!uploadLimit.allowed) {
-                setError(
-                    'Daily limit reached for large files. Resets at midnight.'
-                );
+                setError('Daily limit reached. Resets at midnight.');
                 setStatus('idle');
                 return;
             }
@@ -602,7 +605,7 @@ export default function useCleaner() {
 
             if (items.length > 1) {
                 setError(
-                    `${items.length} folders detected. Kindly upload one at a time`
+                    `${items.length} items detected. Kindly upload one at a time`
                 );
                 stopProgressInterval(progressInterval);
                 setStatus('idle');
@@ -645,7 +648,7 @@ export default function useCleaner() {
                             log.debug('Upload limit', { data: uploadLimit });
                             if (!uploadLimit.allowed) {
                                 setError(
-                                    'Daily limit reached for large files. Resets at midnight.'
+                                    'Daily limit reached . Resets at midnight.'
                                 );
                                 stopProgressInterval(progressInterval);
                                 setStatus('idle');

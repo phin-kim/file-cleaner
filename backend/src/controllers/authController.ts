@@ -19,7 +19,6 @@ export async function register(req: Request, res: Response) {
     if (!isValid) {
         throw AppError.validation('Invalid email format ');
     }
-    log.info('Data from the front end', { data: { email, password } });
     //check if user exists
     const existingUser = await UserModel.findOne({ email });
 
@@ -87,12 +86,7 @@ export async function register(req: Request, res: Response) {
 }
 export async function login(req: Request, res: Response, next: NextFunction) {
     const { email, password } = req.body;
-    log.debug('This is the password', {
-        data: {
-            email,
-            password,
-        },
-    });
+
     if (!password) {
         return next(AppError.badRequest('Password is required'));
     }
@@ -101,7 +95,6 @@ export async function login(req: Request, res: Response, next: NextFunction) {
         throw AppError.validation('Invalid email format ');
     }
     const user = await UserModel.findOne({ email });
-    log.debug(`This is the user records`, { data: { user } });
     if (!user) {
         log.error('Theres no user in the data base');
         throw AppError.notFound('User not found ');
