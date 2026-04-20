@@ -490,8 +490,9 @@ const FolderQuestionAnalyzer = () => {
                         <div className="flex items-center justify-center gap-2 text-sm text-purple-200/80">
                             <AlertCircle className="h-4 w-4" />
                             <span>
-                                Wallet charges are tracked; failed processing is
-                                auto-refunded and logged as refund history.
+                                Please avoid uploading papers with complex
+                                mathematical formulas, as they may not process
+                                correctly.
                             </span>
                         </div>
                     </motion.div>
@@ -516,6 +517,12 @@ const FolderQuestionAnalyzer = () => {
                     Upload folders containing documents, PDFs, or text files for
                     analysis
                 </motion.p>
+                <div className="flex items-center justify-center gap-2 text-sm text-slate-200">
+                    <AlertCircle className="h-4 w-4" />
+                    <span>
+                        Your files are processed securely and never stored
+                    </span>
+                </div>
             </motion.div>
         </div>
     );

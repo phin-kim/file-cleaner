@@ -574,6 +574,13 @@ export default function FolderCleanerUI() {
                         transition={{ delay: 0.5 }}
                         className="mt-8 text-center"
                     >
+                        <div className="flex items-center justify-center gap-2 text-sm text-purple-200/80">
+                            <AlertCircle className="h-4 w-4" />
+                            <span>
+                                Wallet charges are tracked; failed processing is
+                                auto-refunded and logged as refund history.
+                            </span>
+                        </div>
                         <div className="flex items-center justify-center gap-2 text-sm text-slate-200">
                             <AlertCircle className="h-4 w-4" />
                             <span>
