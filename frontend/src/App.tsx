@@ -123,8 +123,9 @@ function App() {
         <>
             <ErrorToast />
             <SuccessToast />
+            <Analytics />
+
             <BrowserRouter>
-                <Analytics />
                 {/**
                         <Route
                             path="/file-merge"
