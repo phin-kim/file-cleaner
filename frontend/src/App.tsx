@@ -5,7 +5,7 @@ import AuthForm from './Pages/Auth';
 import FolderCleanerUI from './Pages/Cleaner';
 import BillingPage from './Pages/Billing';
 import FolderQuestionAnalyzer from './Pages/Merger';
-import { Analytics } from '@vercel/analytics/next';
+import { Analytics } from '@vercel/analytics/react';
 import {
     BrowserRouter,
     Routes,
