@@ -5,6 +5,7 @@ import AuthForm from './Pages/Auth';
 import FolderCleanerUI from './Pages/Cleaner';
 import BillingPage from './Pages/Billing';
 import FolderQuestionAnalyzer from './Pages/Merger';
+import { Analytics } from '@vercel/analytics/next';
 import {
     BrowserRouter,
     Routes,
@@ -123,6 +124,7 @@ function App() {
             <ErrorToast />
             <SuccessToast />
             <BrowserRouter>
+                <Analytics />
                 {/**
                         <Route
                             path="/file-merge"
