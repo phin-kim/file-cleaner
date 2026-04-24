@@ -12,7 +12,7 @@ import {
     Outlet,
     //Navigate,
 } from 'react-router-dom';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import createClientLogger from './utils/clientLogger';
 import handleApiError from './utils/apiError';
 import useErrorStore from './Store/ErrorStore';
@@ -30,6 +30,7 @@ import Sidebar from './components/Sidebar';
 import { useWalletStore } from './Store/walletStore';
 import WalletPage from './Pages/Wallet';
 import HistoryPage from './Pages/History';
+import Profile from './Pages/Profile';
 
 /** 
  
@@ -39,6 +40,7 @@ useAuthStore()	Full store hook	✅ Yes (all)	Avoid unless necessary
 useAuthStore.getState()	Store getters	❌ No	Non-React code (interceptors, helpers, outside components)
 */
 function App() {
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const refreshExecuted = useRef(false);
     const setTierId = useTierStore((state) => state.setTierId);
     const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -158,6 +160,7 @@ function App() {
                                 path="/file-merger"
                                 element={<FolderQuestionAnalyzer />}
                             />
+                            <Route path="/profile" element={<Profile />} />
                             <Route path="/history" element={<HistoryPage />} />
                             <Route path="/wallet" element={<WalletPage />} />
                             <Route path="/pricing" element={<Pricing />} />
@@ -176,10 +179,14 @@ function App() {
 export default App;
 
 function AppLayout() {
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     return (
         <div className="flex h-screen min-h-0 w-full overflow-hidden">
             {/*<Breadcrumb />*/}
-            <Sidebar />
+            <Sidebar
+                isOpen={isSidebarOpen}
+                onToggle={(val) => setIsSidebarOpen(val)}
+            />
             <main className="min-h-0 min-w-0 flex-1 overflow-y-auto">
                 <Outlet />
             </main>

@@ -18,8 +18,10 @@ export const useAuthStore = create<AuthState>()(
             user: null,
             isAuthenticated: false,
             accessToken: null,
+            createdAt: null,
             isLoading: true,
             notFound: false,
+
             setNotFound: (state) => set({ notFound: state }),
             _hasHydrated: false,
             setHasHydrated: (state) => set({ _hasHydrated: state }),
@@ -44,6 +46,7 @@ export const useAuthStore = create<AuthState>()(
                     set({
                         user: res.data.user,
                         accessToken: res.data.accessToken,
+                        createdAt: res.data.createdAt,
                         isAuthenticated: true,
                     });
                     setApiToken(res.data.accessToken);
@@ -84,6 +87,7 @@ export const useAuthStore = create<AuthState>()(
                         user: res.data.user,
                         accessToken: res.data.accessToken,
                         isAuthenticated: true,
+                        createdAt: res.data.createdAt,
                     });
                     setApiToken(res.data.accessToken);
                     localStorage.setItem('hasSession', 'true');
@@ -164,6 +168,7 @@ export const useAuthStore = create<AuthState>()(
                         user: res.data.user,
                         accessToken: res.data.accessToken,
                         isAuthenticated: true,
+                        createdAt: res.data.createdAt,
                     });
                     const currentState = get();
                     log.debug('Access  token from authstore', {
@@ -214,7 +219,27 @@ export const useAuthStore = create<AuthState>()(
                 }
                 setAccessToken(null);
                 setApiToken(null);
-                set({ user: null, accessToken: null, isAuthenticated: false });
+                set({
+                    user: null,
+                    accessToken: null,
+                    isAuthenticated: false,
+                    createdAt: null,
+                });
+            },
+            deleteAccount: async () => {
+                try {
+                    await authApi.post('/auth/delete-account');
+                    setAccessToken(null);
+                    setApiToken(null);
+                    set({
+                        user: null,
+                        accessToken: null,
+                        isAuthenticated: false,
+                        createdAt: null,
+                    });
+                } catch (error) {
+                    log.error('Error in deleteAccount', { data: { error } });
+                }
             },
         }),
         {
@@ -224,6 +249,8 @@ export const useAuthStore = create<AuthState>()(
             partialize: (state) => ({
                 user: state.user,
                 //accessToken: state.accessToken,
+                createdAt: state.createdAt,
+
                 isAuthenticated: state.isAuthenticated,
             }),
             //triggered when local storage is finished loading

@@ -83,6 +83,7 @@ export async function register(req: Request, res: Response) {
             id: user.id,
             email: user.email,
             role: user.role,
+            createdAt: user.createdAt,
         },
     });
 }
@@ -155,6 +156,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
             id: user.id,
             email: user.email,
             role: user.role,
+            createdAt: user.createdAt,
         },
     });
 }

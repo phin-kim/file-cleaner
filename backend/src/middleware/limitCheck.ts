@@ -1,39 +1,73 @@
 import type { Request, Response, NextFunction } from 'express';
-import { UserModel } from '../schema/UsersSchema';
-import AppError from '../utils/appError';
-import type { JWTUserPayload } from '../Types/authenticate';
-import type { AuthenticatedRequest } from '../Types/authenticate';
-import createLogger from '../utils/logger';
+import { UserModel } from '../schema/UsersSchema.js';
+import AppError from '../utils/appError.js';
+import type {
+    JWTUserPayload,
+    AuthenticatedRequest,
+} from '../Types/authenticate.js';
+import createLogger from '../utils/logger.js';
 const log = createLogger('Limitcheck.ts');
 const checkDailyLimit = async (
-    req: Request,
-    _res: Response,
-    next: NextFunction
+    fileLimitThreshold: number = 50,
+    dailyMax = 4
 ) => {
-    const authReq = req as AuthenticatedRequest;
-    const payload = authReq.user;
-    const userId = (payload as JWTUserPayload)?.uid;
-    log.warn('User payload ', { data: { payload } });
-    const user = await UserModel.findById(userId);
+    return async (req: Request, _res: Response, next: NextFunction) => {
+        const authReq = req as AuthenticatedRequest;
+        const payload = authReq.user;
+        const userId = (payload as JWTUserPayload)?.uid;
+        //Get the number of files from the request
+        const fileCount = Array.isArray(req.files) ? req.files?.length : 0;
+        if (fileCount > 100) {
+            return next(
+                AppError.badRequest('MAximum upload limit is 100 files at once')
+            );
+        }
+        //skip if its smaller than the threshold
+        if (fileCount <= fileLimitThreshold) {
+            return next();
+        }
+        const user = await UserModel.findById(userId);
 
-    if (!user) return next(AppError.notFound('User not found'));
-    const DAILY_MAX = 4;
-    //log.debug('User object from database', { data: { user } });
+        if (!user) return next(AppError.notFound('User not found'));
 
-    const today = new Date().setHours(0, 0, 0, 0);
-    const lastUpdate = new Date(user.lastUsageDate).setHours(0, 0, 0, 0);
-    //reset usage date if the last usage was the previous day
-    if (today > lastUpdate) {
-        user.dailyUsageCount = 0;
-        user.lastUsageDate = new Date();
-    }
-    if (user.dailyUsageCount >= DAILY_MAX) {
-        return next(
-            AppError.tooManyRequests('Daily limit reached.Please try again')
+        // 1. Get User's Timezone Offset from headers (sent by frontend)
+        // Frontend should send: headers: { 'x-timezone-offset': new Date().getTimezoneOffset() }
+        const clientOffset =
+            parseInt(req.headers['x-timezone-offset'] as string) || 0;
+
+        // 2. Calculate "Today" relative to the user's timezone
+        const now = new Date();
+        // Adjust UTC time to User's local time
+        const userLocalTime = new Date(now.getTime() - clientOffset * 60000);
+        //24 hours ago in users time
+        const twentyFourHoursAgo = new Date(
+            userLocalTime.getTime() - 24 * 60 * 60 * 1000
         );
-    }
-    //attach user request to avoid a second DB call in the controller
-    (req as AuthenticatedRequest).user = user;
-    next();
+        //last usage date converted into the users local time
+        const lastUsageLocal = new Date(
+            new Date(user.lastUsageDate).getTime() - clientOffset * 60000
+        );
+        //sliding window logic
+        if (lastUsageLocal < twentyFourHoursAgo) {
+            user.dailyUsageCount = 0;
+            //save only in the processing logic
+        }
+        //check heavy usage limit
+        if (user.dailyUsageCount >= dailyMax) {
+            const expiryTimeLocal =
+                lastUsageLocal.getTime() + 24 * 60 * 60 * 1000;
+            const timeLeftMs = expiryTimeLocal - userLocalTime.getTime();
+            const hoursLeft = Math.ceil(timeLeftMs / (1000 * 60 * 60));
+            return next(
+                AppError.tooManyRequests(
+                    `Heavy upload limit reached.Please try again in ${hoursLeft} hour(s)`
+                )
+            );
+        }
+
+        //attach user request to avoid a second DB call in the controller
+        (req as AuthenticatedRequest).user = user;
+        next();
+    };
 };
 export default checkDailyLimit;

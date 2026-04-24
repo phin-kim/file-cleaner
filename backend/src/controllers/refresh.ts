@@ -134,6 +134,7 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
                 id: user.id,
                 email: user.email,
                 role: user.role,
+                createdAt: user.createdAt,
             },
         });
     } catch (error) {

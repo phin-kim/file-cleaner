@@ -13,11 +13,13 @@ export type AuthResponse = {
     accessToken: string;
     user: User;
     message: string;
+    createdAt: Date;
 };
 export type LoginResponse = {
     accessToken: string;
     user: User;
     message: string;
+    createdAt: Date;
 };
 
 export type AuthState = {
@@ -25,6 +27,7 @@ export type AuthState = {
     accessToken: string | null;
     _hasHydrated: boolean; //<-- used  as a flag to tell the pages to wait until the is authenticated is read from the local storage
     isAuthenticated: boolean;
+    createdAt: Date | null;
     isLoading: boolean;
     notFound: boolean;
     requestPasswordReset: (email: string) => Promise<void>;
@@ -36,4 +39,5 @@ export type AuthState = {
     setAccessToken: (token: string | null) => void;
     refresh: () => Promise<void>;
     logout: () => Promise<void>;
+    deleteAccount: () => Promise<void>;
 };

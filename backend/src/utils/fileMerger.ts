@@ -519,7 +519,7 @@ Output only the single best merged question:
 
     try {
         const response = await AI.models.generateContent({
-            model: 'gemini-2.5-flash',
+            model: 'gemini-3-flash-preview',
             config: {
                 systemInstruction:
                     'You merge duplicate exam questions into ONE well-formatted academic question. Return ONLY the merged question, no explanations, no metadata, no multiple questions.',
