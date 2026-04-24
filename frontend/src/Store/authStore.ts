@@ -237,8 +237,13 @@ export const useAuthStore = create<AuthState>()(
                         isAuthenticated: false,
                         createdAt: null,
                     });
+                    localStorage.removeItem('hasSession');
+                    localStorage.removeItem('upload-stats');
+                    localStorage.removeItem('auth-storage');
                 } catch (error) {
                     log.error('Error in deleteAccount', { data: { error } });
+                    const { setError } = useErrorStore.getState();
+                    handleApiError(error, setError);
                 }
             },
         }),
@@ -248,9 +253,7 @@ export const useAuthStore = create<AuthState>()(
             //ONLY PERSIST THESE 2 due to security reasons i removed the accessToken from local storage tho it solved my problem of accessToken persistence
             partialize: (state) => ({
                 user: state.user,
-                //accessToken: state.accessToken,
                 createdAt: state.createdAt,
-
                 isAuthenticated: state.isAuthenticated,
             }),
             //triggered when local storage is finished loading

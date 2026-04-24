@@ -8,6 +8,7 @@ import createLogger from '../utils/logger.js';
 import validateAndNormalizeEmail from '../middleware/emailValidator.js';
 import axios from 'axios';
 import { request } from 'node:http';
+import { DeletedAccountModel } from '../schema/DeletedAccountSchema.js';
 const BREVO_API_KEY = process.env.BREVO_API_KEY;
 if (!BREVO_API_KEY) {
     throw AppError.badRequest('Brevo api key is missing');
@@ -39,6 +40,12 @@ export async function register(req: Request, res: Response) {
     const refreshToken = signRefreshToken({
         uid: user._id.toString(),
     });
+    const deletedUser = await DeletedAccountModel.findOne({ email });
+    if (deletedUser) {
+        user.walletBalance = 0;
+    } else {
+        user.walletBalance = 50;
+    }
     //nb this if statement is there not necessarily for logic but coz the hash token brings an error so its either this or the non null assertion
 
     /*if (!refreshToken) {
@@ -103,7 +110,6 @@ export async function login(req: Request, res: Response, next: NextFunction) {
         throw AppError.validation('Invalid email format ');
     }
     const user = await UserModel.findOne({ email });
-    log.debug(`This is the user records`, { data: { user } });
     if (!user) {
         log.error('Theres no user in the data base');
         throw AppError.notFound('User not found ');

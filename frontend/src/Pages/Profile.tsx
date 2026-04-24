@@ -213,7 +213,7 @@ const Profile: React.FC = () => {
                                             setDeleteConfirm(e.target.value)
                                         }
                                         placeholder="DELETE"
-                                        className="w-full max-w-md border-b border-red-900/50 bg-black/40 p-4 text-lg font-black tracking-widest text-white uppercase transition-colors placeholder:text-red-900/20 focus:border-red-500 focus:outline-none"
+                                        className="w-full max-w-md border-b border-red-900/50 bg-black/40 p-4 text-lg font-black tracking-widest text-white transition-colors placeholder:text-red-900/20 focus:border-red-500 focus:outline-none"
                                     />
                                 </div>
 

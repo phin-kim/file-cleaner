@@ -81,12 +81,17 @@ const authenticate: RequestHandler = async (req, _res, next) => {
             context: 'authenticate',
             data: decoded,
         });
-        log.debug('Payload', {
+        log.info('Payload', {
             requestId,
             context: 'authenticate payload',
             data: payload,
         });
         (req as AuthenticatedRequest).user = payload;
+        log.debug('Authenticated user', {
+            requestId,
+            context: 'authenticate',
+            data: { user: payload },
+        });
         log.highlight('=== AUTHENTICATE MIDDLEWARE DEBUG END ===', {
             requestId,
             context: 'authenticate',
