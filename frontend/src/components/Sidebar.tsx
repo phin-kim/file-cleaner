@@ -15,7 +15,7 @@ import {
     BrushCleaning,
     Combine,
 } from 'lucide-react';
-
+import { useProfileStore } from '../Store/profileStore';
 import { useAuthStore } from '../Store/authStore';
 
 const Sidebar = ({
@@ -59,7 +59,10 @@ const Sidebar = ({
     ];
 
     const userEmail = currentUser?.email || 'User';
-
+    const getInitials = (email: string) => {
+        return email.substring(0, 2).toUpperCase();
+    };
+    const profilePic = useProfileStore((state) => state.profilePic);
     return (
         <>
             {/* Mobile Overlay */}
@@ -225,9 +228,20 @@ const Sidebar = ({
                         <div
                             className={`flex items-center gap-3 overflow-hidden rounded-2xl bg-slate-50 p-3 ${isCollapsed && !isMobile ? 'justify-center' : ''}`}
                         >
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-300 bg-slate-200 text-sm font-black text-slate-900">
-                                {userEmail.substring(0, 2).toUpperCase()}
+                            <div className="group relative">
+                                {profilePic ? (
+                                    <img
+                                        src={profilePic}
+                                        alt="Profile"
+                                        className="h-10 w-10 rounded-full border-2 border-slate-200 object-cover"
+                                    />
+                                ) : (
+                                    <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-slate-200 bg-purple-100 text-sm font-bold text-purple-600">
+                                        {getInitials(userEmail)}
+                                    </div>
+                                )}
                             </div>
+
                             {(!isCollapsed || isMobile) && (
                                 <div className="min-w-0 flex-1 overflow-hidden">
                                     <p className="truncate text-xs font-bold tracking-tight text-slate-900 uppercase">

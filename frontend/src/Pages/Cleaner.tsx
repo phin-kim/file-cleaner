@@ -9,14 +9,14 @@ import {
     Loader2,
     X,
     Coins,
+    AlertTriangle,
     MousePointerClick,
 } from 'lucide-react';
 import useCleaner from '../hooks/useCleaner';
 import { UpgradeModal, SuccessPopup } from '../components/Popup';
 import BreakdownPie from '../components/FilePie';
 import { useGeneralStore } from '../Store/generalStore';
-import { TIER_CONFIG } from '../library/tier';
-import { useTierStore } from '../Store/tierStore';
+//import { TIER_CONFIG } from '../library/tier';
 import { CLEANER_COST_PER_FILE_KES } from '../constants/cleanerPricing';
 import { cleanerChargeAmountKes } from '../constants/cleanerPricing';
 import { SubscriptionExpiredModal } from '../components/Popup';
@@ -50,9 +50,8 @@ export default function FolderCleanerUI() {
     };
     const cleaningStats = useGeneralStore((state) => state.cleaningStats);
     const path = 'processFolder';
-    const tierId = useTierStore((state) => state.tierId);
-    const CAN_ORGANIZE =
-        TIER_CONFIG[tierId as keyof typeof TIER_CONFIG].canOrganize;
+    /*const CAN_ORGANIZE =
+        TIER_CONFIG[tierId as keyof typeof TIER_CONFIG].canOrganize;*/
     const fileCount = useTransactions((state) => state.fileCount);
     const totalCost = cleanerChargeAmountKes(fileCount);
     const walletBalance = useWalletStore((s) => s.balance);
@@ -67,6 +66,52 @@ export default function FolderCleanerUI() {
     return (
         <div>
             <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-purple-600 to-violet-800 p-6">
+                <AnimatePresence>
+                    {status === 'uploading' ||
+                        (status === 'processing' && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -20 }}
+                                className="z-200-full fixed top-4 left-1/2 max-w-lg -translate-x-1/2 px-6"
+                            >
+                                <div className="relative flex items-center gap-6 overflow-hidden rounded-3xl border border-amber-500/30 bg-white p-6 shadow-2xl backdrop-blur-xl">
+                                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-amber-100 text-amber-600">
+                                        <AlertTriangle
+                                            size={24}
+                                            className="animate-pulse"
+                                        />
+                                    </div>
+
+                                    <div className="flex-1">
+                                        <h3 className="text-lg leading-tight font-black text-slate-900">
+                                            Processing in Progress
+                                        </h3>
+                                        <p className="text-sm font-bold text-slate-500">
+                                            Please keep this tab open until
+                                            finished.
+                                        </p>
+                                        <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+                                            <motion.div
+                                                initial={{ x: '-100%' }}
+                                                animate={{ x: '100%' }}
+                                                transition={{
+                                                    repeat: Infinity,
+                                                    duration: 2,
+                                                    ease: 'linear',
+                                                }}
+                                                className="h-full w-1/3 rounded-full bg-amber-500"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="rounded-lg border border-amber-100 bg-amber-50 px-3 py-1.5 text-[10px] font-black tracking-widest text-amber-600 uppercase">
+                                        Active
+                                    </div>
+                                </div>
+                            </motion.div>
+                        ))}
+                </AnimatePresence>
                 <div className="w-full max-w-2xl">
                     <motion.div
                         initial={{ opacity: 0, y: -20 }}
@@ -79,8 +124,8 @@ export default function FolderCleanerUI() {
                         <p className="font-bold text-slate-200">
                             Remove duplicate files instantly. KES{' '}
                             {CLEANER_COST_PER_FILE_KES.toFixed(2)} per file
-                            (rounded to 2 decimals) — select a
-                            folder, review the total, then Pay & Process.
+                            (rounded to 2 decimals) — select a folder, review
+                            the total, then Pay & Process.
                         </p>
                     </motion.div>
                     <input
@@ -315,11 +360,7 @@ export default function FolderCleanerUI() {
                                         </motion.div>
                                     </div>
                                     <div>
-                                        {CAN_ORGANIZE && (
-                                            <BreakdownPie
-                                                CAN_ORGANIZE={CAN_ORGANIZE}
-                                            />
-                                        )}
+                                        <BreakdownPie />
                                     </div>
 
                                     <div className="flex gap-3">
@@ -424,8 +465,8 @@ export default function FolderCleanerUI() {
                                 <div className="rounded-2xl border border-emerald-200 bg-emerald-50/90 p-4 text-sm text-emerald-900 shadow-sm">
                                     Your wallet covers this job (
                                     {totalCost.toFixed(2)}). Tap{' '}
-                                    <strong>Pay &amp; Process</strong> to
-                                    deduct from your wallet — no M-Pesa step.
+                                    <strong>Pay &amp; Process</strong> to deduct
+                                    from your wallet — no M-Pesa step.
                                 </div>
                             ) : (
                                 <div className="rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm">
@@ -497,7 +538,7 @@ export default function FolderCleanerUI() {
                             onClick={() =>
                                 void confirmPayAndProcessFolder(mpesaPhone)
                             }
-                            className="group relative flex min-w-[200px] items-center justify-center gap-3 rounded-2xl bg-slate-900 px-8 py-4 font-bold text-white transition-all hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-600/50 disabled:text-slate-300"
+                            className="group relative flex min-w-50 items-center justify-center gap-3 rounded-2xl bg-slate-900 px-8 py-4 font-bold text-white transition-all hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-600/50 disabled:text-slate-300"
                             title={
                                 walletCoversJob
                                     ? 'Pay from your wallet balance'
@@ -531,6 +572,13 @@ export default function FolderCleanerUI() {
                         transition={{ delay: 0.5 }}
                         className="mt-8 text-center"
                     >
+                        <div className="flex items-center justify-center gap-2 text-sm text-purple-200/80">
+                            <AlertCircle className="h-4 w-4" />
+                            <span>
+                                Wallet charges are tracked; failed processing is
+                                auto-refunded and logged as refund history.
+                            </span>
+                        </div>
                         <div className="flex items-center justify-center gap-2 text-sm text-slate-200">
                             <AlertCircle className="h-4 w-4" />
                             <span>

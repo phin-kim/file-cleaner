@@ -12,8 +12,6 @@ import {
     AlertCircle,
     Coins,
 } from 'lucide-react';
-import { SubscriptionExpiredModal, UpgradeModal } from '../components/Popup';
-import { useTierStore } from '../Store/tierStore';
 import { useTransactions } from '../Store/TransactionStore';
 import { useWalletStore } from '../Store/walletStore';
 import {
@@ -28,10 +26,7 @@ const FolderQuestionAnalyzer = () => {
         status,
         downloadURL,
         fileInputRef,
-        setUpgradeModal,
-        upgradeModal,
-        isExpired,
-        setIsExpired,
+
         isWorkSheet,
         setIsWorkSheet,
         handleFolderInputChange,
@@ -45,7 +40,6 @@ const FolderQuestionAnalyzer = () => {
     } = useCleaner();
 
     const path = 'merge-files';
-    const tierId = useTierStore((state) => state.tierId);
     const fileCount = useTransactions((state) => state.fileCount);
     const totalCost = cleanerChargeAmountKes(fileCount);
     const walletBalance = useWalletStore((s) => s.balance);
@@ -401,7 +395,7 @@ const FolderQuestionAnalyzer = () => {
                             onClick={() =>
                                 void confirmPayAndProcessFolder(mpesaPhone)
                             }
-                            className="group relative flex min-w-[200px] items-center justify-center gap-3 rounded-2xl bg-slate-900 px-8 py-4 font-bold text-white transition-all hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-600/50 disabled:text-slate-300"
+                            className="group relative flex min-w-50 items-center justify-center gap-3 rounded-2xl bg-slate-900 px-8 py-4 font-bold text-white transition-all hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-600/50 disabled:text-slate-300"
                             title={
                                 walletCoversJob
                                     ? 'Pay from your wallet balance'
@@ -444,7 +438,7 @@ const FolderQuestionAnalyzer = () => {
                         </div>
                     </motion.div>
                 </div>
-                {upgradeModal && (
+                {/*upgradeModal && (
                     <UpgradeModal onClose={() => setUpgradeModal(false)} />
                 )}
                 {isExpired && (
@@ -453,7 +447,7 @@ const FolderQuestionAnalyzer = () => {
                         isExpired={isExpired}
                         onClose={() => setIsExpired(false)}
                     />
-                )}
+                )*/}
                 {/* Footer */}
                 <motion.p
                     initial={{ opacity: 0 }}

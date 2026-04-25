@@ -1,19 +1,25 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import React, { useEffect, useRef } from 'react';
+//import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
-    FaArrowLeft,
+    //FaArrowLeft,
     FaUser,
     FaEnvelope,
     FaShieldAlt,
     FaSignOutAlt,
     FaTrashAlt,
+    FaCamera,
+    FaChevronDown,
+    FaUpload,
+    FaImage,
 } from 'react-icons/fa';
+
 import { useState } from 'react';
 import { useAuthStore } from '../Store/authStore';
 import createClientLogger from '../utils/clientLogger';
 const log = createClientLogger('Profile.tsx');
 import { Trash2 } from 'lucide-react';
+import { useProfileStore } from '../Store/profileStore';
 const Profile: React.FC = () => {
     const [deleteConfirm, setDeleteConfirm] = useState('');
     const [isDeleting, setIsDeleting] = useState(false);
@@ -70,6 +76,71 @@ const Profile: React.FC = () => {
         //lastSignIn: 'Apr 24, 2026, 11:52 AM',
     };
 
+    const profilePic = useProfileStore((state) => state.profilePic);
+    const setProfilePic = useProfileStore((state) => state.setProfilePic);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [isUploadDropdownOpen, setIsUploadDropdownOpen] = useState(false);
+    const [isDragging, setIsDragging] = useState(false);
+
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (
+                dropdownRef.current &&
+                !dropdownRef.current.contains(event.target as Node)
+            ) {
+                setIsUploadDropdownOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () =>
+            document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const getInitials = (email: string) => {
+        return email.substring(0, 2).toUpperCase();
+    };
+
+    const processFile = (file: File) => {
+        if (file && file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setProfilePic(reader.result as string);
+                setIsUploadDropdownOpen(false);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) processFile(file);
+    };
+
+    const handleDragOver = (e: React.DragEvent) => {
+        e.preventDefault();
+        setIsDragging(true);
+    };
+
+    const handleDragLeave = (e: React.DragEvent) => {
+        e.preventDefault();
+        setIsDragging(false);
+    };
+
+    const handleDrop = (e: React.DragEvent) => {
+        e.preventDefault();
+        setIsDragging(false);
+        const file = e.dataTransfer.files?.[0];
+        if (file) processFile(file);
+    };
+
+    const handleRemovePhoto = () => {
+        setProfilePic(null);
+        setIsUploadDropdownOpen(false);
+    };
+
     return (
         <div className="min-h-screen bg-slate-50 p-4 text-slate-900 md:p-8">
             <div className="mx-auto max-w-3xl">
@@ -94,6 +165,190 @@ const Profile: React.FC = () => {
                                 <FaUser size={16} />
                             </div>
                             <h2 className="text-xl font-bold">Account</h2>
+                        </div>
+                        <div className="mb-12 flex flex-col items-center gap-8 border-b border-slate-100 pb-12 md:flex-row">
+                            <div
+                                onDragOver={handleDragOver}
+                                onDragLeave={handleDragLeave}
+                                onDrop={handleDrop}
+                                className={`group relative transition-all duration-300 ${isDragging ? 'scale-110' : ''}`}
+                            >
+                                {profilePic ? (
+                                    <img
+                                        src={profilePic}
+                                        alt="Profile"
+                                        className={`h-32 w-32 rounded-full border-4 object-cover shadow-xl transition-all ${isDragging ? 'border-purple-500' : 'border-white'} group-hover:opacity-90`}
+                                    />
+                                ) : (
+                                    <div
+                                        className={`flex h-32 w-32 items-center justify-center rounded-full border-4 text-4xl font-bold shadow-xl transition-all ${isDragging ? 'border-purple-500 bg-purple-200 text-purple-700' : 'border-white bg-purple-100 text-purple-600'}`}
+                                    >
+                                        {getInitials(email || 'NA')}
+                                    </div>
+                                )}
+                                <div className="absolute right-0 bottom-0 rounded-full border border-slate-100 bg-white p-2 text-slate-400 shadow-lg">
+                                    <FaCamera size={14} />
+                                </div>
+                                {isDragging && (
+                                    <div className="absolute inset-0 flex items-center justify-center rounded-full border-2 border-dashed border-purple-500 bg-purple-600/20 backdrop-blur-xs">
+                                        <div className="animate-bounce text-purple-600">
+                                            <FaUpload size={24} />
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="flex flex-col items-center gap-4 md:items-start">
+                                <div className="text-center md:text-left">
+                                    <h3 className="text-xl font-bold text-slate-900">
+                                        Profile Photo
+                                    </h3>
+                                    <p className="text-sm text-slate-500">
+                                        Upload a photo to personalize your
+                                        account. You can drag and drop here.
+                                    </p>
+                                </div>
+
+                                <div className="relative" ref={dropdownRef}>
+                                    <div className="flex items-center gap-3">
+                                        <div className="relative">
+                                            <button
+                                                onClick={() =>
+                                                    setIsUploadDropdownOpen(
+                                                        !isUploadDropdownOpen
+                                                    )
+                                                }
+                                                className="flex items-center gap-2 rounded-xl bg-purple-600 px-6 py-2.5 font-bold text-white shadow-md shadow-purple-100 transition-all hover:bg-purple-500 active:scale-95"
+                                            >
+                                                Change Photo
+                                                <span
+                                                    className={`transition-transform duration-300 ${isUploadDropdownOpen ? 'rotate-180' : ''}`}
+                                                >
+                                                    <FaChevronDown size={12} />
+                                                </span>
+                                            </button>
+
+                                            <AnimatePresence>
+                                                {isUploadDropdownOpen && (
+                                                    <motion.div
+                                                        initial={{
+                                                            opacity: 0,
+                                                            y: 10,
+                                                            scale: 0.95,
+                                                        }}
+                                                        animate={{
+                                                            opacity: 1,
+                                                            y: 0,
+                                                            scale: 1,
+                                                        }}
+                                                        exit={{
+                                                            opacity: 0,
+                                                            y: 10,
+                                                            scale: 0.95,
+                                                        }}
+                                                        className="absolute top-full left-0 z-50 mt-2 w-64 origin-top-left overflow-hidden rounded-2xl border border-slate-200 bg-white py-2 shadow-2xl"
+                                                    >
+                                                        <div className="mb-1 border-b border-slate-50 px-4 py-2 text-[10px] font-bold tracking-widest text-slate-400 uppercase">
+                                                            Options
+                                                        </div>
+                                                        <button
+                                                            onClick={() => {
+                                                                fileInputRef.current?.click();
+                                                                setIsUploadDropdownOpen(
+                                                                    false
+                                                                );
+                                                            }}
+                                                            className="group flex w-full items-center gap-3 px-4 py-3 text-left text-slate-700 transition-colors hover:bg-purple-50"
+                                                        >
+                                                            <div className="rounded-xl bg-purple-100 p-2 text-purple-600 transition-colors group-hover:bg-purple-600 group-hover:text-white">
+                                                                <FaUpload
+                                                                    size={14}
+                                                                />
+                                                            </div>
+                                                            <div>
+                                                                <p className="text-sm font-bold">
+                                                                    Upload from
+                                                                    device
+                                                                </p>
+                                                                <p className="text-[10px] text-slate-500">
+                                                                    Pick a file
+                                                                    from your
+                                                                    computer
+                                                                </p>
+                                                            </div>
+                                                        </button>
+
+                                                        <button
+                                                            onClick={() => {
+                                                                /* library logic */ setIsUploadDropdownOpen(
+                                                                    false
+                                                                );
+                                                            }}
+                                                            className="group flex w-full items-center gap-3 px-4 py-3 text-left text-slate-700 transition-colors hover:bg-violet-50"
+                                                        >
+                                                            <div className="rounded-xl bg-violet-100 p-2 text-violet-600 transition-colors group-hover:bg-violet-600 group-hover:text-white">
+                                                                <FaImage
+                                                                    size={14}
+                                                                />
+                                                            </div>
+                                                            <div>
+                                                                <p className="text-sm font-bold">
+                                                                    Select from
+                                                                    library
+                                                                </p>
+                                                                <p className="text-[10px] text-slate-500">
+                                                                    Choose from
+                                                                    existing
+                                                                    assets
+                                                                </p>
+                                                            </div>
+                                                        </button>
+
+                                                        {profilePic && (
+                                                            <button
+                                                                onClick={
+                                                                    handleRemovePhoto
+                                                                }
+                                                                className="group mt-1 flex w-full items-center gap-3 border-t border-slate-100 px-4 py-3 text-left text-red-600 transition-colors hover:bg-red-50"
+                                                            >
+                                                                <div className="rounded-xl bg-red-100 p-2 text-red-600 transition-colors group-hover:bg-red-600 group-hover:text-white">
+                                                                    <FaTrashAlt
+                                                                        size={
+                                                                            14
+                                                                        }
+                                                                    />
+                                                                </div>
+                                                                <span className="text-sm font-bold">
+                                                                    Remove
+                                                                    current
+                                                                    photo
+                                                                </span>
+                                                            </button>
+                                                        )}
+                                                    </motion.div>
+                                                )}
+                                            </AnimatePresence>
+                                        </div>
+
+                                        {profilePic && (
+                                            <button
+                                                onClick={handleRemovePhoto}
+                                                className="rounded-xl border border-slate-200 bg-white px-6 py-2.5 font-bold text-slate-700 transition-all hover:bg-slate-50"
+                                            >
+                                                Remove
+                                            </button>
+                                        )}
+                                    </div>
+
+                                    <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        onChange={handleFileUpload}
+                                        className="hidden"
+                                        accept="image/*"
+                                    />
+                                </div>
+                            </div>
                         </div>
 
                         <div className="grid gap-8">
@@ -232,7 +487,7 @@ const Profile: React.FC = () => {
                                             isDeleting
                                         }
                                         onClick={handleDeleteAccount}
-                                        className={`min-w-[200px] rounded-xl px-8 py-3 text-sm font-bold shadow-lg transition-all ${
+                                        className={`min-w-50 rounded-xl px-8 py-3 text-sm font-bold shadow-lg transition-all ${
                                             deleteConfirm === 'DELETE' &&
                                             !isDeleting
                                                 ? 'cursor-pointer bg-red-600 text-white shadow-red-600/20 hover:bg-red-700 active:scale-95'

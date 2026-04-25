@@ -25,11 +25,7 @@ const ICON_MAP: Record<FileCategory, LucideIcon> = {
     Others: HardDrive,
 };
 
-export default function BreakdownPie({
-    CAN_ORGANIZE,
-}: {
-    CAN_ORGANIZE: boolean;
-}) {
+export default function BreakdownPie({}) {
     const cleaningStats = useGeneralStore((state) => state.cleaningStats);
 
     const FILE_TYPE_DATA = useMemo(() => {
@@ -41,7 +37,7 @@ export default function BreakdownPie({
             icon: ICON_MAP[key as keyof typeof ICON_MAP] || HardDrive,
         }));
     }, [cleaningStats]);
-    if (FILE_TYPE_DATA.length === 0 && CAN_ORGANIZE) {
+    if (FILE_TYPE_DATA.length === 0) {
         return <div>Loading chart ...</div>;
     }
 

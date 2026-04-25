@@ -3,6 +3,9 @@ import { embeddingCache } from '../utils/fileMerger.js';
 import createLogger from '../utils/logger.js';
 import { saveEmbeddingsCache } from '../utils/fileMerger.js';
 
+import type { JWTUserPayload, UserDocument } from '../Types/authenticate.js';
+//import type { Request } from 'express';
+
 const log = createLogger('Mini Helpers');
 export function normalizeQuestions(question: string) {
     return question.toLocaleLowerCase().replace(/\s+/g, ' ').trim();
@@ -21,3 +24,11 @@ export function trimEmbeddingsCache() {
         saveEmbeddingsCache();
     }
 }
+/**
+ * Type Guard to check if the user property is the full Mongoose Document
+ */
+export const isUserDocument = (
+    user: JWTUserPayload | UserDocument
+): user is UserDocument => {
+    return (user as UserDocument)._id !== undefined;
+};

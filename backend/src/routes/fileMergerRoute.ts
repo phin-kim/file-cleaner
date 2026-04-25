@@ -9,10 +9,10 @@ import { processUploadedFiles } from '../utils/fileMerger.js';
 import generatePDF from '../utils/generatePDF.js';
 import uploadLimiter from '../utils/rateLimiter.js';
 import createLogger from '../utils/logger.js';
-import { TIER_CONFIG } from '../config/tiers.js';
+//import { TIER_CONFIG } from '../config/tiers.js';
 import AppError from '../utils/appError.js';
 import { sendEmailAlert } from '../utils/sendEmail.js';
-import { ConnectionCheckedOutEvent } from 'mongodb';
+//import { ConnectionCheckedOutEvent } from 'mongodb';
 import checkDailyLimit from '../middleware/limitCheck.js';
 import { UserModel } from '../schema/UsersSchema.js';
 import type { AuthenticatedRequest } from '../Types/authenticate.js';
@@ -63,25 +63,39 @@ mergerRoute.post(
     uploadLimiter,
     initSession,
     upload.array('files'),
-    checkDailyLimit,
+    checkDailyLimit(),
     async (req, res, next) => {
         const sessionPath = req.sessionPath;
         try {
-            const tierId = req.query.tierId as keyof typeof TIER_CONFIG;
+            //const tierId = req.query.tierId as keyof typeof TIER_CONFIG;
             const authReq = req as AuthenticatedRequest;
             const userEmail = authReq?.user?.email;
+            /**
+             
+             * const authReq = req as AuthenticatedRequest;
+                     
+                     // Replace findOne({ email: ... }) with findById
+                     if (!authReq.user) {
+                         return next(AppError.unauthorized('Not authenticated'));
+                     }
+             
+                     // TYPE SAFE EXTRACTION:
+                     // If it's a Document, use ._id. If it's a Payload, use .uid.
+                     const userId = isUserDocument(authReq.user)
+                         ? authReq.user._id.toString()
+                         : authReq.user.uid;
+             
+                     // Now you can proceed safely
+                     const user = isUserDocument(authReq.user)
+                         ? authReq.user
+                         : await UserModel.findById(userId);
+             
+                     if (!user) return next(AppError.notFound('User not found'));
+             */
 
             const isWorkSheet = req.query.isWorkSheet === 'true';
-            const CAN_MERGE = TIER_CONFIG[tierId].canMerge;
-            if (!CAN_MERGE) {
-                return next(
-                    new AppError(
-                        'This feature is unavailable in your current subscription plan',
-                        503,
-                        'ServiceUnavailable'
-                    )
-                );
-            }
+            //const CAN_MERGE = TIER_CONFIG[tierId].canMerge;
+
             const user = await UserModel.findOne({ email: userEmail });
             if (!user) {
                 return next(AppError.notFound('User not found'));

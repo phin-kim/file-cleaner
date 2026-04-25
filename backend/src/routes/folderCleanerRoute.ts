@@ -12,8 +12,10 @@ import createZipWithRetry from '../helpers/zipFolderRetry.js';
 import AppError from '../utils/appError.js';
 import asyncHandler from '../middleware/asyncHandler.js';
 import uploadLimiter from '../utils/rateLimiter.js';
-import { TIER_CONFIG } from '../config/tiers.js';
+//import { TIER_CONFIG } from '../config/tiers.js';
 import { sendEmailAlert } from '../utils/sendEmail.js';
+import type { JWTUserPayload } from '../Types/authenticate.js';
+import { isUserDocument } from '../helpers/miniHelpers.js';
 import {
     organizeByExtension,
     type ExtensionStats,
@@ -102,35 +104,13 @@ function handleUploadErrors(
      * I was to sed it via the body but since multer runs prior even b4 the body is loaded, we have to use query parameter
      *
      */
-    const tierId = (req.query.tierId as keyof typeof TIER_CONFIG) || 'free';
     //safely get config (fallback to free if user sends a fake tier name)
-
-    const DYNAMIC_LIMIT =
-        TIER_CONFIG[tierId as keyof typeof TIER_CONFIG]?.maxUploads;
-    log.warn(
-        `Processing for upload tier ${tierId} with limit: ${DYNAMIC_LIMIT}`
-    );
-    const CAN_CLEAN = TIER_CONFIG[tierId].canClean;
-    if (!CAN_CLEAN) {
-        log.info(
-            `Identifying whether the user can clean ${CAN_CLEAN ? 'YES' : 'NO'}`
-        );
-        log.info(`The current tier that the user is in ${tierId}`);
-
-        return next(
-            new AppError(
-                'This feature is unavailable in your current subscription plan',
-                503,
-                'ServiceUnavailable'
-            )
-        );
-    }
 
     const uploadMiddleware = multer({
         storage: storage,
         limits: {
             fileSize: 1000 * 1024 * 1024,
-            files: DYNAMIC_LIMIT,
+            //files: DYNAMIC_LIMIT,
         },
     }).array('files');
     uploadMiddleware(req, res, (err: unknown) => {
@@ -138,7 +118,7 @@ function handleUploadErrors(
             log.error('Upload middleware error:', { data: { err } });
 
             const classifiedError = classifyError(err);
-            if (err instanceof MulterError && err.code === 'LIMIT_FILE_COUNT') {
+            /*if (err instanceof MulterError && err.code === 'LIMIT_FILE_COUNT') {
                 return next(
                     new AppError(
                         `File count exceeded. Your limit is ${DYNAMIC_LIMIT} `,
@@ -146,7 +126,7 @@ function handleUploadErrors(
                         'UploadError'
                     )
                 );
-            }
+            }*/
             switch (classifiedError.type) {
                 case 'ENOENT':
                     log.error('Storage unavailable ', {
@@ -182,7 +162,7 @@ function handleUploadErrors(
                 case 'MULTER_ERROR':
                     const errorMessages: Record<string, string> = {
                         LIMIT_FILE_SIZE: 'File too large. Max 1GB.',
-                        LIMIT_FILE_COUNT: `File count exceeded ${DYNAMIC_LIMIT}`,
+                        //LIMIT_FILE_COUNT: `File count exceeded ${DYNAMIC_LIMIT}`,
                         LIMIT_UNEXPECTED_FILE: 'Unexpected file field.',
                     };
 
@@ -304,21 +284,32 @@ cleanerRoute.post(
     authenticate,
     uploadLimiter,
     handleUploadErrors,
-    checkDailyLimit,
+    checkDailyLimit(),
     asyncHandler(async (req, res, next) => {
         log.highlight(
             `🟢 [BACKEND] request received at: ${new Date().toLocaleDateString()}`
         );
-        const tierId = (req.query.tierId as keyof typeof TIER_CONFIG) || 'free';
-        const CAN_ORGANIZE = TIER_CONFIG[tierId].canOrganize;
+        const isHeavy = (req as AuthenticatedRequest).isHeavyUpload;
         const authReq = req as AuthenticatedRequest;
-        const userEmail = authReq?.user?.email;
-        log.warn(`Whats the user email ${userEmail}`);
 
-        const user = await UserModel.findOne({ email: userEmail });
-        if (!user) {
-            return next(AppError.notFound('User not found'));
+        // Replace findOne({ email: ... }) with findById
+        if (!authReq.user) {
+            return next(AppError.unauthorized('Not authenticated'));
         }
+
+        // TYPE SAFE EXTRACTION:
+        // If it's a Document, use ._id. If it's a Payload, use .uid.
+        const userId = isUserDocument(authReq.user)
+            ? authReq.user._id.toString()
+            : authReq.user.uid;
+
+        // Now you can proceed safely
+        const user = isUserDocument(authReq.user)
+            ? authReq.user
+            : await UserModel.findById(userId);
+
+        if (!user) return next(AppError.notFound('User not found'));
+
         const uploadedFiles = req.files as Express.Multer.File[];
         const uploadedFolderName = req.body.folderName; //fallback
         const subscriptionStatus = await sendEmailAlert(req);
@@ -380,9 +371,9 @@ cleanerRoute.post(
             `[BACKEND] duplicate removal done in ${Date.now() - tidyStart} ms`
         );
         let fileOrgStats: ExtensionStats | null = null;
-        if (CAN_ORGANIZE) {
-            fileOrgStats = await organizeByExtension(tempDir);
-        }
+
+        fileOrgStats = await organizeByExtension(tempDir);
+
         const zippedDir = path.join(outputDir, 'zipped');
         const zipStart = Date.now();
 
@@ -423,9 +414,16 @@ cleanerRoute.post(
                     },
                 },
             });
-            user.dailyUsageCount += 1;
-            user.lastUsageDate = new Date();
-            await user.save();
+            if (isHeavy) {
+                user.dailyUsageCount += 1;
+                user.lastUsageDate = new Date();
+                await user.save();
+                log.debug('Daily usage count incremented and saved.');
+            } else {
+                log.debug(
+                    `Not incrementing daily usage count. isHeavy: ${isHeavy}`
+                );
+            }
             res.json({
                 downloadURL,
                 stats: {

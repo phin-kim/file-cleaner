@@ -7,21 +7,28 @@ import type {
 } from '../Types/authenticate.js';
 import createLogger from '../utils/logger.js';
 const log = createLogger('Limitcheck.ts');
-const checkDailyLimit = async (
-    fileLimitThreshold: number = 50,
-    dailyMax = 4
-) => {
+const checkDailyLimit = (fileLimitThreshold: number = 30, dailyMax = 4) => {
     return async (req: Request, _res: Response, next: NextFunction) => {
         const authReq = req as AuthenticatedRequest;
         const payload = authReq.user;
         const userId = (payload as JWTUserPayload)?.uid;
         //Get the number of files from the request
         const fileCount = Array.isArray(req.files) ? req.files?.length : 0;
-        if (fileCount > 100) {
+        //attach this flag into the request object
+        (req as AuthenticatedRequest).isHeavyUpload =
+            fileCount > fileLimitThreshold;
+        if (!(req as AuthenticatedRequest).isHeavyUpload) {
+            return next();
+        }
+
+        if (fileCount > 300) {
             return next(
-                AppError.badRequest('MAximum upload limit is 100 files at once')
+                AppError.badRequest('Maximum upload limit is 300 files at once')
             );
         }
+        log.debug(
+            `From the limit check middleware: User ${userId} is uploading ${fileCount} files.`
+        );
         //skip if its smaller than the threshold
         if (fileCount <= fileLimitThreshold) {
             return next();
