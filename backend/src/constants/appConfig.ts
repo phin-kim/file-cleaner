@@ -12,7 +12,7 @@ export const appConfig = {
     geminiApiKey: process.env.GEMINI_API_KEY || '',
 
     /** Gemini model to use */
-    geminiModel: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
+    geminiModel: process.env.GEMINI_MODEL || 'gemini-3-flash-preview',
 
     /** Maximum retry attempts for API calls */
     maxRetries: parseInt(process.env.MAX_RETRIES || '3', 10),

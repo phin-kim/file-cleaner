@@ -126,28 +126,34 @@ export class GeminiNativePdfProcessor {
      * build the extraction prompt for native pdf processing
      */
     private buildNativePrompt(fileNames: string[]): string {
-        return `You are extracting exam questions from attached PDFs.
+        return `You are an expert academic assistant. Your task is to extract exam questions from the attached PDFs into a professional study worksheet.
 Attached files (${fileNames.length}): ${fileNames.join(', ')}.
 
-STRICT GROUNDING RULES:
+STRICT GROUNDING & ACADEMIC RULES:
+- Read all the documents thoroughly. Extract the questions exactly as they appear in the source.
+- Group related sub-questions (e.g., a, b, c) under their main question.
+- DO NOT repeat the main question header (like "QUESTION ONE") for every sub-question.
+- DO NOT add any prefixes like ".." or "-" to the start of the <li> tags.
+- Strip away redundant document headers like "QUESTION 1" or "Question 2" from the start of the <li>. The HTML list will provide its own numbers.
+- Merge exact duplicates only.
+- Retain marks allocation (e.g., [4 marks]) neatly.
+- Do not include document preambles, explanations, or code fences.
 - Use ONLY information found in the attached files.
-- Never invent questions from other subjects.
-- If content is unreadable, skip it instead of guessing.
-- Do not include preambles, explanations, markdown, or code fences.
 
-OUTPUT (JSON ONLY):
+OUTPUT FORMAT (JSON ONLY):
 {
-  "itemsHtml": "<li>Question text...</li><li>Question text...</li>",
+  "itemsHtml": "<li><strong>...</strong><br/><br/>a) ... [2 marks]<br/><br/>b) ... [4 marks]</li>",
   "totalCount": 0,
   "duplicatesRemoved": 0,
-  "analysis": "short extraction note"
+  "analysis": "Extraction complete."
 }
 
 HTML RULES:
-- "itemsHtml" must contain only <li>...</li> elements.
-- Preserve numbering and sub-parts exactly as seen.
-- Keep mathematical notation and choices intact.
-- Keep duplicate removal conservative (remove only clear duplicates).`;
+- "itemsHtml" must contain a sequence of <li>...</li> elements ONLY.
+- Combine each main question and its sub-parts into ONE SINGLE <li> element.
+- DO NOT use nested <ol>, <ul>, or <li> tags. Use <br/><br/> for spacing.
+- Emphasize the question body using <strong> tags.
+- Keep mathematical notation intact.`;
     }
     /**Call gemini with exponential backoff retry */
     private async callGeminiWithRetry(

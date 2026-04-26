@@ -36,6 +36,8 @@ import PrivacyPolicy from './Pages/PrivacyPolicy';
 import TermsOfService from './Pages/TermsOfService';
 import PublicPricing from './Pages/PublicPricing';
 import HowItWorks from './Pages/HowItWorks';
+import About from './Pages/About';
+import Contact from './Pages/Contact';
 
 /** 
  
@@ -154,6 +156,8 @@ function App() {
                         }
                     />
                     <Route path="/how-it-works" element={<HowItWorks />} />
+                    <Route path="/about" element={<About />} />
+                    <Route path="/contact" element={<Contact />} />
                     <Route path="/auth" element={<AuthForm />} />
                     <Route
                         path="/auth/forgot-password"

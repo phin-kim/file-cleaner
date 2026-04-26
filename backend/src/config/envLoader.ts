@@ -56,6 +56,15 @@ log.debug(
     `FRONT_END_URL:,
     ${process.env.FRONTEND_URL ? '✅ Set' : '❌ Missing'}`
 );
+log.debug(
+    `CLOUDINARY_CLOUD_NAME:, ${process.env.CLOUDINARY_CLOUD_NAME ? '✅ Set' : '❌ Missing'}`
+);
+log.debug(
+    `CLOUDINARY_API_KEY:, ${process.env.CLOUDINARY_API_KEY ? '✅ Set' : '❌ Missing'}`
+);
+log.debug(
+    `CLOUDINARY_API_SECRET:, ${process.env.CLOUDINARY_API_SECRET ? '✅ Set' : '❌ Missing'}`
+);
 
 // Export the keys with fallbacks
 export const GEMINI_API_KEY =
@@ -65,6 +74,9 @@ export const PAYHERO_AUTH_TOKEN = process.env.PAYHERO_AUTH_TOKEN;
 export const COOKIE_SECRET = process.env.COOKIE_SECRET;
 export const BREVO_API_KEY = process.env.BREVO_API_KEY;
 export const FRONTEND_URL = process.env.FRONTEND_URL;
+export const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME;
+export const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY;
+export const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET;
 // Validate required keys
 if (!GEMINI_API_KEY) {
     log.error('❌ GEMINI_API_KEY or GOOGLE_API_KEY is required in .env file');
@@ -89,5 +101,17 @@ if (!FRONTEND_URL) {
 }
 if (!COOKIE_SECRET) {
     log.error('❌ COOKIE_SECRET is required in .env file');
+    process.exit(1);
+}
+if (!CLOUDINARY_CLOUD_NAME) {
+    log.error('❌ CLOUDINARY_CLOUD_NAME is required in .env file');
+    process.exit(1);
+}
+if (!CLOUDINARY_API_KEY) {
+    log.error('❌ CLOUDINARY_API_KEY is required in .env file');
+    process.exit(1);
+}
+if (!CLOUDINARY_API_SECRET) {
+    log.error('❌ CLOUDINARY_API_SECRET is required in .env file');
     process.exit(1);
 }

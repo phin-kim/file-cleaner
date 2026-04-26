@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-//import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     //FaArrowLeft,
@@ -22,18 +22,19 @@ import { Trash2 } from 'lucide-react';
 import { useProfileStore } from '../Store/profileStore';
 import authApi from '../library/authApi';
 import { welcomePageApi } from '../library/client';
+import useSuccessStore from '../Store/SuccessStore';
 const Profile: React.FC = () => {
     const [deleteConfirm, setDeleteConfirm] = useState('');
     const [isDeleting, setIsDeleting] = useState(false);
     const logout = useAuthStore((state) => state.logout);
     const deleteAccount = useAuthStore((state) => state.deleteAccount);
-    //const navigate = useNavigate();
+    const navigate = useNavigate();
     const handleDeleteAccount = async () => {
         if (deleteConfirm === 'DELETE') {
             setIsDeleting(true);
             try {
                 await deleteAccount();
-                //navigate('/');
+                navigate('/');
             } catch (error) {
                 console.error('Failed to delete account:', error);
             } finally {
@@ -46,7 +47,11 @@ const Profile: React.FC = () => {
     const currentUser = useAuthStore((state) => state.user);
     const email = currentUser?.email;
     const createdAtStore = useAuthStore((state) => state.createdAt);
-    const accountCreated = createdAtStore ? new Date(createdAtStore).toLocaleString() : 'N/A';
+    const accountCreated = createdAtStore
+        ? new Date(createdAtStore).toLocaleString()
+        : currentUser?.createdAt
+          ? new Date(currentUser.createdAt).toLocaleString()
+          : 'N/A';
 
     // Now you can use formatDate in your UI
     const userData = {
@@ -61,6 +66,7 @@ const Profile: React.FC = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isUploadDropdownOpen, setIsUploadDropdownOpen] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
 
     const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -85,20 +91,38 @@ const Profile: React.FC = () => {
 
     const processFile = async (file: File) => {
         if (file && file.type.startsWith('image/')) {
+            const previousPic = profilePic;
+            const objectUrl = URL.createObjectURL(file);
+            setProfilePic(objectUrl);
+            setIsUploadDropdownOpen(false);
+            setIsUploading(true);
+
             const formData = new FormData();
             formData.append('image', file);
             try {
-                const { data } = await authApi.post('/auth/profile-image', formData, {
-                    headers: { 'Content-Type': 'multipart/form-data' },
-                });
+                const { data } = await authApi.post(
+                    '/auth/profile-image',
+                    formData,
+                    {
+                        headers: { 'Content-Type': 'multipart/form-data' },
+                    }
+                );
                 setProfilePic(
                     typeof data?.profileImageUrl === 'string'
                         ? data.profileImageUrl
                         : null
                 );
-                setIsUploadDropdownOpen(false);
+                useSuccessStore
+                    .getState()
+                    .setSuccess('Profile photo updated successfully!');
             } catch (error) {
-                log.error('Failed to upload profile photo', { data: { error } });
+                setProfilePic(previousPic);
+                log.error('Failed to upload profile photo', {
+                    data: { error },
+                });
+            } finally {
+                setIsUploading(false);
+                URL.revokeObjectURL(objectUrl);
             }
         }
     };
@@ -126,12 +150,20 @@ const Profile: React.FC = () => {
     };
 
     const handleRemovePhoto = async () => {
+        const previousPic = profilePic;
+        setProfilePic(null);
+        setIsUploadDropdownOpen(false);
+        setIsUploading(true);
         try {
             await authApi.delete('/auth/profile-image');
-            setProfilePic(null);
-            setIsUploadDropdownOpen(false);
+            useSuccessStore
+                .getState()
+                .setSuccess('Profile photo removed successfully!');
         } catch (error) {
+            setProfilePic(previousPic);
             log.error('Failed to remove profile photo', { data: { error } });
+        } finally {
+            setIsUploading(false);
         }
     };
 
@@ -207,19 +239,33 @@ const Profile: React.FC = () => {
                                     <div className="flex items-center gap-3">
                                         <div className="relative">
                                             <button
+                                                disabled={isUploading}
                                                 onClick={() =>
                                                     setIsUploadDropdownOpen(
                                                         !isUploadDropdownOpen
                                                     )
                                                 }
-                                                className="flex items-center gap-2 rounded-xl bg-purple-600 px-6 py-2.5 font-bold text-white shadow-md shadow-purple-100 transition-all hover:bg-purple-500 active:scale-95"
+                                                className={`flex items-center gap-2 rounded-xl px-6 py-2.5 font-bold text-white shadow-md transition-all active:scale-95 ${
+                                                    isUploading
+                                                        ? 'cursor-not-allowed bg-purple-400'
+                                                        : 'bg-purple-600 shadow-purple-100 hover:bg-purple-500'
+                                                }`}
                                             >
-                                                Change Photo
-                                                <span
-                                                    className={`transition-transform duration-300 ${isUploadDropdownOpen ? 'rotate-180' : ''}`}
-                                                >
-                                                    <FaChevronDown size={12} />
-                                                </span>
+                                                {isUploading ? (
+                                                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                                                ) : null}
+                                                {isUploading
+                                                    ? 'Saving...'
+                                                    : 'Change Photo'}
+                                                {!isUploading && (
+                                                    <span
+                                                        className={`transition-transform duration-300 ${isUploadDropdownOpen ? 'rotate-180' : ''}`}
+                                                    >
+                                                        <FaChevronDown
+                                                            size={12}
+                                                        />
+                                                    </span>
+                                                )}
                                             </button>
 
                                             <AnimatePresence>
@@ -407,7 +453,10 @@ const Profile: React.FC = () => {
                             again to use your workspace.
                         </p>
                         <button
-                            onClick={logout}
+                            onClick={async () => {
+                                await logout();
+                                navigate('/');
+                            }}
                             className="flex items-center gap-2 rounded-xl border border-slate-200 px-6 py-2 font-bold text-slate-700 transition-colors hover:bg-slate-50"
                         >
                             <FaSignOutAlt />

@@ -10,6 +10,7 @@ import {
     CheckCircle2,
     MousePointerClick,
     AlertCircle,
+    AlertTriangle,
     Coins,
 } from 'lucide-react';
 import { useTransactions } from '../Store/TransactionStore';
@@ -24,6 +25,7 @@ const FolderQuestionAnalyzer = () => {
         isDragging,
         progress,
         status,
+        statusMessage,
         downloadURL,
         fileInputRef,
 
@@ -52,6 +54,48 @@ const FolderQuestionAnalyzer = () => {
     const mpesaDigitsOk = mpesaPhone.replace(/\D/g, '').length >= 9;
     return (
         <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-purple-900 via-purple-800 to-indigo-900 p-6">
+            <AnimatePresence>
+                {(status === 'uploading' || status === 'processing') && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        className="z-[200] fixed top-4 left-1/2 max-w-lg -translate-x-1/2 px-6"
+                    >
+                        <div className="relative flex items-center gap-6 overflow-hidden rounded-3xl border border-amber-500/30 bg-white p-6 shadow-2xl backdrop-blur-xl">
+                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-amber-100 text-amber-600">
+                                <AlertTriangle
+                                    size={24}
+                                    className="animate-pulse"
+                                />
+                            </div>
+
+                            <div className="flex-1">
+                                <h3 className="text-lg leading-tight font-black text-slate-900">
+                                    Processing in Progress
+                                </h3>
+                                <p className="text-sm font-bold text-slate-500">
+                                    {statusMessage || 'Please keep this tab open until finished.'}
+                                </p>
+                                <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+                                    <motion.div
+                                        animate={{ width: `${progress}%` }}
+                                        transition={{
+                                            duration: 0.5,
+                                            ease: 'linear',
+                                        }}
+                                        className="h-full rounded-full bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.5)]"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="rounded-lg border border-amber-100 bg-amber-50 px-3 py-1.5 text-[10px] font-black tracking-widest text-amber-600 uppercase">
+                                Active
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -208,16 +252,21 @@ const FolderQuestionAnalyzer = () => {
                                 </p>
 
                                 <div className="mx-auto max-w-md">
-                                    <div className="h-3 overflow-hidden rounded-full bg-purple-900/50">
+                                    <p className="mt-2 text-sm font-bold text-white/90">
+                                        {statusMessage ||
+                                            (status === 'uploading'
+                                                ? 'Uploading...'
+                                                : 'Processing...')}{' '}
+                                        {Math.round(progress)}%
+                                    </p>
+                                    <div className="mt-4 h-3 overflow-hidden rounded-full bg-purple-900/50">
                                         <motion.div
-                                            animate={{
-                                                width: `${status === 'uploading' ? progress : 96}%`,
-                                            }}
+                                            animate={{ width: `${progress}%` }}
                                             transition={{
-                                                duration: 0.35,
-                                                ease: 'easeOut',
+                                                duration: 0.5,
+                                                ease: 'linear',
                                             }}
-                                            className="h-full rounded-full bg-linear-to-r from-purple-400 to-indigo-400"
+                                            className="h-full rounded-full bg-linear-to-r from-purple-400 to-indigo-400 shadow-[0_0_15px_rgba(168,85,247,0.5)]"
                                         />
                                     </div>
                                     <motion.p

@@ -28,6 +28,9 @@ export default function FolderCleanerUI() {
         isDragging,
         uploadedFolder,
         status,
+        progress,
+        statusMessage,
+        downloadURL,
         isExpired,
         setIsExpired,
         openPopup,
@@ -67,13 +70,12 @@ export default function FolderCleanerUI() {
         <div>
             <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-purple-600 to-violet-800 p-6">
                 <AnimatePresence>
-                    {status === 'uploading' ||
-                        (status === 'processing' && (
+                    {(status === 'uploading' || status === 'processing') && (
                             <motion.div
                                 initial={{ opacity: 0, y: -20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -20 }}
-                                className="z-200-full fixed top-4 left-1/2 max-w-lg -translate-x-1/2 px-6"
+                                className="z-[200] fixed top-4 left-1/2 max-w-lg -translate-x-1/2 px-6"
                             >
                                 <div className="relative flex items-center gap-6 overflow-hidden rounded-3xl border border-amber-500/30 bg-white p-6 shadow-2xl backdrop-blur-xl">
                                     <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-amber-100 text-amber-600">
@@ -88,19 +90,16 @@ export default function FolderCleanerUI() {
                                             Processing in Progress
                                         </h3>
                                         <p className="text-sm font-bold text-slate-500">
-                                            Please keep this tab open until
-                                            finished.
+                                            {statusMessage || 'Please keep this tab open until finished.'}
                                         </p>
                                         <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
                                             <motion.div
-                                                initial={{ x: '-100%' }}
-                                                animate={{ x: '100%' }}
+                                                animate={{ width: `${progress}%` }}
                                                 transition={{
-                                                    repeat: Infinity,
-                                                    duration: 2,
+                                                    duration: 0.5,
                                                     ease: 'linear',
                                                 }}
-                                                className="h-full w-1/3 rounded-full bg-amber-500"
+                                                className="h-full rounded-full bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.5)]"
                                             />
                                         </div>
                                     </div>
@@ -110,7 +109,7 @@ export default function FolderCleanerUI() {
                                     </div>
                                 </div>
                             </motion.div>
-                        ))}
+                        )}
                 </AnimatePresence>
                 <div className="w-full max-w-2xl">
                     <motion.div
@@ -547,13 +546,25 @@ export default function FolderCleanerUI() {
                         >
                             {status === 'uploading' ||
                             status === 'processing' ? (
-                                <>
-                                    <Loader2
-                                        className="animate-spin text-purple-300"
-                                        size={18}
-                                    />
-                                    <span>Processing…</span>
-                                </>
+                                <div className="w-full">
+                                    <p className="mt-2 text-sm font-bold text-white/90">
+                                        {statusMessage ||
+                                            (status === 'uploading'
+                                                ? 'Uploading...'
+                                                : 'Processing...')}{' '}
+                                        {Math.round(progress)}%
+                                    </p>
+                                    <div className="mt-4 h-3 overflow-hidden rounded-full bg-purple-900/50">
+                                        <motion.div
+                                            animate={{ width: `${progress}%` }}
+                                            transition={{
+                                                duration: 0.5,
+                                                ease: 'linear',
+                                            }}
+                                            className="h-full rounded-full bg-linear-to-r from-purple-400 to-indigo-400 shadow-[0_0_15px_rgba(168,85,247,0.5)]"
+                                        />
+                                    </div>
+                                </div>
                             ) : (
                                 <>
                                     <Coins

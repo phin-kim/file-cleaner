@@ -9,6 +9,7 @@ export interface User {
     name?: string;
     profileImageUrl?: string;
     role: 'user' | 'admin';
+    createdAt?: Date;
 }
 export type AuthResponse = {
     accessToken: string;

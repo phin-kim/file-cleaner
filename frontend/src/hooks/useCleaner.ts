@@ -104,6 +104,7 @@ export default function useCleaner() {
     const [upgradeModal, setUpgradeModal] = useState(false);
     const [result, setResult] = useState<AnalysisResult | null>(null);
     const [progress, setProgress] = useState(0);
+    const [statusMessage, setStatusMessage] = useState('');
     const [isExpired, setIsExpired] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     /** Staged folder cleaner job: pay + upload runs only after "Pay & Process". */
@@ -215,12 +216,21 @@ export default function useCleaner() {
         folderName: string,
         path: string,
         uploadLimit: UploadLimitResult,
-        progressInterval: ReturnType<typeof setInterval>,
+        progressInterval: ReturnType<typeof setInterval> | null,
         chargedWallet: { amount: number; chargeReference: string } | null,
         resumeAwaitingPaymentOnError: boolean,
         clearPendingCleanOnSuccess: boolean
     ) => {
+        if (progressInterval) clearInterval(progressInterval);
+        setStatusMessage('Scanning files...');
+        setProgress(1);
+
         try {
+            // Artificial "Scanning" delay to feel more realistic
+            await new Promise(resolve => setTimeout(resolve, 800));
+            setStatusMessage('Optimizing for upload...');
+            setProgress(3);
+            await new Promise(resolve => setTimeout(resolve, 600));
             const formData = new FormData();
             formData.append('folderName', folderName || 'folder');
             files.forEach((file) => formData.append('files', file, file.name));
@@ -230,13 +240,16 @@ export default function useCleaner() {
             log.info('Sending files to backend');
             const storage = localStorage.getItem('auth-storage');
             if (!storage) {
-                stopProgressInterval(progressInterval);
                 setError('Not authenticated');
                 setStatus(
                     resumeAwaitingPaymentOnError ? 'awaiting_payment' : 'idle'
                 );
                 return;
             }
+
+            // Simulated processing progress after upload reaches 100%
+            let processingInterval: ReturnType<typeof setInterval> | null = null;
+
             const parsed = JSON.parse(storage);
             const userId = parsed.state.user.id;
             const response = await fileCleanerApi.post(
@@ -244,8 +257,48 @@ export default function useCleaner() {
                 formData,
                 {
                     headers: { 'Content-Type': 'multipart/form-data' },
+                    onUploadProgress: (progressEvent) => {
+                        const total = progressEvent.total || (files.length * 500000); // fallback 500KB per file
+                        const percent = Math.round((progressEvent.loaded * 100) / total);
+                        
+                        // Map 0-100% upload to 5-45% progress (Slower upload visual)
+                        const mappedProgress = 5 + (percent * 0.40);
+                        setProgress(Math.floor(mappedProgress));
+                        
+                        if (percent < 100) {
+                            setStatusMessage(`Uploading: ${percent}%`);
+                        } else {
+                            setStatusMessage('Securing connection...');
+                            // Start slow processing simulation from 45% to 98%
+                            if (!processingInterval) {
+                                processingInterval = setInterval(() => {
+                                    setProgress(prev => {
+                                        if (prev >= 98) {
+                                            if (processingInterval) clearInterval(processingInterval);
+                                            return 98;
+                                        }
+                                        // Even slower crawl
+                                        const increment = prev > 85 ? 0.05 : 0.2;
+                                        return +(prev + increment).toFixed(2);
+                                    });
+                                    
+                                    // Rotate messages
+                                    const msgs = [
+                                        'Extracting questions...',
+                                        'Analyzing document structure...',
+                                        'Removing duplicates...',
+                                        'Finalizing study worksheet...',
+                                        'Polishing results...'
+                                    ];
+                                    const msgIndex = Math.floor((Date.now() / 3000) % msgs.length);
+                                    setStatusMessage(msgs[msgIndex]);
+                                }, 200);
+                            }
+                        }
+                    }
                 }
             );
+            if (processingInterval) clearInterval(processingInterval);
             const res = response.data;
             log.debug('This is the response from my backend', {
                 data: { res },
@@ -286,6 +339,7 @@ export default function useCleaner() {
             );
             clearInterval(progressInterval);
             setProgress(100);
+            setStatusMessage('Complete!');
             useGeneralStore.getState().setCleaningStats(response.data.stats);
             setDownloadURL(response.data.downloadURL);
             setStatus('complete');
@@ -371,12 +425,8 @@ export default function useCleaner() {
             useErrorStore.getState().clearError();
             setStatus('uploading');
             setProgress(0);
-            const progressInterval = setInterval(() => {
-                setProgress((prev) => {
-                    if (prev >= 95) return prev;
-                    return prev + 3;
-                });
-            }, 100);
+            setStatusMessage('Initializing...');
+            const progressInterval = null;
 
             try {
                 try {
@@ -577,12 +627,8 @@ export default function useCleaner() {
             log.info(`Folder selected via input`);
             setStatus('uploading');
             setProgress(0);
-            const progressInterval = setInterval(() => {
-                setProgress((prev) => {
-                    if (prev >= 95) return prev;
-                    return prev + 3;
-                });
-            }, 100);
+            setStatusMessage('Initializing...');
+            const progressInterval = null;
             try {
                 await processFolderUploadPipeline(
                     fileArray,
@@ -763,6 +809,7 @@ export default function useCleaner() {
         uploadedFolder,
         status,
         progress,
+        statusMessage,
         result,
         downloadURL,
         openPopup,

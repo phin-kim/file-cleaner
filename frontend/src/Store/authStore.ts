@@ -9,6 +9,7 @@ import useSuccessStore from './SuccessStore';
 import useErrorStore from './ErrorStore';
 import handleApiError from '../utils/apiError';
 import type { BackendError, UnknownApiError } from '../types/types';
+import { useProfileStore } from './profileStore';
 //import NotFound from '../components/NotFound';
 const log = createClientLogger('AUTH STORE');
 
@@ -49,6 +50,7 @@ export const useAuthStore = create<AuthState>()(
                         createdAt: res.data.createdAt,
                         isAuthenticated: true,
                     });
+                    useProfileStore.getState().setProfilePic(res.data.user?.profileImageUrl || null);
                     setApiToken(res.data.accessToken);
                     localStorage.setItem('hasSession', 'true');
                     const currentState = get();
@@ -89,6 +91,7 @@ export const useAuthStore = create<AuthState>()(
                         isAuthenticated: true,
                         createdAt: res.data.createdAt,
                     });
+                    useProfileStore.getState().setProfilePic(res.data.user?.profileImageUrl || null);
                     setApiToken(res.data.accessToken);
                     localStorage.setItem('hasSession', 'true');
                     const currentState = get();
@@ -170,6 +173,7 @@ export const useAuthStore = create<AuthState>()(
                         isAuthenticated: true,
                         createdAt: res.data.createdAt,
                     });
+                    useProfileStore.getState().setProfilePic(res.data.user?.profileImageUrl || null);
                     const currentState = get();
                     log.debug('Access  token from authstore', {
                         data: currentState.accessToken,
@@ -225,6 +229,7 @@ export const useAuthStore = create<AuthState>()(
                     isAuthenticated: false,
                     createdAt: null,
                 });
+                useProfileStore.getState().clearProfilePic();
             },
             deleteAccount: async () => {
                 try {

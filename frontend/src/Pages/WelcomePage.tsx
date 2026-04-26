@@ -283,102 +283,160 @@ const AuthenticatedHome = () => {
                     </div>
                 </div>
             </section>
+            
+            <CommonFooter isAuthenticated={true} />
         </div>
     );
 };
 
+const CommonFooter = ({ isAuthenticated }: { isAuthenticated?: boolean }) => (
+    <footer className="bg-slate-900 pt-16 pb-12 mt-auto">
+        <div className="container mx-auto px-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12 border-b border-white/10 pb-12">
+                <div className="col-span-2 md:col-span-1 space-y-6">
+                    <div className="flex items-center gap-2 font-black text-xl tracking-tight text-white">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-600 text-white shadow-[0_0_15px_rgba(147,51,234,0.5)]">
+                            T
+                        </div>
+                        Tidy Up
+                    </div>
+                    <p className="text-slate-400 text-sm leading-relaxed max-w-xs">
+                        Turn dense chaotic folders into perfectly organized structures. Merge multiple PDFs into single, deduplicated master files.
+                    </p>
+                </div>
+                
+                <div>
+                    <h4 className="font-bold text-xs tracking-widest text-slate-500 uppercase mb-6">Product</h4>
+                    <ul className="space-y-4 text-sm font-medium">
+                        {!isAuthenticated && <li><Link to="/auth" className="text-slate-300 hover:text-white transition-colors">Start free</Link></li>}
+                        {isAuthenticated && (
+                            <>
+                                <li><Link to="/folder-cleaner" className="text-slate-300 hover:text-white transition-colors">Folder Cleaner</Link></li>
+                                <li><Link to="/file-merger" className="text-slate-300 hover:text-white transition-colors">File Merger</Link></li>
+                            </>
+                        )}
+                        <li><Link to="/how-it-works" className="text-slate-300 hover:text-white transition-colors">How it works</Link></li>
+                        <li><Link to="/pricing" className="text-slate-300 hover:text-white transition-colors">Pricing</Link></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 className="font-bold text-xs tracking-widest text-slate-500 uppercase mb-6">Company</h4>
+                    <ul className="space-y-4 text-sm font-medium">
+                        <li><Link to="/about" className="text-purple-400 hover:text-purple-300 transition-colors">About</Link></li>
+                        <li><Link to="/contact" className="text-slate-300 hover:text-white transition-colors">Contact</Link></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 className="font-bold text-xs tracking-widest text-slate-500 uppercase mb-6">Legal</h4>
+                    <ul className="space-y-4 text-sm font-medium">
+                        <li><Link to="/privacy" className="text-slate-300 hover:text-white transition-colors">Privacy</Link></li>
+                        <li><Link to="/terms" className="text-slate-300 hover:text-white transition-colors">Terms</Link></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div className="text-center text-xs text-slate-500 font-medium">
+                &copy; {new Date().getFullYear()} Tidy Up.
+            </div>
+        </div>
+    </footer>
+);
+
 const UnauthenticatedHome = () => {
     const navigate = useNavigate();
-    const year = new Date().getFullYear();
 
     return (
-        <div className="min-h-screen bg-[#0A0A0A] text-white font-sans selection:bg-purple-500/30">
-            {/* Nav simulation for unauthenticated users, if you don't have a global nav */}
+        <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-purple-500/30 flex flex-col">
+            {/* Nav simulation for unauthenticated users */}
             <nav className="container mx-auto px-6 py-6 flex items-center justify-between relative z-20">
                 <div className="flex items-center gap-2 font-black text-xl tracking-tight">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-600 text-white shadow-[0_0_15px_rgba(147,51,234,0.5)]">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-600 text-white shadow-md shadow-purple-500/20">
                         T
                     </div>
                     Tidy Up
                 </div>
-                <div className="hidden md:flex items-center gap-8 text-sm font-bold text-slate-400">
-                    <Link to="/how-it-works" className="hover:text-white transition-colors">How it works</Link>
-                    <Link to="/pricing" className="hover:text-white transition-colors">Pricing</Link>
+                <div className="hidden md:flex items-center gap-8 text-sm font-bold text-slate-600">
+                    <Link to="/" className="hover:text-purple-600 transition-colors">Home</Link>
+                    <Link to="/how-it-works" className="hover:text-purple-600 transition-colors">How it works</Link>
+                    <Link to="/pricing" className="hover:text-purple-600 transition-colors">Pricing</Link>
                 </div>
                 <div className="flex items-center gap-4 text-sm font-bold">
-                    <Link to="/auth" className="text-slate-300 hover:text-white transition-colors">Sign in</Link>
-                    <Link to="/auth" className="rounded-full bg-purple-600 px-5 py-2.5 text-white hover:bg-purple-500 transition-colors shadow-[0_0_20px_rgba(147,51,234,0.3)]">Get started</Link>
+                    <Link to="/auth" className="text-slate-600 hover:text-purple-600 transition-colors">Sign in</Link>
+                    <Link to="/auth" className="rounded-full bg-purple-600 px-5 py-2.5 text-white hover:bg-purple-700 transition-colors shadow-md shadow-purple-500/20">Get started</Link>
                 </div>
             </nav>
 
-            {/* Premium Dark Hero Section */}
-            <section className="relative pt-24 pb-32 overflow-hidden">
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-900/20 via-[#0A0A0A] to-[#0A0A0A]"></div>
-                
-                <div className="container mx-auto px-6 text-center relative z-10">
+            {/* Light Hero Section */}
+            <section className="relative overflow-hidden pt-20 pb-32">
+                <div className="relative z-10 container mx-auto px-6 text-center">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6 }}
                         className="max-w-4xl mx-auto space-y-8"
                     >
-                        <div className="inline-flex items-center gap-2 rounded-full border border-purple-500/30 bg-purple-500/10 px-4 py-1.5 text-xs font-bold text-purple-300">
+                        <div className="inline-flex items-center gap-2 rounded-full border border-purple-200 bg-purple-50 px-4 py-1.5 text-xs font-bold text-purple-600">
                             <Sparkles size={14} />
                             <span>Precision workspace tools</span>
                         </div>
                         
-                        <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-white leading-tight">
+                        <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-slate-900 leading-tight">
                             Organize your chaotic files.<br className="hidden md:block"/>
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-indigo-400">
+                            <span className="text-purple-600">
                                 Merge your study materials.
                             </span>
                         </h1>
                         
-                        <p className="mx-auto max-w-2xl text-lg text-slate-400 leading-relaxed">
+                        <p className="mx-auto max-w-2xl text-lg text-slate-600 leading-relaxed">
                             Turn dense, chaotic folders into perfectly organized structures. Merge multiple PDFs into single, deduplicated master files. Pay only for what you process.
                         </p>
                         
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
                             <button
                                 onClick={() => navigate('/auth')}
-                                className="w-full sm:w-auto rounded-full bg-white px-8 py-4 text-sm font-black text-black transition-transform hover:scale-105 shadow-[0_0_30px_rgba(255,255,255,0.1)] flex items-center justify-center gap-2"
+                                className="w-full sm:w-auto rounded-full bg-purple-600 px-8 py-4 text-sm font-black text-white transition-transform hover:scale-105 shadow-xl shadow-purple-500/20 flex items-center justify-center gap-2"
                             >
-                                <Play size={16} className="fill-black" />
+                                <Play size={16} className="fill-white" />
                                 Start organizing now
                             </button>
                             <button
                                 onClick={() => navigate('/how-it-works')}
-                                className="w-full sm:w-auto rounded-full border border-white/10 bg-white/5 px-8 py-4 text-sm font-bold text-white transition-colors hover:bg-white/10"
+                                className="w-full sm:w-auto rounded-full border border-slate-200 bg-white px-8 py-4 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50"
                             >
                                 See how it works
                             </button>
                         </div>
                     </motion.div>
                 </div>
+                {/* Floating elements for visual interest */}
+                <div className="absolute top-20 left-10 h-32 w-32 animate-pulse rounded-full bg-purple-200 opacity-30 blur-3xl" />
+                <div className="absolute right-10 bottom-20 h-64 w-64 rounded-full bg-purple-300 opacity-20 blur-[100px]" />
             </section>
 
             {/* Value Props */}
-            <section className="py-24 border-t border-white/5 relative bg-[#0C0C0C]">
+            <section className="py-24 border-t border-slate-100 relative bg-white">
                 <div className="container mx-auto px-6">
                     <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
                         
                         {/* Tool 1 */}
-                        <div className="rounded-3xl border border-white/10 bg-[#121212] p-8 lg:p-10 hover:border-purple-500/30 transition-colors group relative overflow-hidden">
-                            <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <div className="rounded-3xl border border-slate-100 bg-slate-50 p-8 lg:p-10 hover:border-purple-200 hover:shadow-xl transition-all group relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity text-purple-600">
                                 <FolderTree size={120} />
                             </div>
                             <div className="relative z-10">
-                                <div className="mb-6 inline-flex rounded-2xl bg-purple-500/20 p-4 text-purple-400">
+                                <div className="mb-6 inline-flex rounded-2xl bg-purple-100 p-4 text-purple-600">
                                     <FolderTree size={24} />
                                 </div>
-                                <h3 className="text-2xl font-black mb-4">Folder Cleaner</h3>
-                                <p className="text-slate-400 leading-relaxed mb-8">
+                                <h3 className="text-2xl font-black mb-4 text-slate-900">Folder Cleaner</h3>
+                                <p className="text-slate-600 leading-relaxed mb-8">
                                     Stop hoarding duplicates. Upload a chaotic folder, and we'll analyze, deduplicate, and organize your files into logical subfolders automatically.
                                 </p>
                                 <ul className="space-y-3">
                                     {['Identifies identical files', 'Sorts by file type', 'Calculates exact cost upfront'].map((feature, i) => (
-                                        <li key={i} className="flex items-center gap-3 text-sm text-slate-300 font-medium">
-                                            <div className="rounded-full bg-purple-500/20 p-1 text-purple-400">
+                                        <li key={i} className="flex items-center gap-3 text-sm text-slate-700 font-medium">
+                                            <div className="rounded-full bg-purple-100 p-1 text-purple-600">
                                                 <FileCheck size={12} />
                                             </div>
                                             {feature}
@@ -389,22 +447,22 @@ const UnauthenticatedHome = () => {
                         </div>
 
                         {/* Tool 2 */}
-                        <div className="rounded-3xl border border-white/10 bg-[#121212] p-8 lg:p-10 hover:border-indigo-500/30 transition-colors group relative overflow-hidden">
-                            <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <div className="rounded-3xl border border-slate-100 bg-slate-50 p-8 lg:p-10 hover:border-indigo-200 hover:shadow-xl transition-all group relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity text-indigo-600">
                                 <Copy size={120} />
                             </div>
                             <div className="relative z-10">
-                                <div className="mb-6 inline-flex rounded-2xl bg-indigo-500/20 p-4 text-indigo-400">
+                                <div className="mb-6 inline-flex rounded-2xl bg-indigo-100 p-4 text-indigo-600">
                                     <Copy size={24} />
                                 </div>
-                                <h3 className="text-2xl font-black mb-4">File Merger</h3>
-                                <p className="text-slate-400 leading-relaxed mb-8">
+                                <h3 className="text-2xl font-black mb-4 text-slate-900">File Merger</h3>
+                                <p className="text-slate-600 leading-relaxed mb-8">
                                     Built for students. Merge past papers and notes into a single master PDF. We identify duplicate questions across years to save you study time.
                                 </p>
                                 <ul className="space-y-3">
                                     {['Merges multiple PDFs', 'Deduplicates questions', 'Billed transparently per page'].map((feature, i) => (
-                                        <li key={i} className="flex items-center gap-3 text-sm text-slate-300 font-medium">
-                                            <div className="rounded-full bg-indigo-500/20 p-1 text-indigo-400">
+                                        <li key={i} className="flex items-center gap-3 text-sm text-slate-700 font-medium">
+                                            <div className="rounded-full bg-indigo-100 p-1 text-indigo-600">
                                                 <FileCheck size={12} />
                                             </div>
                                             {feature}
@@ -421,17 +479,17 @@ const UnauthenticatedHome = () => {
             {/* Bottom CTA */}
             <section className="py-32 relative">
                 <div className="container mx-auto px-6">
-                    <div className="relative overflow-hidden rounded-[3rem] bg-gradient-to-br from-[#1A1025] to-[#0A0A0A] border border-purple-500/20 p-12 md:p-20 text-center">
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-purple-600/10 via-transparent to-transparent"></div>
+                    <div className="relative overflow-hidden rounded-[3rem] bg-purple-600 text-white p-12 md:p-20 text-center shadow-2xl shadow-purple-600/20">
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(ellipse_at_center,_rgba(255,255,255,0.2)_0%,_transparent_70%)]"></div>
                         
                         <div className="relative z-10">
                             <h2 className="text-4xl md:text-5xl font-black mb-6">Experience the magic firsthand.</h2>
-                            <p className="max-w-xl mx-auto text-purple-200/60 mb-10">
+                            <p className="max-w-xl mx-auto text-purple-100 mb-10 text-lg">
                                 Join today and get starter credits. Run a folder or merge PDFs and see exactly how Tidy Up works before paying a dime.
                             </p>
                             <button
                                 onClick={() => navigate('/auth')}
-                                className="rounded-full bg-purple-600 px-10 py-4 font-bold text-white shadow-[0_0_30px_rgba(147,51,234,0.4)] transition-transform hover:scale-105"
+                                className="rounded-full bg-white px-10 py-4 font-bold text-purple-600 shadow-xl transition-transform hover:scale-105"
                             >
                                 Get started for free
                             </button>
@@ -440,23 +498,7 @@ const UnauthenticatedHome = () => {
                 </div>
             </section>
 
-            <footer className="border-t border-white/5 py-12">
-                <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
-                    <div className="flex items-center gap-2 font-black text-xl tracking-tight text-white/50">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 text-white/50">
-                            T
-                        </div>
-                        Tidy Up
-                    </div>
-                    <div className="flex gap-6 text-sm font-bold text-slate-500">
-                        <Link to="/privacy" className="hover:text-slate-300">Privacy Policy</Link>
-                        <Link to="/terms" className="hover:text-slate-300">Terms of Service</Link>
-                    </div>
-                    <p className="text-sm font-bold text-slate-600">
-                        &copy; {year} Tidy Up.
-                    </p>
-                </div>
-            </footer>
+            <CommonFooter isAuthenticated={false} />
         </div>
     );
 };
