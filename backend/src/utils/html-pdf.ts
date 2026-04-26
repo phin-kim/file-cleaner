@@ -24,7 +24,8 @@ export async function convertHtmlToPdf(
 
     const browser = await puppeteer.launch({
         headless: true,
-        executablePath: executablePath(),
+        executablePath:
+            'C:\\Users\\User\\.cache\\puppeteer\\chrome\\win64-147.0.7727.57\\chrome-win64\\chrome.exe',
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
@@ -45,26 +46,43 @@ export async function convertHtmlToPdf(
         //write HTML to temp file for debugging (optional)
         const htmlDebugPath = outputPath.replace('.pdf', '.html');
         writeFileSync(htmlDebugPath, processedHtml, 'utf-8');
+        log.debug(
+            `Check to see if the processed html has content ${processedHtml.length}`
+        );
         log.info(`Debug html saved to ${htmlDebugPath}`);
+
         //load html content
         await page.setContent(processedHtml, {
             waitUntil: ['networkidle0', 'domcontentloaded'],
             timeout: appConfig.puppeteerTimeout,
         });
+        // 2. Wait for your container to exist
+        await page.waitForSelector('.extracted-content', { timeout: 5000 });
+        // FORCE a wait for a specific element that SHOULD be there
+        // This ensures we don't print a blank page
+        try {
+            await page.waitForSelector('.extracted-content', { timeout: 5000 });
+        } catch (e) {
+            log.warn(
+                'Warning: .extracted-content class not found before printing.'
+            );
+        }
         //wait for mathjax to render if present
         const hasMathJax =
             processedHtml.includes('mathjax') ||
             processedHtml.includes('MathJax');
-        if (hasMathJax) {
+
+        // 2. Check for actual LaTeX delimiters (e.g., \( \), \[ \], or $)
+        // This regex looks for common math patterns
+        const hasMathContent = /\\\(|\\\[|\$|\\begin\{/.test(processedHtml);
+
+        if (hasMathJax && hasMathContent) {
             log.info('Waiting for math jax to render formulas...');
             try {
                 //wait for MathJax to finish type setting
-                await page.waitForFunction(
+                /*await page.waitForFunction(
                     () => {
-                        /*window as unknown as Record<
-                            string,
-                            unknown
-                        >*/
+                       
                         const win = globalThis as any;
                         return (
                             win.MathJax &&
@@ -87,7 +105,23 @@ export async function convertHtmlToPdf(
                 });
                 //give extra time for rendering
                 await new Promise((render) => setTimeout(render, 3000));
-                log.highlight('Math Jax render complete');
+                log.highlight('Math Jax render complete');*/
+                await page.evaluate(async () => {
+                    const win = globalThis as any;
+
+                    // Safety check: if MathJax failed to load, don't hang the loop
+                    const startTime = Date.now();
+                    while (!win.MathJax?.typesetPromise) {
+                        if (Date.now() - startTime > 5000)
+                            throw new Error('MathJax Load Timeout');
+                        await new Promise((r) => setTimeout(r, 100));
+                    }
+
+                    await win.MathJax.typesetPromise();
+                });
+
+                await new Promise((r) => setTimeout(r, 1000));
+                log.highlight('MathJax render complete');
             } catch (error) {
                 log.error(
                     'Math jax render timeout continuing with the raw LaTex'
@@ -340,6 +374,22 @@ function ensureProperHtml(
       color: #555;
       font-size: 10pt;
     }
+      /* This makes the numbering look professional and bold */
+        .extracted-content ol {
+            list-style-type: decimal;
+            padding-left: 25px;
+        }
+
+        .extracted-content ol li {
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        /* For sub-questions (a, b, c) */
+        .extracted-content ol li ol {
+            list-style-type: lower-alpha;
+            margin-top: 10px;
+        }
   </style>
 </head>
 <body>
@@ -352,7 +402,9 @@ function ensureProperHtml(
          : ''
  }
   <h1>${title}</h1>
-  ${htmlContent}
+  <div class="extracted-content">
+    ${htmlContent}
+  </div>
 </body>
 </html>`;
 }

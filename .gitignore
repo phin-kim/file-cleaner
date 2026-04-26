@@ -41,7 +41,7 @@ backend/src/routes/temp/
 uploads/
 upload/
 backend/output/
-backend/.puppeteerrc.cjs/
+backend/.cache/
 
 # Specific files you mentioned
 backend/routes/temp/  # This will be ignored if it exists

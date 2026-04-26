@@ -6,7 +6,6 @@ import type { QuestionExtractionResponse } from '../Types/filer-merger';
 import { appConfig } from '../constants/appConfig';
 import AppError from '../utils/appError';
 import pLimit from 'p-limit';
-import { promise } from 'zod';
 interface GeminiFileResponse {
     name: string;
     mimeType: string;
@@ -54,25 +53,27 @@ export class GeminiNativePdfProcessor {
                 log.info(
                     `Processing each batch #${index + 1} (${chunk.length}) files`
                 );
-                /*const filePaths = chunk.map((file) => ({
-                    fileData: {
-                        fileUri: file.uri,
-                        mimeType: file.mimeType,
-                    },
-                }));*/
-                const fileParts = uploadedFiles.map((file) => ({
+                const fileParts = chunk.map((file) => ({
                     fileData: {
                         fileUri: file.uri,
                         mimeType: file.mimeType,
                     },
                 }));
+                /*const fileParts = uploadedFiles.map((file) => ({
+                    fileData: {
+                        fileUri: file.uri,
+                        mimeType: file.mimeType,
+                    },
+                }));*/
                 const instruction = this.buildNativePrompt(
                     chunk.map((f) => f.name)
                 );
                 const promptWithConstraint = `
                 ${instruction}
                 
-                STRICT CONSTRAINT: Do not provide a preamble or thought process. 
+                STRICT CONSTRAINT: Do not provide a preamble or thought process.
+                - Use ONLY the attached ${chunk.length} files. 
+                - Output must be valid JSON with the "itemsHtml" key containing only <li> tags.
                 Go straight to the HTML output. 
                 If you encounter duplicates within this batch, merge them immediately.
             `;
@@ -97,7 +98,10 @@ export class GeminiNativePdfProcessor {
         return this.parseResponse(mergedResponses, pdfPaths);
     }
     private async mergeBatchResponses(batchTexts: string[]): Promise<string> {
-        if (batchTexts.length === 1) return batchTexts[0];
+        if (batchTexts.length === 1) {
+            // If there's only one batch, we still want to ensure it's wrapped in an <ol>
+            return `<ol class="exam-list">${batchTexts[0]}</ol>`;
+        }
 
         log.highlight('Merging batch results for final deduplication...');
 
@@ -106,7 +110,7 @@ export class GeminiNativePdfProcessor {
         1. Combine them into a single, clean HTML document.
         2. Strictly remove any identical or nearly identical duplicate questions.
         3. Maintain the professional styling (question blocks, MathJax, etc.).
-        
+        4. Return ONLY the final deduplicated questions inside <li> tags. Do not explain your steps or provide Python code.
         DATA TO MERGE:
         ${batchTexts.join('\n\n---NEXT BATCH---\n\n')}
     `;
@@ -118,7 +122,13 @@ export class GeminiNativePdfProcessor {
             },
         ];
 
-        return await this.callGeminiWithRetry(contents);
+        const mergedItems = await this.callGeminiWithRetry(contents);
+
+        // 2. Wrap the items in the <ol> tag here
+        const finalHtml = `<ol class="exam-list">${mergedItems}</ol>`;
+
+        // 3. Return the wrapped HTML
+        return finalHtml;
     }
     private async uploadPdfs(
         pdfPaths: string[]
@@ -164,6 +174,8 @@ export class GeminiNativePdfProcessor {
      * build the extraction prompt for native pdf processing
      */
     private buildNativePrompt(fileNames: string[]): string {
+        /*"html": "<!DOCTYPE html><html>...</html>",
+        "uniqueCount": 25,*/
         return `You are an expert educational content analyzer. I have provided you with ${fileNames.length} PDF document(s): ${fileNames.join(', ')}.
 
         These PDFs contain exam questions. Your task:
@@ -172,6 +184,8 @@ export class GeminiNativePdfProcessor {
         2. **Extract ALL questions** found across all documents
         3. **DETECT AND REMOVE DUPLICATES**: If the same question (or essentially the same question with minor wording differences) appears in multiple documents, keep only ONE instance
         4. **Return the unique questions as well-formatted HTML**
+        5. STRICTURE: Do not add any external knowledge, trivia, or general questions. If it is not in the source, it is FORBIDDEN to include it.
+        6. NO PREAMBLE: Do not say "Here are the questions" or "I have analyzed the files."
 
         CRITICAL INSTRUCTIONS:
         - You have access to BOTH the visual rendering of each page AND the native text embedded in the PDFs
@@ -181,11 +195,12 @@ export class GeminiNativePdfProcessor {
         - Preserve tables, diagrams (describe them in text if needed)
         - For multiple choice questions, keep all options (A, B, C, D)
         - Group question parts together (don't split a multi-part question)
+        - Do not wrap them in <html> or <body> tags.
 
         OUTPUT FORMAT - Return ONLY a JSON object:
         {
-        "html": "<!DOCTYPE html><html>...</html>",
-        "uniqueCount": 25,
+        "itemsHtml": "<li>Question 1...</li><li>Question 2...</li>",
+        
         "totalCount": 40,
         "duplicatesRemoved": 15,
         "analysis": "Brief summary of what was found"
@@ -246,7 +261,7 @@ export class GeminiNativePdfProcessor {
                 await new Promise((res) => setTimeout(res, waitTime));
             }
         }
-        log.error('UN expected end of loop');
+        log.error('Unexpected end of loop');
         throw new AppError('Unexpected end of retry loop', 500, 'GeminiRetry');
     }
     private parseResponse(

@@ -70,7 +70,9 @@ function extractPayHeroStatus(payload: unknown): string | undefined {
 }
 
 /** IDs PayHero may return on STK initiate — status API often needs this, not only external_reference. */
-function extractPayHeroInitiateTransactionId(body: unknown): string | undefined {
+function extractPayHeroInitiateTransactionId(
+    body: unknown
+): string | undefined {
     if (!body || typeof body !== 'object') return undefined;
     const root = body as Record<string, unknown>;
     const data = root.data;
@@ -177,7 +179,7 @@ export async function finalizeFolderCleanIfPendingByReference(
     const userAfter = await UserModel.findByIdAndUpdate(
         tx.userId,
         { $inc: { walletBalance: tx.amount } },
-        { new: true, select: 'walletBalance' }
+        { returnDocument: 'after', select: 'walletBalance' }
     );
 
     log.info('Folder clean payment finalized; wallet credited', {
@@ -250,7 +252,7 @@ export async function finalizeWalletTopupIfPendingByReference(
     const userAfter = await UserModel.findByIdAndUpdate(
         tx.userId,
         { $inc: { walletBalance: tx.amount } },
-        { new: true, select: 'walletBalance' }
+        { returnDocument: 'after', select: 'walletBalance' }
     );
 
     log.info('Wallet top-up finalized; wallet credited', {
@@ -541,10 +543,9 @@ export async function pollFolderCleanPaymentStatus(
     }
 
     try {
-        const refCandidates = [
-            tx.payheroInternalRef,
-            tx.reference,
-        ].filter((x): x is string => typeof x === 'string' && x.length > 0);
+        const refCandidates = [tx.payheroInternalRef, tx.reference].filter(
+            (x): x is string => typeof x === 'string' && x.length > 0
+        );
         const uniqueRefs = [...new Set(refCandidates)];
 
         let body: unknown | undefined;
@@ -877,10 +878,9 @@ export async function pollWalletTopupPaymentStatus(
     }
 
     try {
-        const refCandidates = [
-            tx.payheroInternalRef,
-            tx.reference,
-        ].filter((x): x is string => typeof x === 'string' && x.length > 0);
+        const refCandidates = [tx.payheroInternalRef, tx.reference].filter(
+            (x): x is string => typeof x === 'string' && x.length > 0
+        );
         const uniqueRefs = [...new Set(refCandidates)];
 
         let body: unknown | undefined;
@@ -1040,7 +1040,7 @@ export async function chargeWalletForFolderCleaner(
     const userAfterDebit = await UserModel.findOneAndUpdate(
         { _id: userId, walletBalance: { $gte: amount } },
         { $inc: { walletBalance: -amount } },
-        {  returnDocument: 'after' , select: 'walletBalance email' }
+        { returnDocument: 'after', select: 'walletBalance email' }
     );
     if (!userAfterDebit) {
         return next(
