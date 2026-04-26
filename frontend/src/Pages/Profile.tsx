@@ -20,6 +20,8 @@ import createClientLogger from '../utils/clientLogger';
 const log = createClientLogger('Profile.tsx');
 import { Trash2 } from 'lucide-react';
 import { useProfileStore } from '../Store/profileStore';
+import authApi from '../library/authApi';
+import { welcomePageApi } from '../library/client';
 const Profile: React.FC = () => {
     const [deleteConfirm, setDeleteConfirm] = useState('');
     const [isDeleting, setIsDeleting] = useState(false);
@@ -43,36 +45,14 @@ const Profile: React.FC = () => {
     // Mock user data based on the provided image
     const currentUser = useAuthStore((state) => state.user);
     const email = currentUser?.email;
-    // 1. Declare the variable to hold the raw date
-    let createdAtRaw;
-
-    const storage = localStorage.getItem('auth-storage');
-
-    if (!storage) {
-        // 2. Fallback to Zustand state
-        createdAtRaw = useAuthStore((state) => state.createdAt);
-        log.debug('Reading created at from state');
-    } else {
-        // 3. Read from LocalStorage
-        try {
-            const parsed = JSON.parse(storage);
-            createdAtRaw = parsed.state.user?.createdAt;
-            log.debug('Reading created at from local storage');
-        } catch (err) {
-            log.error('Failed to parse auth-storage');
-        }
-    }
-
-    // 4. Format the date ONLY after you've retrieved the value
-    const formatDate = createdAtRaw
-        ? new Date(createdAtRaw).toLocaleString()
-        : 'N/A';
+    const createdAtStore = useAuthStore((state) => state.createdAt);
+    const accountCreated = createdAtStore ? new Date(createdAtStore).toLocaleString() : 'N/A';
 
     // Now you can use formatDate in your UI
     const userData = {
         email: email,
         signInMethod: 'Email & password',
-        accountCreated: formatDate,
+        accountCreated,
         //lastSignIn: 'Apr 24, 2026, 11:52 AM',
     };
 
@@ -103,20 +83,29 @@ const Profile: React.FC = () => {
         return email.substring(0, 2).toUpperCase();
     };
 
-    const processFile = (file: File) => {
+    const processFile = async (file: File) => {
         if (file && file.type.startsWith('image/')) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setProfilePic(reader.result as string);
+            const formData = new FormData();
+            formData.append('image', file);
+            try {
+                const { data } = await authApi.post('/auth/profile-image', formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                });
+                setProfilePic(
+                    typeof data?.profileImageUrl === 'string'
+                        ? data.profileImageUrl
+                        : null
+                );
                 setIsUploadDropdownOpen(false);
-            };
-            reader.readAsDataURL(file);
+            } catch (error) {
+                log.error('Failed to upload profile photo', { data: { error } });
+            }
         }
     };
 
     const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
-        if (file) processFile(file);
+        if (file) void processFile(file);
     };
 
     const handleDragOver = (e: React.DragEvent) => {
@@ -133,12 +122,17 @@ const Profile: React.FC = () => {
         e.preventDefault();
         setIsDragging(false);
         const file = e.dataTransfer.files?.[0];
-        if (file) processFile(file);
+        if (file) void processFile(file);
     };
 
-    const handleRemovePhoto = () => {
-        setProfilePic(null);
-        setIsUploadDropdownOpen(false);
+    const handleRemovePhoto = async () => {
+        try {
+            await authApi.delete('/auth/profile-image');
+            setProfilePic(null);
+            setIsUploadDropdownOpen(false);
+        } catch (error) {
+            log.error('Failed to remove profile photo', { data: { error } });
+        }
     };
 
     return (

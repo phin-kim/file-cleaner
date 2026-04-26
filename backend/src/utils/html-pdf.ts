@@ -374,9 +374,10 @@ function ensureProperHtml(
       color: #555;
       font-size: 10pt;
     }
-      /* This makes the numbering look professional and bold */
-        .extracted-content ol {
-            list-style-type: decimal;
+        /* Force primary numbering to numeric for all merged questions */
+        .extracted-content ol,
+        .extracted-content ol.exam-list {
+            list-style-type: decimal !important;
             padding-left: 25px;
         }
 
@@ -385,7 +386,7 @@ function ensureProperHtml(
             font-weight: 500;
         }
 
-        /* For sub-questions (a, b, c) */
+        /* Keep subparts structure on nested lists */
         .extracted-content ol li ol {
             list-style-type: lower-alpha;
             margin-top: 10px;

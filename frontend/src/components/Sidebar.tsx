@@ -42,7 +42,7 @@ const Sidebar = ({
 
     const isMobile = windowWidth < 1024;
     const navItems = [
-        { icon: LayoutDashboard, label: 'Home', path: '/' },
+        { icon: LayoutDashboard, label: 'Home', path: '/home' },
         {
             icon: BrushCleaning,
             label: 'Folder Cleaner',

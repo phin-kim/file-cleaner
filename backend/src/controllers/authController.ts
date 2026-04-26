@@ -9,6 +9,9 @@ import validateAndNormalizeEmail from '../middleware/emailValidator.js';
 import axios from 'axios';
 import { request } from 'node:http';
 import { DeletedAccountModel } from '../schema/DeletedAccountSchema.js';
+import type { AuthenticatedRequest } from '../Types/authenticate.js';
+import { isUserDocument } from '../helpers/miniHelpers.js';
+import cloudinary from '../utils/cloudinary.js';
 const BREVO_API_KEY = process.env.BREVO_API_KEY;
 if (!BREVO_API_KEY) {
     throw AppError.badRequest('Brevo api key is missing');
@@ -91,6 +94,7 @@ export async function register(req: Request, res: Response) {
             email: user.email,
             role: user.role,
             createdAt: user.createdAt,
+            profileImageUrl: user.profileImageUrl ?? '',
         },
     });
 }
@@ -158,6 +162,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
             email: user.email,
             role: user.role,
             createdAt: user.createdAt,
+            profileImageUrl: user.profileImageUrl ?? '',
         },
     });
 }
@@ -254,4 +259,83 @@ export async function resetPassword(
     user.resetPasswordToken = undefined;
     await user.save();
     res.status(200).json({ success: true });
+}
+
+export async function uploadProfileImage(req: Request, res: Response) {
+    const authReq = req as AuthenticatedRequest;
+    if (!authReq.user) {
+        throw AppError.unauthorized('Not authenticated');
+    }
+    const userId = isUserDocument(authReq.user)
+        ? authReq.user._id.toString()
+        : authReq.user.uid;
+    const user = await UserModel.findById(userId);
+    if (!user) {
+        throw AppError.notFound('User not found');
+    }
+    const image = req.file;
+    if (!image || !image.buffer) {
+        throw AppError.badRequest('Image file is required');
+    }
+    const uploaded = await new Promise<{
+        secure_url: string;
+        public_id: string;
+    }>((resolve, reject) => {
+        const upload = cloudinary.uploader.upload_stream(
+            {
+                folder: `tidy-up/users/${userId}/profile`,
+                resource_type: 'image',
+                overwrite: true,
+            },
+            (error, result) => {
+                if (error || !result) {
+                    reject(error || new Error('Cloudinary upload failed'));
+                    return;
+                }
+                resolve({
+                    secure_url: result.secure_url,
+                    public_id: result.public_id,
+                });
+            }
+        );
+        upload.end(image.buffer);
+    });
+
+    if (user.profileImagePublicId) {
+        await cloudinary.uploader.destroy(user.profileImagePublicId, {
+            resource_type: 'image',
+        });
+    }
+
+    user.profileImageUrl = uploaded.secure_url;
+    user.profileImagePublicId = uploaded.public_id;
+    await user.save();
+
+    return res.status(200).json({
+        success: true,
+        profileImageUrl: user.profileImageUrl,
+    });
+}
+
+export async function removeProfileImage(req: Request, res: Response) {
+    const authReq = req as AuthenticatedRequest;
+    if (!authReq.user) {
+        throw AppError.unauthorized('Not authenticated');
+    }
+    const userId = isUserDocument(authReq.user)
+        ? authReq.user._id.toString()
+        : authReq.user.uid;
+    const user = await UserModel.findById(userId);
+    if (!user) {
+        throw AppError.notFound('User not found');
+    }
+    if (user.profileImagePublicId) {
+        await cloudinary.uploader.destroy(user.profileImagePublicId, {
+            resource_type: 'image',
+        });
+    }
+    user.profileImageUrl = '';
+    user.profileImagePublicId = '';
+    await user.save();
+    return res.status(200).json({ success: true, profileImageUrl: '' });
 }

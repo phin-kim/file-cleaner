@@ -61,3 +61,13 @@ export async function pollWalletTopupPayment(reference: string): Promise<{
         reference
     );
 }
+
+export async function pollFileMergerPayment(reference: string): Promise<{
+    walletBalance: number;
+    amount: number;
+}> {
+    return pollUntilResolved(
+        (ref) => `/payment/file-merger/status/${encodeURIComponent(ref)}`,
+        reference
+    );
+}

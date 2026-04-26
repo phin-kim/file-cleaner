@@ -20,6 +20,8 @@ import type { AuthenticatedRequest } from '../Types/authenticate.js';
 import authenticate from '../middleware/authenticate.js';
 import { processPdfsNative } from '../utils/GeminiPdfMerger.js';
 import { convertHtmlToPdf, saveHtml } from '../utils/html-pdf.js';
+import { countPdfPagesFromPaths } from '../utils/pdfPageCounter.js';
+import { mergerChargeAmountKes } from '../constants/mergerPricing.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const log = createLogger('Merge route');
@@ -127,6 +129,14 @@ mergerRoute.post(
                 .readdirSync(sessionPath)
                 .map((file) => path.join(sessionPath, file))
                 .filter((filePath) => fs.statSync(filePath).isFile());
+            const pdfFilesInFolder = filesInFolder.filter((filePath) =>
+                filePath.toLowerCase().endsWith('.pdf')
+            );
+            const pageCount =
+                pdfFilesInFolder.length > 0
+                    ? await countPdfPagesFromPaths(pdfFilesInFolder)
+                    : 0;
+            const chargeAmount = mergerChargeAmountKes(pageCount);
             //const mergedQuestions = await processUploadedFiles(sessionPath);
             const mergedQuestions = await processPdfsNative(filesInFolder);
             if (!mergedQuestions || mergedQuestions.uniqueCount === 0) {
@@ -165,6 +175,11 @@ mergerRoute.post(
             res.json({
                 success: true,
                 downloadURL,
+                billing: {
+                    pageCount,
+                    ratePerPageKes: 2.5,
+                    amountKes: chargeAmount,
+                },
             });
         } catch (error) {
             console.error('Merge route error', error);

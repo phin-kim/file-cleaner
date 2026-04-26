@@ -15,9 +15,9 @@ import {
 import { useTransactions } from '../Store/TransactionStore';
 import { useWalletStore } from '../Store/walletStore';
 import {
-    CLEANER_COST_PER_FILE_KES,
-    cleanerChargeAmountKes,
-} from '../constants/cleanerPricing';
+    MERGER_COST_PER_PAGE_KES,
+    mergerChargeAmountKes,
+} from '../constants/mergerPricing';
 const FolderQuestionAnalyzer = () => {
     const {
         handleDrop,
@@ -40,14 +40,14 @@ const FolderQuestionAnalyzer = () => {
     } = useCleaner();
 
     const path = 'merge-files';
-    const fileCount = useTransactions((state) => state.fileCount);
-    const totalCost = cleanerChargeAmountKes(fileCount);
+    const pageCount = useTransactions((state) => state.pageCount);
+    const totalCost = mergerChargeAmountKes(pageCount);
     const walletBalance = useWalletStore((s) => s.balance);
     const walletCoversJob =
-        fileCount > 0 &&
+        pageCount > 0 &&
         Math.round(walletBalance * 100) >= Math.round(totalCost * 100);
     const needsMpesaTopUp =
-        status === 'awaiting_payment' && fileCount > 0 && !walletCoversJob;
+        status === 'awaiting_payment' && pageCount > 0 && !walletCoversJob;
     const [mpesaPhone, setMpesaPhone] = useState('');
     const mpesaDigitsOk = mpesaPhone.replace(/\D/g, '').length >= 9;
     return (
@@ -79,7 +79,7 @@ const FolderQuestionAnalyzer = () => {
                         </div>
 
                         <p className="text-purple-200">
-                            Upload a folder to extract and merge questions
+                            Upload PDF files to extract and merge questions
                         </p>
                     </div>
                     <input
@@ -155,7 +155,7 @@ const FolderQuestionAnalyzer = () => {
                                     <p className="mb-3 text-sm text-purple-200">
                                         {status === 'awaiting_payment'
                                             ? 'Folder staged. Review payment section below, then tap Pay & Process.'
-                                            : `KES ${CLEANER_COST_PER_FILE_KES.toFixed(2)} per file (rounded to 2 decimals).`}
+                                            : `KES ${MERGER_COST_PER_PAGE_KES.toFixed(2)} per page (rounded to 2 decimals).`}
                                     </p>
                                     <div className="relative mb-6">
                                         <div className="absolute inset-0 flex items-center">
@@ -306,8 +306,13 @@ const FolderQuestionAnalyzer = () => {
                             </motion.div>
                         )}
                     </AnimatePresence>
-                    {status === 'awaiting_payment' && fileCount > 0 && (
+                    {status === 'awaiting_payment' && pageCount > 0 && (
                         <div className="mt-8 space-y-4">
+                            <div className="rounded-2xl border border-purple-300/30 bg-purple-500/10 px-4 py-3 text-sm text-purple-100">
+                                Billing preview: {pageCount} pages × KES{' '}
+                                {MERGER_COST_PER_PAGE_KES.toFixed(2)} = KES{' '}
+                                {totalCost.toFixed(2)} (rounded).
+                            </div>
                             <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm text-slate-700 shadow-sm">
                                 <span className="font-semibold text-slate-600">
                                     Wallet balance
@@ -373,10 +378,10 @@ const FolderQuestionAnalyzer = () => {
                                 <span className="text-2xl font-black text-white">
                                     KES {totalCost.toFixed(2)}
                                 </span>
-                                {fileCount > 0 && (
+                                {pageCount > 0 && (
                                     <span className="text-xs font-medium whitespace-nowrap text-slate-300">
-                                        ({fileCount} ×{' '}
-                                        {CLEANER_COST_PER_FILE_KES.toFixed(2)},
+                                        ({pageCount} ×{' '}
+                                        {MERGER_COST_PER_PAGE_KES.toFixed(2)},
                                         rounded)
                                     </span>
                                 )}
@@ -389,7 +394,7 @@ const FolderQuestionAnalyzer = () => {
                             whileTap={{ scale: 0.98 }}
                             disabled={
                                 status !== 'awaiting_payment' ||
-                                fileCount === 0 ||
+                                pageCount === 0 ||
                                 (needsMpesaTopUp && !mpesaDigitsOk)
                             }
                             onClick={() =>

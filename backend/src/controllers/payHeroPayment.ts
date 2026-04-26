@@ -22,6 +22,7 @@ import {
 } from '../schema/TransactionSchema.js';
 import { UserModel } from '../schema/UsersSchema.js';
 import { cleanerChargeAmountKes } from '../constants/cleanerPricing.js';
+import { mergerChargeAmountKes } from '../constants/mergerPricing.js';
 import { maxFolderFilesForTier } from '../constants/tierUploadLimits.js';
 
 const log = createLogger('payHeroPayment.ts');
@@ -266,6 +267,75 @@ export async function finalizeWalletTopupIfPendingByReference(
     };
 }
 
+export async function finalizeFileMergerIfPendingByReference(
+    reference: string,
+    payheroReceipt?: string
+): Promise<{
+    outcome: FolderCleanPollStatus | 'not_found' | 'wrong_kind';
+    walletBalance?: number;
+    amount?: number;
+    reason?: string;
+}> {
+    const tx = await TransactionsModel.findOne({
+        reference,
+        paymentKind: 'file_merger',
+    });
+    if (!tx) {
+        return { outcome: 'not_found' };
+    }
+    if (tx.status === 'success') {
+        const user = await UserModel.findById(tx.userId).select(
+            'walletBalance'
+        );
+        return {
+            outcome: 'success',
+            walletBalance: user?.walletBalance ?? 0,
+            amount: tx.amount,
+        };
+    }
+    if (tx.status === 'failed') {
+        return { outcome: 'failed', reason: 'Transaction failed' };
+    }
+
+    const updated = await TransactionsModel.findOneAndUpdate(
+        { _id: tx._id, status: 'pending', paymentKind: 'file_merger' },
+        {
+            $set: {
+                status: 'success',
+                ...(payheroReceipt ? { mpesaReceipt: payheroReceipt } : {}),
+            },
+        },
+        { returnDocument: 'after' }
+    );
+
+    if (!updated) {
+        const again = await TransactionsModel.findOne({ reference });
+        if (again?.status === 'success') {
+            const user = await UserModel.findById(again.userId).select(
+                'walletBalance'
+            );
+            return {
+                outcome: 'success',
+                walletBalance: user?.walletBalance ?? 0,
+                amount: again.amount,
+            };
+        }
+        return { outcome: 'pending' };
+    }
+
+    const userAfter = await UserModel.findByIdAndUpdate(
+        tx.userId,
+        { $inc: { walletBalance: tx.amount } },
+        { returnDocument: 'after', select: 'walletBalance' }
+    );
+
+    return {
+        outcome: 'success',
+        walletBalance: userAfter?.walletBalance ?? tx.amount,
+        amount: tx.amount,
+    };
+}
+
 async function markFolderCleanFailed(
     tx: Transaction_Type,
     reason: string
@@ -288,6 +358,18 @@ async function markWalletTopupFailed(
         { $set: { status: 'failed' } }
     );
     log.warn('Wallet top-up transaction failed', {
+        data: { reference: tx.reference, reason },
+    });
+}
+async function markFileMergerFailed(
+    tx: Transaction_Type,
+    reason: string
+): Promise<void> {
+    await TransactionsModel.updateOne(
+        { _id: tx._id, status: 'pending' },
+        { $set: { status: 'failed' } }
+    );
+    log.warn('File merger transaction failed', {
         data: { reference: tx.reference, reason },
     });
 }
@@ -1012,6 +1094,247 @@ export async function pollWalletTopupPaymentStatus(
     }
 }
 
+export async function initiateFileMergerStk(
+    req: Request,
+    res: Response,
+    next: NextFunction
+) {
+    const authReq = req as AuthenticatedRequest;
+    const userPayload = authReq?.user as JWTUserPayload | undefined;
+    const userId = userPayload?.uid;
+    if (!userId) return next(AppError.unauthorized('Authentication required'));
+    if (!PAYHERO_AUTH_TOKEN) {
+        return next(
+            new AppError(
+                'Payment provider is not configured on server',
+                500,
+                'ConfigError'
+            )
+        );
+    }
+
+    const { phoneNumber, pageCount } = req.body as {
+        phoneNumber?: string;
+        pageCount?: number;
+    };
+    if (phoneNumber == null || String(phoneNumber).trim() === '') {
+        return next(AppError.badRequest('phoneNumber is required'));
+    }
+    const count = Number(pageCount);
+    if (!Number.isFinite(count) || count < 1) {
+        return next(AppError.badRequest('pageCount must be a positive integer'));
+    }
+
+    const user = await UserModel.findById(userId).select('email');
+    if (!user?.email) return next(AppError.notFound('User not found'));
+
+    const expectedAmount = mergerChargeAmountKes(count);
+    if (expectedAmount <= 0) {
+        return next(AppError.badRequest('Invalid payment amount'));
+    }
+
+    const reference = 'MPESA_' + crypto.randomUUID();
+    const payload = {
+        amount: expectedAmount,
+        customer_name: user.email,
+        channel_id: PAYHERO_CHANNEL_ID,
+        phone_number: String(phoneNumber).trim(),
+        provider: 'm-pesa',
+        external_reference: reference,
+    };
+    try {
+        const payheroResponse = await axios.post(
+            PAYHERO_PAYMENTS_URL,
+            payload,
+            { headers: payheroAuthHeaders() }
+        );
+        const body = payheroResponse.data;
+        if (!body?.success) {
+            const msg =
+                body?.data?.message ||
+                body?.message ||
+                'PayHero rejected the payment request';
+            return next(AppError.badRequest(msg));
+        }
+        const payheroInternalRef = extractPayHeroInitiateTransactionId(body);
+        await TransactionsModel.create({
+            userId,
+            amount: expectedAmount,
+            email: user.email,
+            status: 'pending',
+            reference,
+            project: 'tidy-up',
+            provider: 'mpesa',
+            paymentKind: 'file_merger',
+            mergerPageCount: count,
+            ...(payheroInternalRef ? { payheroInternalRef } : {}),
+            createdAt: new Date(),
+        });
+
+        return res.json({
+            status: true,
+            message:
+                body?.message ||
+                'Please complete authorization on your mobile phone',
+            data: {
+                reference,
+                payheroReference: payheroInternalRef ?? null,
+                amount: expectedAmount,
+                pageCount: count,
+            },
+        });
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            if (error.response) {
+                const msg =
+                    error.response.data?.data?.message ||
+                    error.response.data?.message ||
+                    error.response.statusText;
+                return next(AppError.badRequest(msg || 'PayHero request failed'));
+            }
+            if (error.request) {
+                return next(
+                    new AppError(
+                        'Payment service is currently unavailable. Please try again later.',
+                        503,
+                        'PaymentError'
+                    )
+                );
+            }
+        }
+        return next(error);
+    }
+}
+
+export async function pollFileMergerPaymentStatus(
+    req: Request,
+    res: Response,
+    next: NextFunction
+) {
+    const authReq = req as AuthenticatedRequest;
+    const userPayload = authReq?.user as JWTUserPayload | undefined;
+    const userId = userPayload?.uid;
+    if (!userId) return next(AppError.unauthorized('Authentication required'));
+    if (!PAYHERO_AUTH_TOKEN) {
+        return next(
+            new AppError(
+                'Payment provider is not configured on server',
+                500,
+                'ConfigError'
+            )
+        );
+    }
+    const { reference } = req.params;
+    if (!reference || typeof reference !== 'string') {
+        return next(AppError.badRequest('reference is required'));
+    }
+
+    const tx = await TransactionsModel.findOne({
+        reference,
+        userId,
+        paymentKind: 'file_merger',
+    });
+    if (!tx) return next(AppError.notFound('Transaction not found'));
+    if (tx.status === 'success') {
+        const user = await UserModel.findById(userId).select('walletBalance');
+        return res.json({
+            status: 'success' as const,
+            amount: tx.amount,
+            walletBalance: user?.walletBalance ?? 0,
+        });
+    }
+    if (tx.status === 'failed') {
+        return res.json({
+            status: 'failed' as const,
+            reason: 'Payment was not completed',
+        });
+    }
+
+    try {
+        const refCandidates = [tx.payheroInternalRef, tx.reference].filter(
+            (x): x is string => typeof x === 'string' && x.length > 0
+        );
+        const uniqueRefs = [...new Set(refCandidates)];
+        let body: unknown | undefined;
+        let saw404 = false;
+
+        outer: for (const refQuery of uniqueRefs) {
+            for (const statusUrl of statusUrlCandidates(refQuery)) {
+                const phRes = await axios.get(statusUrl, {
+                    headers: { Authorization: `Basic ${PAYHERO_AUTH_TOKEN}` },
+                    validateStatus: (s) => s < 600,
+                });
+                if (phRes.status === 404) {
+                    saw404 = true;
+                    continue;
+                }
+                if (phRes.status >= 500) {
+                    return next(
+                        new AppError(
+                            'Payment service is currently unavailable.',
+                            503,
+                            'PaymentError'
+                        )
+                    );
+                }
+                if (phRes.status >= 400) {
+                    return next(
+                        AppError.badRequest(
+                            'Unable to verify payment status. Try again shortly.'
+                        )
+                    );
+                }
+                body = phRes.data;
+                break outer;
+            }
+        }
+
+        if (body === undefined) {
+            if (saw404) log.warn('File merger payment not indexed yet');
+            return res.json({ status: 'pending' as const });
+        }
+
+        const statusRaw = extractPayHeroStatus(body);
+        const mapped = mapPayHeroToPollStatus(statusRaw);
+        const receipt = extractPayHeroReceipt(body);
+        if (mapped === 'success') {
+            const fin = await finalizeFileMergerIfPendingByReference(
+                reference,
+                receipt
+            );
+            if (fin.outcome === 'success') {
+                return res.json({
+                    status: 'success' as const,
+                    amount: fin.amount ?? tx.amount,
+                    walletBalance: fin.walletBalance ?? 0,
+                });
+            }
+            if (fin.outcome === 'pending') {
+                return res.json({ status: 'pending' as const });
+            }
+        }
+        if (mapped === 'failed') {
+            await markFileMergerFailed(tx, statusRaw || 'failed');
+            return res.json({
+                status: 'failed' as const,
+                reason: statusRaw || 'Payment failed',
+            });
+        }
+        return res.json({ status: 'pending' as const });
+    } catch (error) {
+        if (axios.isAxiosError(error) && error.request) {
+            return next(
+                new AppError(
+                    'Payment service is currently unavailable.',
+                    503,
+                    'PaymentError'
+                )
+            );
+        }
+        return next(error);
+    }
+}
+
 export async function chargeWalletForFolderCleaner(
     req: Request,
     res: Response,
@@ -1062,6 +1385,71 @@ export async function chargeWalletForFolderCleaner(
             provider: 'wallet',
             paymentKind: 'billing',
             folderCleanFileCount: count,
+            createdAt: new Date(),
+        });
+    } catch (error) {
+        await UserModel.findByIdAndUpdate(userId, {
+            $inc: { walletBalance: amount },
+        });
+        throw error;
+    }
+
+    return res.status(200).json({
+        status: 'success',
+        walletBalance: userAfterDebit.walletBalance ?? 0,
+        amount,
+        chargeReference,
+    });
+}
+
+export async function chargeWalletForFileMerger(
+    req: Request,
+    res: Response,
+    next: NextFunction
+) {
+    const authReq = req as AuthenticatedRequest;
+    const userPayload = authReq?.user as JWTUserPayload | undefined;
+    const userId = userPayload?.uid;
+    if (!userId) {
+        return next(AppError.unauthorized('Authentication required'));
+    }
+
+    const { pageCount } = req.body as { pageCount?: number };
+    const count = Number(pageCount);
+    if (!Number.isFinite(count) || count < 1) {
+        return next(AppError.badRequest('pageCount must be a positive integer'));
+    }
+
+    const amount = mergerChargeAmountKes(count);
+    if (amount <= 0) {
+        return next(AppError.badRequest('Invalid charge amount'));
+    }
+
+    const userAfterDebit = await UserModel.findOneAndUpdate(
+        { _id: userId, walletBalance: { $gte: amount } },
+        { $inc: { walletBalance: -amount } },
+        { returnDocument: 'after', select: 'walletBalance email' }
+    );
+    if (!userAfterDebit) {
+        return next(
+            AppError.badRequest(
+                `Insufficient wallet balance for this service (KES ${amount.toFixed(2)}).`
+            )
+        );
+    }
+
+    const chargeReference = `WALLET_CHARGE_${crypto.randomUUID()}`;
+    try {
+        await TransactionsModel.create({
+            userId,
+            amount,
+            email: userAfterDebit.email,
+            status: 'success',
+            reference: chargeReference,
+            project: 'tidy-up',
+            provider: 'wallet',
+            paymentKind: 'billing',
+            mergerPageCount: count,
             createdAt: new Date(),
         });
     } catch (error) {

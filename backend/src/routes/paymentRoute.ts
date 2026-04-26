@@ -2,9 +2,12 @@ import { Router } from 'express';
 import asyncHandler from '../middleware/asyncHandler.js';
 import { mpesaPayment } from '../controllers/paymentContoller.js';
 import {
+    chargeWalletForFileMerger,
     chargeWalletForFolderCleaner,
+    initiateFileMergerStk,
     initiateFolderCleanStk,
     initiateWalletTopupStk,
+    pollFileMergerPaymentStatus,
     pollFolderCleanPaymentStatus,
     pollWalletTopupPaymentStatus,
     refundWalletCharge,
@@ -28,6 +31,16 @@ paymentRoute.get(
     asyncHandler(pollFolderCleanPaymentStatus)
 );
 paymentRoute.post(
+    '/file-merger/initiate',
+    authenticate,
+    asyncHandler(initiateFileMergerStk)
+);
+paymentRoute.get(
+    '/file-merger/status/:reference',
+    authenticate,
+    asyncHandler(pollFileMergerPaymentStatus)
+);
+paymentRoute.post(
     '/wallet-topup/initiate',
     authenticate,
     asyncHandler(initiateWalletTopupStk)
@@ -41,6 +54,11 @@ paymentRoute.post(
     '/wallet/charge-folder-clean',
     authenticate,
     asyncHandler(chargeWalletForFolderCleaner)
+);
+paymentRoute.post(
+    '/wallet/charge-file-merger',
+    authenticate,
+    asyncHandler(chargeWalletForFileMerger)
 );
 paymentRoute.post(
     '/wallet/refund-charge',

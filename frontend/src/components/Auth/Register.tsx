@@ -41,7 +41,7 @@ const RegistrationForm = ({ onToggle }: RegisterFormProps) => {
                 'Response from the register user function in the authstore',
                 { data: res }
             );
-            navigate('/');
+            navigate('/home');
         } catch (error) {
             log.error('Error sending the client info', { data: { error } });
             handleApiError(error, setError);

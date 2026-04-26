@@ -38,7 +38,7 @@ const LoginForm = ({ onToggle }: LoginFormProps) => {
         try {
             const res = await loginUser(data.email, data.password);
             log.info('Login successful', { data: res });
-            navigate('/');
+            navigate('/home');
         } catch (error) {
             log.error('Login error', { data: { error } });
 

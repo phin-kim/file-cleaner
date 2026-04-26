@@ -37,6 +37,9 @@ subRouter.get('/fetch-profile', authenticate, async (req, res, next) => {
             lastUsageDate: user.lastUsageDate,
             dailyUsageCount: user.dailyUsageCount,
             walletBalance: user.walletBalance ?? 0,
+            profileImageUrl: user.profileImageUrl ?? '',
+            createdAt: user.createdAt,
+            email: user.email,
         });
         //res.status(200).json({ tierId: tierId, dailyUsageCount });
     } catch (error) {
@@ -107,7 +110,8 @@ subRouter.get('/wallet-history', authenticate, async (req, res, next) => {
         const history = txs.map((tx) => {
             const isWalletCredit =
                 tx.paymentKind === 'wallet_topup' ||
-                tx.paymentKind === 'folder_clean';
+                tx.paymentKind === 'folder_clean' ||
+                tx.paymentKind === 'file_merger';
             const isWalletRefund =
                 tx.paymentKind === 'billing' &&
                 typeof tx.reference === 'string' &&

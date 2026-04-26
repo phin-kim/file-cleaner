@@ -31,6 +31,11 @@ import { useWalletStore } from './Store/walletStore';
 import WalletPage from './Pages/Wallet';
 import HistoryPage from './Pages/History';
 import Profile from './Pages/Profile';
+import { useProfileStore } from './Store/profileStore';
+import PrivacyPolicy from './Pages/PrivacyPolicy';
+import TermsOfService from './Pages/TermsOfService';
+import PublicPricing from './Pages/PublicPricing';
+import HowItWorks from './Pages/HowItWorks';
 
 /** 
  
@@ -86,6 +91,12 @@ function App() {
                     if (typeof wb === 'number') {
                         useWalletStore.getState().setBalanceFromServer(wb);
                     }
+                    const profileImageUrl = response.data.profileImageUrl;
+                    if (typeof profileImageUrl === 'string') {
+                        useProfileStore.getState().setProfilePic(
+                            profileImageUrl || null
+                        );
+                    }
                     const syncProfile = async () => {
                         const dbUser = response.data;
 
@@ -135,6 +146,14 @@ function App() {
                             element={<UpgradeModal />}
                         /> */}
                 <Routes>
+                    <Route path="/" element={<WelcomeModal />} />
+                    <Route
+                        path="/pricing"
+                        element={
+                            isAuthenticated ? <Pricing /> : <PublicPricing />
+                        }
+                    />
+                    <Route path="/how-it-works" element={<HowItWorks />} />
                     <Route path="/auth" element={<AuthForm />} />
                     <Route
                         path="/auth/forgot-password"
@@ -148,9 +167,11 @@ function App() {
                         path="/auth/reset-password"
                         element={<ResetPassword />}
                     />
+                    <Route path="/privacy" element={<PrivacyPolicy />} />
+                    <Route path="/terms" element={<TermsOfService />} />
                     <Route element={<ProtectedRoutes />}>
                         <Route element={<AppLayout />}>
-                            <Route path="/" element={<WelcomeModal />} />
+                            <Route path="/home" element={<WelcomeModal />} />
 
                             <Route
                                 path="/folder-cleaner"
@@ -163,7 +184,6 @@ function App() {
                             <Route path="/profile" element={<Profile />} />
                             <Route path="/history" element={<HistoryPage />} />
                             <Route path="/wallet" element={<WalletPage />} />
-                            <Route path="/pricing" element={<Pricing />} />
                             <Route
                                 path="/pricing/billing"
                                 element={<BillingPage />}

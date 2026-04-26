@@ -26,6 +26,8 @@ export interface User_Type extends Document {
     resetPasswordExpires: Date | undefined;
     refreshTokens: RefreshToken[];
     walletBalance?: number;
+    profileImageUrl?: string;
+    profileImagePublicId?: string;
 }
 export interface tierId {
     enum: ['free', 'tier-1', 'tier-2', 'tier-3'];
@@ -101,6 +103,14 @@ const UserSchema = new Schema<User_Type>(
             type: Number,
             default: 0,
             min: 0,
+        },
+        profileImageUrl: {
+            type: String,
+            default: '',
+        },
+        profileImagePublicId: {
+            type: String,
+            default: '',
         },
     },
     { timestamps: true }

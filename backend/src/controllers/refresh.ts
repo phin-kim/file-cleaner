@@ -135,6 +135,7 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
                 email: user.email,
                 role: user.role,
                 createdAt: user.createdAt,
+                profileImageUrl: user.profileImageUrl ?? '',
             },
         });
     } catch (error) {

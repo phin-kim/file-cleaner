@@ -5,6 +5,7 @@ import type { Document } from 'mongoose';
 export type PaymentKind =
     | 'subscription'
     | 'folder_clean'
+    | 'file_merger'
     | 'billing'
     | 'wallet_topup';
 
@@ -25,6 +26,7 @@ export interface Transaction_Type extends Document {
     updatedAt?: Date;
     paymentKind?: PaymentKind;
     folderCleanFileCount?: number;
+    mergerPageCount?: number;
     payheroInternalRef?: string;
 }
 export interface Metadata {
@@ -100,9 +102,16 @@ const TransactionsSchema = new Schema<Transaction_Type>(
         project: String,
         paymentKind: {
             type: String,
-            enum: ['subscription', 'folder_clean', 'billing', 'wallet_topup'],
+            enum: [
+                'subscription',
+                'folder_clean',
+                'file_merger',
+                'billing',
+                'wallet_topup',
+            ],
         },
         folderCleanFileCount: { type: Number },
+        mergerPageCount: { type: Number },
         payheroInternalRef: { type: String, sparse: true },
         createdAt: {
             type: Date,

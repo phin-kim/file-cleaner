@@ -9,7 +9,7 @@ import { Sparkles, CheckCircle, Lock, Shield, Zap, Info } from 'lucide-react';
 import { FaPaypal, FaCreditCard, FaCheck } from 'react-icons/fa6';
 import { MdPhoneAndroid } from 'react-icons/md';
 import { useTransactions } from '../Store/TransactionStore';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import type { PaymentMethod } from '../types/transactions';
 import useErrorStore from '../Store/ErrorStore';
 //import handleApiError from '../utils/apiError';
@@ -47,7 +47,7 @@ export default function Billing() {
     // Redirect if no tier is selected
     useEffect(() => {
         if (!selectedTier) {
-            navigate('/');
+            navigate('/pricing');
         }
     }, [selectedTier, navigate]);
     //const prodURL = 'https://tidy-upp.netlify.app';
@@ -483,9 +483,16 @@ export default function Billing() {
                         />
 
                         <p className="mt-6 text-center text-[10px] leading-relaxed text-purple-300/40">
-                            By completing this purchase, you agree to our Terms
-                            of Service and Privacy Policy. Payments are
-                            processed securely via encrypted channels.
+                            By completing this purchase, you agree to our{' '}
+                            <Link to="/terms" className="underline">
+                                Terms of Service
+                            </Link>{' '}
+                            and{' '}
+                            <Link to="/privacy" className="underline">
+                                Privacy Policy
+                            </Link>
+                            . Payments are processed securely via encrypted
+                            channels.
                         </p>
                     </div>
                 </motion.div>

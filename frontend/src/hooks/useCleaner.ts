@@ -17,7 +17,12 @@ import { uploadLimiter } from '../utils/uploadLimiter';
 import { useTransactions } from '../Store/TransactionStore';
 import { useWalletStore } from '../Store/walletStore';
 import { cleanerChargeAmountKes } from '../constants/cleanerPricing';
-import { pollFolderCleanPayment } from '../utils/pollPayHeroPayment';
+import { mergerChargeAmountKes } from '../constants/mergerPricing';
+import {
+    pollFileMergerPayment,
+    pollFolderCleanPayment,
+} from '../utils/pollPayHeroPayment';
+import { countPdfPagesFromFiles } from '../utils/pdfPageCounter';
 
 const log = createClientLogger('UseCleaner.tsx');
 
@@ -28,9 +33,16 @@ const PAID_UPLOAD_PATHS = new Set([FOLDER_CLEANER_PATH, QUESTION_MERGER_PATH]);
 
 /** Returns charge payload or null if blocked (error already set). */
 async function chargeWalletForCleanerUpload(
-    fileCount: number
+    path: string,
+    count: number
 ): Promise<{ amount: number; chargeReference: string } | null> {
-    const amount = cleanerChargeAmountKes(fileCount);
+    const isMerger = path === QUESTION_MERGER_PATH;
+    const amount = isMerger
+        ? mergerChargeAmountKes(count)
+        : cleanerChargeAmountKes(count);
+    const chargeUrl = isMerger
+        ? '/payment/wallet/charge-file-merger'
+        : '/payment/wallet/charge-folder-clean';
     const { hasSufficientFunds, balance, setBalanceFromServer } =
         useWalletStore.getState();
     const { setError } = useErrorStore.getState();
@@ -46,7 +58,10 @@ async function chargeWalletForCleanerUpload(
             amount: number;
             chargeReference: string;
             walletBalance: number;
-        }>('/payment/wallet/charge-folder-clean', { fileCount });
+        }>(
+            chargeUrl,
+            isMerger ? { pageCount: count } : { fileCount: count }
+        );
         setBalanceFromServer(Number(data.walletBalance ?? 0));
         if (!data.chargeReference) {
             setError('Could not confirm wallet charge reference.');
@@ -97,6 +112,7 @@ export default function useCleaner() {
         folderName: string;
         path: string;
         uploadLimit: UploadLimitResult;
+        pageCount: number;
     } | null>(null);
     const payProcessInFlight = useRef(false);
     const tierId = useTierStore((state) => state.tierId);
@@ -341,7 +357,14 @@ export default function useCleaner() {
             return;
         }
 
-        const totalCost = cleanerChargeAmountKes(pending.files.length);
+        const units =
+            pending.path === QUESTION_MERGER_PATH
+                ? pending.pageCount
+                : pending.files.length;
+        const totalCost =
+            pending.path === QUESTION_MERGER_PATH
+                ? mergerChargeAmountKes(units)
+                : cleanerChargeAmountKes(units);
 
         payProcessInFlight.current = true;
         try {
@@ -373,7 +396,8 @@ export default function useCleaner() {
 
                 if (hasSufficientFunds(totalCost)) {
                     const chargedWallet = await chargeWalletForCleanerUpload(
-                        pending.files.length
+                        pending.path,
+                        units
                     );
                     if (chargedWallet === null) {
                         stopProgressInterval(progressInterval);
@@ -409,13 +433,24 @@ export default function useCleaner() {
                     data?: {
                         reference: string;
                         amount: number;
-                        fileCount: number;
+                        fileCount?: number;
+                        pageCount?: number;
                     };
                     message?: string;
-                }>('/payment/folder-clean/initiate', {
-                    phoneNumber: phone,
-                    fileCount: pending.files.length,
-                });
+                }>(
+                    pending.path === QUESTION_MERGER_PATH
+                        ? '/payment/file-merger/initiate'
+                        : '/payment/folder-clean/initiate',
+                    pending.path === QUESTION_MERGER_PATH
+                        ? {
+                              phoneNumber: phone,
+                              pageCount: pending.pageCount,
+                          }
+                        : {
+                              phoneNumber: phone,
+                              fileCount: pending.files.length,
+                          }
+                );
 
                 const reference = initRes.data?.data?.reference;
                 if (!reference) {
@@ -426,11 +461,14 @@ export default function useCleaner() {
                 }
 
                 const { walletBalance } =
-                    await pollFolderCleanPayment(reference);
+                    pending.path === QUESTION_MERGER_PATH
+                        ? await pollFileMergerPayment(reference)
+                        : await pollFolderCleanPayment(reference);
                 useWalletStore.getState().setBalanceFromServer(walletBalance);
 
                 const chargedWallet = await chargeWalletForCleanerUpload(
-                    pending.files.length
+                    pending.path,
+                    units
                 );
                 if (chargedWallet === null) {
                     stopProgressInterval(progressInterval);
@@ -520,11 +558,17 @@ export default function useCleaner() {
                 useErrorStore.getState().clearError();
                 fileNoCheck(fileArray.length);
                 setUploadedFolder({ name: folderName, files: fileArray });
+                const pageCount =
+                    path === QUESTION_MERGER_PATH
+                        ? await countPdfPagesFromFiles(fileArray)
+                        : 0;
+                useTransactions.getState().pageNoCheck(pageCount);
                 pendingCleanRef.current = {
                     files: fileArray,
                     folderName,
                     path,
                     uploadLimit,
+                    pageCount,
                 };
                 setStatus('awaiting_payment');
                 return;
@@ -661,11 +705,17 @@ export default function useCleaner() {
                 useErrorStore.getState().clearError();
                 fileNoCheck(files.length);
                 setUploadedFolder({ name: folderName, files });
+                const pageCount =
+                    path === QUESTION_MERGER_PATH
+                        ? await countPdfPagesFromFiles(files)
+                        : 0;
+                useTransactions.getState().pageNoCheck(pageCount);
                 pendingCleanRef.current = {
                     files,
                     folderName,
                     path,
                     uploadLimit,
+                    pageCount,
                 };
                 setStatus('awaiting_payment');
                 return;
@@ -700,6 +750,7 @@ export default function useCleaner() {
         setUploadedFolder(null);
         setStatus('idle');
         useTransactions.getState().fileNoCheck(0);
+        useTransactions.getState().pageNoCheck(0);
         useGeneralStore.getState().resetStats();
     };
     const resetMergerUpload = () => {

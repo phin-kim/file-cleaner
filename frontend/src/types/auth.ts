@@ -7,6 +7,7 @@ export interface User {
     phone: string;
     email: string;
     name?: string;
+    profileImageUrl?: string;
     role: 'user' | 'admin';
 }
 export type AuthResponse = {
