@@ -5,6 +5,7 @@ import fs from 'fs-extra';
 import multer from 'multer';
 import { fileURLToPath } from 'url';
 
+import { isUserDocument } from '../helpers/miniHelpers.js';
 import { processUploadedFiles } from '../utils/fileMerger.js';
 import generatePDF from '../utils/generatePDF.js';
 import uploadLimiter from '../utils/rateLimiter.js';
@@ -17,6 +18,8 @@ import checkDailyLimit from '../middleware/limitCheck.js';
 import { UserModel } from '../schema/UsersSchema.js';
 import type { AuthenticatedRequest } from '../Types/authenticate.js';
 import authenticate from '../middleware/authenticate.js';
+import { processPdfsNative } from '../utils/GeminiPdfMerger.js';
+import { convertHtmlToPdf, saveHtml } from '../utils/html-pdf.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const log = createLogger('Merge route');
@@ -68,39 +71,33 @@ mergerRoute.post(
         const sessionPath = req.sessionPath;
         try {
             //const tierId = req.query.tierId as keyof typeof TIER_CONFIG;
+
+            //const userEmail = authReq?.user?.email;
+
             const authReq = req as AuthenticatedRequest;
-            const userEmail = authReq?.user?.email;
-            /**
-             
-             * const authReq = req as AuthenticatedRequest;
-                     
-                     // Replace findOne({ email: ... }) with findById
-                     if (!authReq.user) {
-                         return next(AppError.unauthorized('Not authenticated'));
-                     }
-             
-                     // TYPE SAFE EXTRACTION:
-                     // If it's a Document, use ._id. If it's a Payload, use .uid.
-                     const userId = isUserDocument(authReq.user)
-                         ? authReq.user._id.toString()
-                         : authReq.user.uid;
-             
-                     // Now you can proceed safely
-                     const user = isUserDocument(authReq.user)
-                         ? authReq.user
-                         : await UserModel.findById(userId);
-             
-                     if (!user) return next(AppError.notFound('User not found'));
-             */
+
+            // Replace findOne({ email: ... }) with findById
+            if (!authReq.user) {
+                return next(AppError.unauthorized('Not authenticated'));
+            }
+
+            // TYPE SAFE EXTRACTION:
+            // If it's a Document, use ._id. If it's a Payload, use .uid.
+            const userId = isUserDocument(authReq.user)
+                ? authReq.user._id.toString()
+                : authReq.user.uid;
+
+            // Now you can proceed safely
+            const user = isUserDocument(authReq.user)
+                ? authReq.user
+                : await UserModel.findById(userId);
+
+            if (!user) return next(AppError.notFound('User not found'));
 
             const isWorkSheet = req.query.isWorkSheet === 'true';
             //const CAN_MERGE = TIER_CONFIG[tierId].canMerge;
 
-            const user = await UserModel.findOne({ email: userEmail });
-            if (!user) {
-                return next(AppError.notFound('User not found'));
-            }
-            const subscriptionStatus = await sendEmailAlert(req);
+            /*const subscriptionStatus = await sendEmailAlert(req);
             log.highlight('This is the subscription status', {
                 data: { subscriptionStatus },
             });
@@ -109,7 +106,7 @@ mergerRoute.post(
                     type: 'SUBSCRIPTION_EXPIRED',
                     message: 'Your subscription has expired',
                 });
-            }
+            }*/
 
             const folderName = req.body.folderName;
             if (!folderName) {
@@ -125,9 +122,14 @@ mergerRoute.post(
                     )
                 );
             }
-            const mergedQuestions = await processUploadedFiles(sessionPath);
-
-            if (!mergedQuestions || mergedQuestions.length === 0) {
+            //convert directory path into an array of file paths to satisfy the new style
+            const filesInFolder = fs
+                .readdirSync(sessionPath)
+                .map((file) => path.join(sessionPath, file))
+                .filter((filePath) => fs.statSync(filePath).isFile());
+            //const mergedQuestions = await processUploadedFiles(sessionPath);
+            const mergedQuestions = await processPdfsNative(filesInFolder);
+            if (!mergedQuestions || mergedQuestions.uniqueCount === 0) {
                 return res.status(200).json({
                     success: true,
                     stats: {
@@ -143,7 +145,11 @@ mergerRoute.post(
             //creates the folder if missing
             const outputFile = path.join(outputDir, `${safeFolderName}.pdf`);
 
-            await generatePDF(mergedQuestions, outputFile, isWorkSheet);
+            await convertHtmlToPdf(
+                mergedQuestions.html,
+                outputFile,
+                isWorkSheet
+            );
             log.warn('The pdf generator is done');
 
             // Build absolute download URL so frontend (different origin) can access it

@@ -52,7 +52,7 @@ const MERGER_BASE_DIR = path.join(PROJECT_ROOT, 'output/file-merger-temps');
 const CLEANER_BASE_DIR = path.join(PROJECT_ROOT, 'output/folder-cleaner-temps');
 
 const MERGER_UPLOADS = path.join(MERGER_BASE_DIR, 'uploads');
-export const MERGER_OUTPUTS = path.join(MERGER_BASE_DIR, 'outputs');
+const MERGER_OUTPUTS = path.join(MERGER_BASE_DIR, 'outputs');
 const FOLDER_UPLOADS = path.join(CLEANER_BASE_DIR, 'uploads');
 const FOLDER_OUTPUTS = path.join(CLEANER_BASE_DIR, 'outputs');
 const FOLDER_STORAGE_TEMPS = path.join(

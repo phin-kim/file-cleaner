@@ -156,7 +156,7 @@ export async function finalizeFolderCleanIfPendingByReference(
                 ...(payheroReceipt ? { mpesaReceipt: payheroReceipt } : {}),
             },
         },
-        { new: true }
+        { returnDocument: 'after' }
     );
 
     if (!updated) {
@@ -229,7 +229,7 @@ export async function finalizeWalletTopupIfPendingByReference(
                 ...(payheroReceipt ? { mpesaReceipt: payheroReceipt } : {}),
             },
         },
-        { new: true }
+        { returnDocument: 'after' }
     );
 
     if (!updated) {
@@ -1040,7 +1040,7 @@ export async function chargeWalletForFolderCleaner(
     const userAfterDebit = await UserModel.findOneAndUpdate(
         { _id: userId, walletBalance: { $gte: amount } },
         { $inc: { walletBalance: -amount } },
-        { new: true, select: 'walletBalance email' }
+        {  returnDocument: 'after' , select: 'walletBalance email' }
     );
     if (!userAfterDebit) {
         return next(

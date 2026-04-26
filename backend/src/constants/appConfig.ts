@@ -1,11 +1,18 @@
-import { MERGER_OUTPUTS } from '../App';
+import path from 'path';
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const PROJECT_ROOT = path.resolve(__dirname, '../');
+const MERGER_BASE_DIR = path.join(PROJECT_ROOT, 'output/file-merger-temps');
+
+const MERGER_OUTPUTS = path.join(MERGER_BASE_DIR, 'outputs');
 
 export const appConfig = {
     /** Google Gemini API Key */
     geminiApiKey: process.env.GEMINI_API_KEY || '',
 
     /** Gemini model to use */
-    geminiModel: process.env.GEMINI_MODEL || 'gemini-2.5-pro',
+    geminiModel: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
 
     /** Maximum retry attempts for API calls */
     maxRetries: parseInt(process.env.MAX_RETRIES || '3', 10),
