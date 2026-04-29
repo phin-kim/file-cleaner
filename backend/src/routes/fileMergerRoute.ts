@@ -153,12 +153,13 @@ mergerRoute.post(
             const safeFolderName = folderName.replace(/[^a-z0-9_-]/gi, '_');
 
             //creates the folder if missing
-            const outputFile = path.join(outputDir, `${safeFolderName}.pdf`);
+            const outputFile = path.join(outputDir, `${safeFolderName}-tidyup-summary.pdf`);
 
             await convertHtmlToPdf(
                 mergedQuestions.html,
                 outputFile,
-                isWorkSheet
+                isWorkSheet,
+                folderName
             );
             log.warn('The pdf generator is done');
 

@@ -72,9 +72,9 @@ export default function PublicPricing() {
                         Simple, transparent pricing
                     </h1>
                     <p className="mx-auto max-w-2xl text-sm leading-relaxed text-slate-600 md:text-base">
-                        No monthly plans - just your wallet, clear per-file
-                        pricing, and a confirm step that matches what you will
-                        see in the app.
+                        No monthly plans - just your wallet, clear per-file or
+                        per page pricing, and a confirm step that matches what
+                        you will see in the app.
                     </p>
                 </header>
 

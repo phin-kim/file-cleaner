@@ -172,18 +172,28 @@ function ensureProperHtml(
     isWorkSheet: boolean = false
 ): string {
     const worksheetStyles = `
-        .question {
-            margin-bottom: 150px !important; /* Space for student to write */
-            border-bottom: 1px dashed #bdc3c7 !important;
-            background: #ffffff !important; /* Clean for printing */
-            page-break-inside: avoid;
+        .question, 
+        .extracted-content li, 
+        .extracted-content .exam-list li {
+            margin-bottom: 120px !important; /* Space for student to write */
+            border-bottom: 1px dashed #ccc !important;
+            padding-bottom: 20px !important;
+            background: #ffffff !important;
+            page-break-inside: avoid !important;
+            display: block !important;
+            position: relative !important;
         }
-        .question::after {
-            content: "Answer:";
+        .question::after, 
+        .extracted-content li::after, 
+        .extracted-content .exam-list li::after {
+            content: "Answer / Working space:";
             display: block;
-            margin-top: 15px;
+            margin-top: 20px;
+            font-size: 10pt;
             font-weight: bold;
-            color: #7f8c8d;
+            color: #95a5a6;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
     `;
     // If already a complete HTML document, return as-is
@@ -281,8 +291,6 @@ function ensureProperHtml(
       border-radius: 0 6px 6px 0;
       page-break-inside: avoid;
     }
-      /* AREA: Conditional Worksheet Overrides */
-    ${isWorkSheet ? worksheetStyles : ''}
     .question-number {
       font-weight: bold;
       color: #2c3e50;
@@ -391,6 +399,9 @@ function ensureProperHtml(
             list-style-type: lower-alpha;
             margin-top: 10px;
         }
+
+        /* AREA: Conditional Worksheet Overrides - Must be at end to override defaults */
+        ${isWorkSheet ? worksheetStyles : ''}
   </style>
 </head>
 <body>
