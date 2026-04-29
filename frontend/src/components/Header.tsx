@@ -8,7 +8,7 @@ const Header = () => {
             <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
                 <div
                     className="flex cursor-pointer items-center gap-2"
-                    onClick={() => navigate('/welcome')}
+                    onClick={() => navigate('/home')}
                 >
                     <div className="bg-gradient-purple-blue flex h-8 w-8 items-center justify-center rounded-lg font-bold text-white">
                         <PiBroomBold className="text-2xl" />
@@ -19,7 +19,7 @@ const Header = () => {
                 </div>
 
                 <button
-                    onClick={() => navigate('/welcome')}
+                    onClick={() => navigate('/home')}
                     className="group flex w-[10em] items-center justify-center gap-1 rounded-4xl bg-slate-200 p-2 text-sm font-medium text-slate-900 transition-colors hover:text-indigo-600"
                 >
                     <FaArrowLeftLong className="transition-all duration-150 group-hover:-translate-x-3" />

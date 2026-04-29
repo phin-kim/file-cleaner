@@ -6,10 +6,9 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
-
+.cache/
 # Dependencies - This will ignore ALL node_modules folders in any subdirectory
 node_modules/
-
 # Build outputs
 dist/
 dist-ssr/
@@ -42,5 +41,7 @@ backend/src/routes/temp/
 uploads/
 upload/
 backend/output/
+backend/.cache/
+
 # Specific files you mentioned
 backend/routes/temp/  # This will be ignored if it exists

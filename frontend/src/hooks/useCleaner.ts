@@ -17,7 +17,12 @@ import { uploadLimiter } from '../utils/uploadLimiter';
 import { useTransactions } from '../Store/TransactionStore';
 import { useWalletStore } from '../Store/walletStore';
 import { cleanerChargeAmountKes } from '../constants/cleanerPricing';
-import { pollFolderCleanPayment } from '../utils/pollPayHeroPayment';
+import { mergerChargeAmountKes } from '../constants/mergerPricing';
+import {
+    pollFileMergerPayment,
+    pollFolderCleanPayment,
+} from '../utils/pollPayHeroPayment';
+import { countPdfPagesFromFiles } from '../utils/pdfPageCounter';
 
 const log = createClientLogger('UseCleaner.tsx');
 
@@ -28,9 +33,16 @@ const PAID_UPLOAD_PATHS = new Set([FOLDER_CLEANER_PATH, QUESTION_MERGER_PATH]);
 
 /** Returns charge payload or null if blocked (error already set). */
 async function chargeWalletForCleanerUpload(
-    fileCount: number
+    path: string,
+    count: number
 ): Promise<{ amount: number; chargeReference: string } | null> {
-    const amount = cleanerChargeAmountKes(fileCount);
+    const isMerger = path === QUESTION_MERGER_PATH;
+    const amount = isMerger
+        ? mergerChargeAmountKes(count)
+        : cleanerChargeAmountKes(count);
+    const chargeUrl = isMerger
+        ? '/payment/wallet/charge-file-merger'
+        : '/payment/wallet/charge-folder-clean';
     const { hasSufficientFunds, balance, setBalanceFromServer } =
         useWalletStore.getState();
     const { setError } = useErrorStore.getState();
@@ -46,7 +58,7 @@ async function chargeWalletForCleanerUpload(
             amount: number;
             chargeReference: string;
             walletBalance: number;
-        }>('/payment/wallet/charge-folder-clean', { fileCount });
+        }>(chargeUrl, isMerger ? { pageCount: count } : { fileCount: count });
         setBalanceFromServer(Number(data.walletBalance ?? 0));
         if (!data.chargeReference) {
             setError('Could not confirm wallet charge reference.');
@@ -89,6 +101,7 @@ export default function useCleaner() {
     const [upgradeModal, setUpgradeModal] = useState(false);
     const [result, setResult] = useState<AnalysisResult | null>(null);
     const [progress, setProgress] = useState(0);
+    const [statusMessage, setStatusMessage] = useState('');
     const [isExpired, setIsExpired] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     /** Staged folder cleaner job: pay + upload runs only after "Pay & Process". */
@@ -97,6 +110,7 @@ export default function useCleaner() {
         folderName: string;
         path: string;
         uploadLimit: UploadLimitResult;
+        pageCount: number;
     } | null>(null);
     const payProcessInFlight = useRef(false);
     const tierId = useTierStore((state) => state.tierId);
@@ -166,13 +180,13 @@ export default function useCleaner() {
         if (serverStatus === 503) {
             goIdleOrAwaiting();
             setProgress(0);
-            setUpgradeModal(true);
+            //setUpgradeModal(true);
             handleApiError(error, setError);
             return;
         }
         if (serverStatus === 409) {
             goIdleOrAwaiting();
-            setUpgradeModal(true);
+            //setUpgradeModal(true);
             handleApiError(serverData, setError);
             return;
         }
@@ -199,12 +213,21 @@ export default function useCleaner() {
         folderName: string,
         path: string,
         uploadLimit: UploadLimitResult,
-        progressInterval: ReturnType<typeof setInterval>,
+        progressInterval: ReturnType<typeof setInterval> | undefined,
         chargedWallet: { amount: number; chargeReference: string } | null,
         resumeAwaitingPaymentOnError: boolean,
         clearPendingCleanOnSuccess: boolean
     ) => {
+        if (progressInterval) clearInterval(progressInterval);
+        setStatusMessage('Scanning files...');
+        setProgress(1);
+
         try {
+            // Artificial "Scanning" delay to feel more realistic
+            await new Promise((resolve) => setTimeout(resolve, 800));
+            setStatusMessage('Optimizing for upload...');
+            setProgress(3);
+            await new Promise((resolve) => setTimeout(resolve, 600));
             const formData = new FormData();
             formData.append('folderName', folderName || 'folder');
             files.forEach((file) => formData.append('files', file, file.name));
@@ -214,27 +237,75 @@ export default function useCleaner() {
             log.info('Sending files to backend');
             const storage = localStorage.getItem('auth-storage');
             if (!storage) {
-                stopProgressInterval(progressInterval);
                 setError('Not authenticated');
                 setStatus(
                     resumeAwaitingPaymentOnError ? 'awaiting_payment' : 'idle'
                 );
                 return;
             }
+
+            // Simulated processing progress after upload reaches 100%
+            let processingInterval: ReturnType<typeof setInterval> | null =
+                null;
+
             const parsed = JSON.parse(storage);
             const userId = parsed.state.user.id;
             const response = await fileCleanerApi.post(
                 `/${path}?tierId=${tierId}&isWorkSheet=${isWorkSheet}&userId=${userId}`,
                 formData,
                 {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                        'x-timezone-offset': new Date()
-                            .getTimezoneOffset()
-                            .toString(),
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                    onUploadProgress: (progressEvent) => {
+                        const total =
+                            progressEvent.total || files.length * 500000; // fallback 500KB per file
+                        const percent = Math.round(
+                            (progressEvent.loaded * 100) / total
+                        );
+
+                        // Map 0-100% upload to 5-45% progress (Slower upload visual)
+                        const mappedProgress = 5 + percent * 0.4;
+                        setProgress(Math.floor(mappedProgress));
+
+                        if (percent < 100) {
+                            setStatusMessage(`Uploading: ${percent}%`);
+                        } else {
+                            setStatusMessage('Securing connection...');
+                            // Start slow processing simulation from 45% to 98%
+                            if (!processingInterval) {
+                                processingInterval = setInterval(() => {
+                                    setProgress((prev) => {
+                                        if (prev >= 98) {
+                                            if (processingInterval)
+                                                clearInterval(
+                                                    processingInterval
+                                                );
+                                            return 98;
+                                        }
+                                        // Even slower crawl
+                                        const increment =
+                                            prev > 85 ? 0.05 : 0.2;
+                                        return +(prev + increment).toFixed(2);
+                                    });
+
+                                    // Rotate messages
+                                    const msgs = [
+                                        'Extracting questions...',
+                                        'Analyzing document structure...',
+                                        'Removing duplicates...',
+                                        'Finalizing study worksheet...',
+                                        'Polishing results...',
+                                    ];
+                                    const msgIndex = Math.floor(
+                                        (Date.now() / 3000) % msgs.length
+                                    );
+                                    setStatusMessage(msgs[msgIndex]);
+                                }, 200);
+                            }
+                        }
                     },
                 }
             );
+            if (processingInterval) clearInterval(processingInterval);
             const res = response.data;
             log.debug('This is the response from my backend', {
                 data: { res },
@@ -275,6 +346,7 @@ export default function useCleaner() {
             );
             clearInterval(progressInterval);
             setProgress(100);
+            setStatusMessage('Complete!');
             useGeneralStore.getState().setCleaningStats(response.data.stats);
             setDownloadURL(response.data.downloadURL);
             setStatus('complete');
@@ -346,20 +418,22 @@ export default function useCleaner() {
             return;
         }
 
-        const totalCost = cleanerChargeAmountKes(pending.files.length);
+        const units =
+            pending.path === QUESTION_MERGER_PATH
+                ? pending.pageCount
+                : pending.files.length;
+        const totalCost =
+            pending.path === QUESTION_MERGER_PATH
+                ? mergerChargeAmountKes(units)
+                : cleanerChargeAmountKes(units);
 
         payProcessInFlight.current = true;
         try {
             useErrorStore.getState().clearError();
             setStatus('uploading');
             setProgress(0);
-            const progressInterval = setInterval(() => {
-                setProgress((prev) => {
-                    if (prev >= 95) return prev;
-                    return prev + 3;
-                });
-            }, 100);
-
+            setStatusMessage('Initializing...');
+            const progressInterval = null as unknown as number;
             try {
                 try {
                     const prof = await welcomePageApi.get<{
@@ -378,7 +452,8 @@ export default function useCleaner() {
 
                 if (hasSufficientFunds(totalCost)) {
                     const chargedWallet = await chargeWalletForCleanerUpload(
-                        pending.files.length
+                        pending.path,
+                        units
                     );
                     if (chargedWallet === null) {
                         stopProgressInterval(progressInterval);
@@ -414,13 +489,24 @@ export default function useCleaner() {
                     data?: {
                         reference: string;
                         amount: number;
-                        fileCount: number;
+                        fileCount?: number;
+                        pageCount?: number;
                     };
                     message?: string;
-                }>('/payment/folder-clean/initiate', {
-                    phoneNumber: phone,
-                    fileCount: pending.files.length,
-                });
+                }>(
+                    pending.path === QUESTION_MERGER_PATH
+                        ? '/payment/file-merger/initiate'
+                        : '/payment/folder-clean/initiate',
+                    pending.path === QUESTION_MERGER_PATH
+                        ? {
+                              phoneNumber: phone,
+                              pageCount: pending.pageCount,
+                          }
+                        : {
+                              phoneNumber: phone,
+                              fileCount: pending.files.length,
+                          }
+                );
 
                 const reference = initRes.data?.data?.reference;
                 if (!reference) {
@@ -431,11 +517,14 @@ export default function useCleaner() {
                 }
 
                 const { walletBalance } =
-                    await pollFolderCleanPayment(reference);
+                    pending.path === QUESTION_MERGER_PATH
+                        ? await pollFileMergerPayment(reference)
+                        : await pollFolderCleanPayment(reference);
                 useWalletStore.getState().setBalanceFromServer(walletBalance);
 
                 const chargedWallet = await chargeWalletForCleanerUpload(
-                    pending.files.length
+                    pending.path,
+                    units
                 );
                 if (chargedWallet === null) {
                     stopProgressInterval(progressInterval);
@@ -522,11 +611,17 @@ export default function useCleaner() {
                 useErrorStore.getState().clearError();
                 fileNoCheck(fileArray.length);
                 setUploadedFolder({ name: folderName, files: fileArray });
+                const pageCount =
+                    path === QUESTION_MERGER_PATH
+                        ? await countPdfPagesFromFiles(fileArray)
+                        : 0;
+                useTransactions.getState().pageNoCheck(pageCount);
                 pendingCleanRef.current = {
                     files: fileArray,
                     folderName,
                     path,
                     uploadLimit,
+                    pageCount,
                 };
                 setStatus('awaiting_payment');
                 return;
@@ -535,12 +630,8 @@ export default function useCleaner() {
             log.info(`Folder selected via input`);
             setStatus('uploading');
             setProgress(0);
-            const progressInterval = setInterval(() => {
-                setProgress((prev) => {
-                    if (prev >= 95) return prev;
-                    return prev + 3;
-                });
-            }, 100);
+            setStatusMessage('Initializing...');
+            const progressInterval = null as unknown as number;
             try {
                 await processFolderUploadPipeline(
                     fileArray,
@@ -631,6 +722,7 @@ export default function useCleaner() {
                                 `[FRONTEND] processing folder ${dirEntry.name}`
                             );
                             const dirFiles = await traverseDirectory(dirEntry);
+
                             /*if (dirFiles.length > CURRENT_LIMIT) {
                                 log.debug(
                                     `The limit detected after ${Date.now() - startTime}ms`
@@ -644,17 +736,6 @@ export default function useCleaner() {
                                 setIsDragging(false);
                                 return;
                             }*/
-                            uploadLimit = uploadLimiter();
-                            log.debug('Upload limit', { data: uploadLimit });
-                            if (!uploadLimit.allowed) {
-                                setError(
-                                    'Daily limit reached . Resets at midnight.'
-                                );
-                                stopProgressInterval(progressInterval);
-                                setStatus('idle');
-                                setIsDragging(false);
-                                return;
-                            }
 
                             log.info(
                                 `[FRONTEND] ${dirFiles.length} found in folder`
@@ -677,11 +758,17 @@ export default function useCleaner() {
                 useErrorStore.getState().clearError();
                 fileNoCheck(files.length);
                 setUploadedFolder({ name: folderName, files });
+                const pageCount =
+                    path === QUESTION_MERGER_PATH
+                        ? await countPdfPagesFromFiles(files)
+                        : 0;
+                useTransactions.getState().pageNoCheck(pageCount);
                 pendingCleanRef.current = {
                     files,
                     folderName,
                     path,
                     uploadLimit,
+                    pageCount,
                 };
                 setStatus('awaiting_payment');
                 return;
@@ -716,6 +803,7 @@ export default function useCleaner() {
         setUploadedFolder(null);
         setStatus('idle');
         useTransactions.getState().fileNoCheck(0);
+        useTransactions.getState().pageNoCheck(0);
         useGeneralStore.getState().resetStats();
     };
     const resetMergerUpload = () => {
@@ -728,6 +816,7 @@ export default function useCleaner() {
         uploadedFolder,
         status,
         progress,
+        statusMessage,
         result,
         downloadURL,
         openPopup,

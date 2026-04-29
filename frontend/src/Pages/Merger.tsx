@@ -13,25 +13,22 @@ import {
     AlertCircle,
     Coins,
 } from 'lucide-react';
-import { SubscriptionExpiredModal, UpgradeModal } from '../components/Popup';
 import { useTransactions } from '../Store/TransactionStore';
 import { useWalletStore } from '../Store/walletStore';
 import {
-    CLEANER_COST_PER_FILE_KES,
-    cleanerChargeAmountKes,
-} from '../constants/cleanerPricing';
+    MERGER_COST_PER_PAGE_KES,
+    mergerChargeAmountKes,
+} from '../constants/mergerPricing';
 const FolderQuestionAnalyzer = () => {
     const {
         handleDrop,
         isDragging,
         progress,
         status,
+        statusMessage,
         downloadURL,
         fileInputRef,
-        setUpgradeModal,
-        upgradeModal,
-        isExpired,
-        setIsExpired,
+
         isWorkSheet,
         setIsWorkSheet,
         handleFolderInputChange,
@@ -45,63 +42,60 @@ const FolderQuestionAnalyzer = () => {
     } = useCleaner();
 
     const path = 'merge-files';
-    const fileCount = useTransactions((state) => state.fileCount);
-    const totalCost = cleanerChargeAmountKes(fileCount);
+    const pageCount = useTransactions((state) => state.pageCount);
+    const totalCost = mergerChargeAmountKes(pageCount);
     const walletBalance = useWalletStore((s) => s.balance);
     const walletCoversJob =
-        fileCount > 0 &&
+        pageCount > 0 &&
         Math.round(walletBalance * 100) >= Math.round(totalCost * 100);
     const needsMpesaTopUp =
-        status === 'awaiting_payment' && fileCount > 0 && !walletCoversJob;
+        status === 'awaiting_payment' && pageCount > 0 && !walletCoversJob;
     const [mpesaPhone, setMpesaPhone] = useState('');
     const mpesaDigitsOk = mpesaPhone.replace(/\D/g, '').length >= 9;
     return (
         <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-purple-900 via-purple-800 to-indigo-900 p-6">
             <AnimatePresence>
-                {status === 'uploading' ||
-                    (status === 'processing' && (
-                        <motion.div
-                            initial={{ opacity: 0, y: -20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
-                            className="fixed top-4 left-1/2 z-[200] w-full max-w-lg -translate-x-1/2 px-6"
-                        >
-                            <div className="relative flex items-center gap-6 overflow-hidden rounded-3xl border border-amber-500/30 bg-white bg-white/90 p-6 shadow-2xl backdrop-blur-xl">
-                                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-amber-100 text-amber-600">
-                                    <AlertTriangle
-                                        size={24}
-                                        className="animate-pulse"
+                {(status === 'uploading' || status === 'processing') && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        className="fixed top-4 left-1/2 z-200 max-w-lg -translate-x-1/2 px-6"
+                    >
+                        <div className="relative flex items-center gap-6 overflow-hidden rounded-3xl border border-amber-500/30 bg-white p-6 shadow-2xl backdrop-blur-xl">
+                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-amber-100 text-amber-600">
+                                <AlertTriangle
+                                    size={24}
+                                    className="animate-pulse"
+                                />
+                            </div>
+
+                            <div className="flex-1">
+                                <h3 className="text-lg leading-tight font-black text-slate-900">
+                                    Processing in Progress
+                                </h3>
+                                <p className="text-sm font-bold text-slate-500">
+                                    {statusMessage ||
+                                        'Please keep this tab open until finished.'}
+                                </p>
+                                <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+                                    <motion.div
+                                        animate={{ width: `${progress}%` }}
+                                        transition={{
+                                            duration: 0.5,
+                                            ease: 'linear',
+                                        }}
+                                        className="h-full rounded-full bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.5)]"
                                     />
                                 </div>
-
-                                <div className="flex-1">
-                                    <h3 className="text-lg leading-tight font-black text-slate-900">
-                                        Processing in Progress
-                                    </h3>
-                                    <p className="text-sm font-bold text-slate-500">
-                                        Please keep this tab open until
-                                        finished.
-                                    </p>
-                                    <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
-                                        <motion.div
-                                            initial={{ x: '-100%' }}
-                                            animate={{ x: '100%' }}
-                                            transition={{
-                                                repeat: Infinity,
-                                                duration: 2,
-                                                ease: 'linear',
-                                            }}
-                                            className="h-full w-1/3 rounded-full bg-amber-500"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="rounded-lg border border-amber-100 bg-amber-50 px-3 py-1.5 text-[10px] font-black tracking-widest text-amber-600 uppercase">
-                                    Active
-                                </div>
                             </div>
-                        </motion.div>
-                    ))}
+
+                            <div className="rounded-lg border border-amber-100 bg-amber-50 px-3 py-1.5 text-[10px] font-black tracking-widest text-amber-600 uppercase">
+                                Active
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
             </AnimatePresence>
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -130,7 +124,7 @@ const FolderQuestionAnalyzer = () => {
                         </div>
 
                         <p className="text-purple-200">
-                            Upload a folder to extract and merge questions
+                            Upload PDF files to extract and merge questions
                         </p>
                     </div>
                     <input
@@ -206,7 +200,7 @@ const FolderQuestionAnalyzer = () => {
                                     <p className="mb-3 text-sm text-purple-200">
                                         {status === 'awaiting_payment'
                                             ? 'Folder staged. Review payment section below, then tap Pay & Process.'
-                                            : `KES ${CLEANER_COST_PER_FILE_KES.toFixed(2)} per file (rounded to 2 decimals).`}
+                                            : `KES ${MERGER_COST_PER_PAGE_KES.toFixed(2)} per page (rounded to 2 decimals).`}
                                     </p>
                                     <div className="relative mb-6">
                                         <div className="absolute inset-0 flex items-center">
@@ -259,23 +253,21 @@ const FolderQuestionAnalyzer = () => {
                                 </p>
 
                                 <div className="mx-auto max-w-md">
-                                    <div className="h-3 overflow-hidden rounded-full bg-purple-900/50">
+                                    <p className="mt-2 text-sm font-bold text-white/90">
+                                        {statusMessage ||
+                                            (status === 'uploading'
+                                                ? 'Uploading...'
+                                                : 'Processing...')}{' '}
+                                        {Math.round(progress)}%
+                                    </p>
+                                    <div className="mt-4 h-3 overflow-hidden rounded-full bg-purple-900/50">
                                         <motion.div
-                                            animate={{
-                                                // If uploading, use progress. If success, jump to 100%.
-                                                width:
-                                                    status === 'uploading' ||
-                                                    'processing'
-                                                        ? `${progress}%`
-                                                        : '100%',
-                                            }}
+                                            animate={{ width: `${progress}%` }}
                                             transition={{
-                                                // Duration should be slightly longer than the interval
-                                                // to "stretch" the animation between updates
-                                                duration: 0.8,
-                                                ease: 'linear', // Linear is better when the state updates frequently
+                                                duration: 0.5,
+                                                ease: 'linear',
                                             }}
-                                            className="h-full rounded-full bg-linear-to-r from-purple-400 to-indigo-400"
+                                            className="h-full rounded-full bg-linear-to-r from-purple-400 to-indigo-400 shadow-[0_0_15px_rgba(168,85,247,0.5)]"
                                         />
                                     </div>
                                     <motion.p
@@ -364,8 +356,13 @@ const FolderQuestionAnalyzer = () => {
                             </motion.div>
                         )}
                     </AnimatePresence>
-                    {status === 'awaiting_payment' && fileCount > 0 && (
+                    {status === 'awaiting_payment' && pageCount > 0 && (
                         <div className="mt-8 space-y-4">
+                            <div className="rounded-2xl border border-purple-300/30 bg-purple-500/10 px-4 py-3 text-sm text-purple-100">
+                                Billing preview: {pageCount} pages × KES{' '}
+                                {MERGER_COST_PER_PAGE_KES.toFixed(2)} = KES{' '}
+                                {totalCost.toFixed(2)} (rounded).
+                            </div>
                             <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm text-slate-700 shadow-sm">
                                 <span className="font-semibold text-slate-600">
                                     Wallet balance
@@ -431,10 +428,10 @@ const FolderQuestionAnalyzer = () => {
                                 <span className="text-2xl font-black text-white">
                                     KES {totalCost.toFixed(2)}
                                 </span>
-                                {fileCount > 0 && (
+                                {pageCount > 0 && (
                                     <span className="text-xs font-medium whitespace-nowrap text-slate-300">
-                                        ({fileCount} ×{' '}
-                                        {CLEANER_COST_PER_FILE_KES.toFixed(2)},
+                                        ({pageCount} ×{' '}
+                                        {MERGER_COST_PER_PAGE_KES.toFixed(2)},
                                         rounded)
                                     </span>
                                 )}
@@ -447,7 +444,7 @@ const FolderQuestionAnalyzer = () => {
                             whileTap={{ scale: 0.98 }}
                             disabled={
                                 status !== 'awaiting_payment' ||
-                                fileCount === 0 ||
+                                pageCount === 0 ||
                                 (needsMpesaTopUp && !mpesaDigitsOk)
                             }
                             onClick={() =>
@@ -497,7 +494,7 @@ const FolderQuestionAnalyzer = () => {
                         </div>
                     </motion.div>
                 </div>
-                {upgradeModal && (
+                {/*upgradeModal && (
                     <UpgradeModal onClose={() => setUpgradeModal(false)} />
                 )}
                 {isExpired && (
@@ -506,7 +503,7 @@ const FolderQuestionAnalyzer = () => {
                         isExpired={isExpired}
                         onClose={() => setIsExpired(false)}
                     />
-                )}
+                )*/}
                 {/* Footer */}
                 <motion.p
                     initial={{ opacity: 0 }}

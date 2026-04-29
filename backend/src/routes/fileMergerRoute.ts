@@ -5,17 +5,20 @@ import fs from 'fs-extra';
 import multer from 'multer';
 import { fileURLToPath } from 'url';
 
-import { processUploadedFiles } from '../utils/fileMerger.js';
-import generatePDF from '../utils/generatePDF.js';
+import { isUserDocument } from '../helpers/miniHelpers.js';
 import uploadLimiter from '../utils/rateLimiter.js';
 import createLogger from '../utils/logger.js';
 //import { TIER_CONFIG } from '../config/tiers.js';
 import AppError from '../utils/appError.js';
-import { sendEmailAlert } from '../utils/sendEmail.js';
+//import { ConnectionCheckedOutEvent } from 'mongodb';
 import checkDailyLimit from '../middleware/limitCheck.js';
 import { UserModel } from '../schema/UsersSchema.js';
 import type { AuthenticatedRequest } from '../Types/authenticate.js';
 import authenticate from '../middleware/authenticate.js';
+import { processPdfsNative } from '../utils/GeminiPdfMerger.js';
+import { convertHtmlToPdf } from '../utils/html-pdf.js';
+import { countPdfPagesFromPaths } from '../utils/pdfPageCounter.js';
+import { mergerChargeAmountKes } from '../constants/mergerPricing.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const log = createLogger('Merge route');
@@ -62,30 +65,38 @@ mergerRoute.post(
     uploadLimiter,
     initSession,
     upload.array('files'),
-    checkDailyLimit,
+    checkDailyLimit(),
     async (req, res, next) => {
         const sessionPath = req.sessionPath;
         try {
             //const tierId = req.query.tierId as keyof typeof TIER_CONFIG;
+
+            //const userEmail = authReq?.user?.email;
+
             const authReq = req as AuthenticatedRequest;
-            const userEmail = authReq?.user?.email;
+
+            // Replace findOne({ email: ... }) with findById
+            if (!authReq.user) {
+                return next(AppError.unauthorized('Not authenticated'));
+            }
+
+            // TYPE SAFE EXTRACTION:
+            // If it's a Document, use ._id. If it's a Payload, use .uid.
+            const userId = isUserDocument(authReq.user)
+                ? authReq.user._id.toString()
+                : authReq.user.uid;
+
+            // Now you can proceed safely
+            const user = isUserDocument(authReq.user)
+                ? authReq.user
+                : await UserModel.findById(userId);
+
+            if (!user) return next(AppError.notFound('User not found'));
 
             const isWorkSheet = req.query.isWorkSheet === 'true';
-            /*const CAN_MERGE = TIER_CONFIG[tierId].canMerge;
-            if (!CAN_MERGE) {
-                return next(
-                    new AppError(
-                        'This feature is unavailable in your current subscription plan',
-                        503,
-                        'ServiceUnavailable'
-                    )
-                );
-            }*/
-            const user = await UserModel.findOne({ email: userEmail });
-            if (!user) {
-                return next(AppError.notFound('User not found'));
-            }
-            const subscriptionStatus = await sendEmailAlert(req);
+            //const CAN_MERGE = TIER_CONFIG[tierId].canMerge;
+
+            /*const subscriptionStatus = await sendEmailAlert(req);
             log.highlight('This is the subscription status', {
                 data: { subscriptionStatus },
             });
@@ -94,7 +105,7 @@ mergerRoute.post(
                     type: 'SUBSCRIPTION_EXPIRED',
                     message: 'Your subscription has expired',
                 });
-            }
+            }*/
 
             const folderName = req.body.folderName;
             if (!folderName) {
@@ -110,9 +121,22 @@ mergerRoute.post(
                     )
                 );
             }
-            const mergedQuestions = await processUploadedFiles(sessionPath);
-
-            if (!mergedQuestions || mergedQuestions.length === 0) {
+            //convert directory path into an array of file paths to satisfy the new style
+            const filesInFolder = fs
+                .readdirSync(sessionPath)
+                .map((file) => path.join(sessionPath, file))
+                .filter((filePath) => fs.statSync(filePath).isFile());
+            const pdfFilesInFolder = filesInFolder.filter((filePath) =>
+                filePath.toLowerCase().endsWith('.pdf')
+            );
+            const pageCount =
+                pdfFilesInFolder.length > 0
+                    ? await countPdfPagesFromPaths(pdfFilesInFolder)
+                    : 0;
+            const chargeAmount = mergerChargeAmountKes(pageCount);
+            //const mergedQuestions = await processUploadedFiles(sessionPath);
+            const mergedQuestions = await processPdfsNative(filesInFolder);
+            if (!mergedQuestions || mergedQuestions.uniqueCount === 0) {
                 return res.status(200).json({
                     success: true,
                     stats: {
@@ -126,9 +150,17 @@ mergerRoute.post(
             const safeFolderName = folderName.replace(/[^a-z0-9_-]/gi, '_');
 
             //creates the folder if missing
-            const outputFile = path.join(outputDir, `${safeFolderName}.pdf`);
+            const outputFile = path.join(
+                outputDir,
+                `${safeFolderName}-tidyup-summary.pdf`
+            );
 
-            await generatePDF(mergedQuestions, outputFile, isWorkSheet);
+            await convertHtmlToPdf(
+                mergedQuestions.html,
+                outputFile,
+                isWorkSheet,
+                folderName
+            );
             log.warn('The pdf generator is done');
 
             // Build absolute download URL so frontend (different origin) can access it
@@ -144,6 +176,11 @@ mergerRoute.post(
             res.json({
                 success: true,
                 downloadURL,
+                billing: {
+                    pageCount,
+                    ratePerPageKes: 2.5,
+                    amountKes: chargeAmount,
+                },
             });
         } catch (error) {
             console.error('Merge route error', error);

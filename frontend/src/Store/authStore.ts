@@ -9,6 +9,7 @@ import useSuccessStore from './SuccessStore';
 import useErrorStore from './ErrorStore';
 import handleApiError from '../utils/apiError';
 import type { BackendError, UnknownApiError } from '../types/types';
+import { useProfileStore } from './profileStore';
 //import NotFound from '../components/NotFound';
 const log = createClientLogger('AUTH STORE');
 
@@ -18,8 +19,10 @@ export const useAuthStore = create<AuthState>()(
             user: null,
             isAuthenticated: false,
             accessToken: null,
+            createdAt: null,
             isLoading: true,
             notFound: false,
+
             setNotFound: (state) => set({ notFound: state }),
             _hasHydrated: false,
             setHasHydrated: (state) => set({ _hasHydrated: state }),
@@ -44,8 +47,10 @@ export const useAuthStore = create<AuthState>()(
                     set({
                         user: res.data.user,
                         accessToken: res.data.accessToken,
+                        createdAt: res.data.createdAt,
                         isAuthenticated: true,
                     });
+                    useProfileStore.getState().setProfilePic(res.data.user?.profileImageUrl || null);
                     setApiToken(res.data.accessToken);
                     localStorage.setItem('hasSession', 'true');
                     const currentState = get();
@@ -84,7 +89,9 @@ export const useAuthStore = create<AuthState>()(
                         user: res.data.user,
                         accessToken: res.data.accessToken,
                         isAuthenticated: true,
+                        createdAt: res.data.createdAt,
                     });
+                    useProfileStore.getState().setProfilePic(res.data.user?.profileImageUrl || null);
                     setApiToken(res.data.accessToken);
                     localStorage.setItem('hasSession', 'true');
                     const currentState = get();
@@ -164,7 +171,9 @@ export const useAuthStore = create<AuthState>()(
                         user: res.data.user,
                         accessToken: res.data.accessToken,
                         isAuthenticated: true,
+                        createdAt: res.data.createdAt,
                     });
+                    useProfileStore.getState().setProfilePic(res.data.user?.profileImageUrl || null);
                     const currentState = get();
                     log.debug('Access  token from authstore', {
                         data: currentState.accessToken,
@@ -214,7 +223,33 @@ export const useAuthStore = create<AuthState>()(
                 }
                 setAccessToken(null);
                 setApiToken(null);
-                set({ user: null, accessToken: null, isAuthenticated: false });
+                set({
+                    user: null,
+                    accessToken: null,
+                    isAuthenticated: false,
+                    createdAt: null,
+                });
+                useProfileStore.getState().clearProfilePic();
+            },
+            deleteAccount: async () => {
+                try {
+                    await authApi.post('/auth/delete-account');
+                    setAccessToken(null);
+                    setApiToken(null);
+                    set({
+                        user: null,
+                        accessToken: null,
+                        isAuthenticated: false,
+                        createdAt: null,
+                    });
+                    localStorage.removeItem('hasSession');
+                    localStorage.removeItem('upload-stats');
+                    localStorage.removeItem('auth-storage');
+                } catch (error) {
+                    log.error('Error in deleteAccount', { data: { error } });
+                    const { setError } = useErrorStore.getState();
+                    handleApiError(error, setError);
+                }
             },
         }),
         {
@@ -223,7 +258,7 @@ export const useAuthStore = create<AuthState>()(
             //ONLY PERSIST THESE 2 due to security reasons i removed the accessToken from local storage tho it solved my problem of accessToken persistence
             partialize: (state) => ({
                 user: state.user,
-                //accessToken: state.accessToken,
+                createdAt: state.createdAt,
                 isAuthenticated: state.isAuthenticated,
             }),
             //triggered when local storage is finished loading

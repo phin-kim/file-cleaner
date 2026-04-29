@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
 import { Rocket, ArrowLeft } from 'lucide-react';
 import LoginForm from '../components/Auth/Login';
 import RegisterForm from '../components/Auth/Register';
@@ -9,7 +8,6 @@ import NotFound from '../components/NotFound';
 
 const AuthForm = () => {
     const [isLogin, setIsLogin] = useState(false);
-    const navigate = useNavigate();
     const notFound = useAuthStore((state) => state.notFound);
     const setNotFound = useAuthStore((state) => state.setNotFound);
     if (notFound) {

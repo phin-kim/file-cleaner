@@ -2,12 +2,11 @@ import { Router } from 'express';
 
 import createLogger from '../utils/logger.js';
 import authenticate from '../middleware/authenticate.js';
-import type {
-    AuthenticatedRequest,
-} from '../Types/authenticate.js';
+import type { AuthenticatedRequest } from '../Types/authenticate.js';
 import { UserModel } from '../schema/UsersSchema.js';
 import { TransactionsModel } from '../schema/TransactionSchema.js';
 import AppError from '../utils/appError.js';
+import { isUserDocument } from '../helpers/miniHelpers.js';
 import type { JWTUserPayload } from '../Types/authenticate.js';
 export const subRouter: Router = Router();
 
@@ -38,6 +37,9 @@ subRouter.get('/fetch-profile', authenticate, async (req, res, next) => {
             lastUsageDate: user.lastUsageDate,
             dailyUsageCount: user.dailyUsageCount,
             walletBalance: user.walletBalance ?? 0,
+            profileImageUrl: user.profileImageUrl ?? '',
+            createdAt: user.createdAt,
+            email: user.email,
         });
         //res.status(200).json({ tierId: tierId, dailyUsageCount });
     } catch (error) {
@@ -48,8 +50,22 @@ subRouter.get('/fetch-profile', authenticate, async (req, res, next) => {
 subRouter.patch('/increment-usage', authenticate, async (req, res, next) => {
     try {
         const authReq = req as AuthenticatedRequest;
-        const payload = authReq.user as JWTUserPayload;
-        const user = await UserModel.findOne({ email: payload.email });
+
+        // Replace findOne({ email: ... }) with findById
+        if (!authReq.user) {
+            return next(AppError.unauthorized('Not authenticated'));
+        }
+
+        // TYPE SAFE EXTRACTION:
+        // If it's a Document, use ._id. If it's a Payload, use .uid.
+        const userId = isUserDocument(authReq.user)
+            ? authReq.user._id.toString()
+            : authReq.user.uid;
+
+        // Now you can proceed safely
+        const user = isUserDocument(authReq.user)
+            ? authReq.user
+            : await UserModel.findById(userId);
 
         if (!user) return next(AppError.notFound('User not found'));
         user.dailyUsageCount += 1;
@@ -94,7 +110,8 @@ subRouter.get('/wallet-history', authenticate, async (req, res, next) => {
         const history = txs.map((tx) => {
             const isWalletCredit =
                 tx.paymentKind === 'wallet_topup' ||
-                tx.paymentKind === 'folder_clean';
+                tx.paymentKind === 'folder_clean' ||
+                tx.paymentKind === 'file_merger';
             const isWalletRefund =
                 tx.paymentKind === 'billing' &&
                 typeof tx.reference === 'string' &&
@@ -102,19 +119,15 @@ subRouter.get('/wallet-history', authenticate, async (req, res, next) => {
             const numericAmount = Number(tx.amount || 0);
             return {
                 id: String(tx._id),
-                amount: isWalletCredit || isWalletRefund
-                    ? Math.abs(numericAmount)
-                    : -Math.abs(numericAmount),
-                type: (
-                    isWalletRefund
-                        ? 'refund'
-                        : isWalletCredit
-                          ? 'top-up'
-                          : 'payment'
-                ) as
-                    | 'top-up'
-                    | 'refund'
-                    | 'payment',
+                amount:
+                    isWalletCredit || isWalletRefund
+                        ? Math.abs(numericAmount)
+                        : -Math.abs(numericAmount),
+                type: (isWalletRefund
+                    ? 'refund'
+                    : isWalletCredit
+                      ? 'top-up'
+                      : 'payment') as 'top-up' | 'refund' | 'payment',
                 source:
                     tx.paymentKind === 'wallet_topup'
                         ? 'wallet-topup'
@@ -122,7 +135,11 @@ subRouter.get('/wallet-history', authenticate, async (req, res, next) => {
                             tx.paymentKind === 'billing'
                           ? 'in-app-payment'
                           : 'local',
-                date: (tx.createdAt || tx.updatedAt || new Date()).toISOString(),
+                date: (
+                    tx.createdAt ||
+                    tx.updatedAt ||
+                    new Date()
+                ).toISOString(),
                 reference: tx.reference || null,
                 mpesaReference: tx.mpesaReceipt || null,
                 payheroReference: tx.payheroInternalRef || null,

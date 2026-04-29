@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
     Files,
     Trash2,
@@ -9,14 +9,14 @@ import {
     FileCheck,
     Plus,
     Sparkles,
-    ArrowRight,
+    Play,
 } from 'lucide-react';
 import { useAuthStore } from '../Store/authStore';
-const LandingPage = () => {
-    const navigate = useNavigate();
-    const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
-    const year = new Date().getFullYear();
+const AuthenticatedHome = () => {
+    const navigate = useNavigate();
+    //const year = new Date().getFullYear();
+
     return (
         <div className="min-h-screen bg-slate-50">
             {/* Hero Section */}
@@ -41,16 +41,22 @@ const LandingPage = () => {
                             professionals. Organize files, remove duplicates,
                             and master your documents with precision.
                         </p>
-                        {!isAuthenticated && (
-                            <div className="flex flex-col justify-center gap-4 sm:flex-row">
-                                <button
-                                    onClick={() => navigate('/auth')}
-                                    className="rounded-3xl bg-purple-600 px-10 py-5 font-bold text-white shadow-xl shadow-purple-500/20 transition-all hover:scale-105 hover:bg-purple-700"
-                                >
-                                    Join Now Free
-                                </button>
-                            </div>
-                        )}
+
+                        {/* Action buttons for logged in user */}
+                        <div className="flex flex-col justify-center gap-4 sm:flex-row">
+                            <button
+                                onClick={() => navigate('/folder-cleaner')}
+                                className="rounded-3xl bg-purple-600 px-10 py-5 font-bold text-white shadow-xl shadow-purple-500/20 transition-all hover:scale-105 hover:bg-purple-700"
+                            >
+                                Open Folder Cleaner
+                            </button>
+                            <button
+                                onClick={() => navigate('/file-merger')}
+                                className="rounded-3xl border border-slate-200 bg-white px-10 py-5 font-bold text-slate-700 shadow-sm transition-all hover:scale-105 hover:bg-slate-50"
+                            >
+                                Open File Merger
+                            </button>
+                        </div>
                     </motion.div>
                 </div>
 
@@ -70,7 +76,7 @@ const LandingPage = () => {
                             viewport={{ once: true }}
                             className="space-y-8"
                         >
-                            <div className="flex h-16 w-16 items-center justify-center rounded-[2rem] border border-purple-100 bg-purple-50 text-purple-600 shadow-sm">
+                            <div className="flex h-16 w-16 items-center justify-center rounded-4xl border border-purple-100 bg-purple-50 text-purple-600 shadow-sm">
                                 <FolderTree size={32} />
                             </div>
                             <div>
@@ -125,7 +131,7 @@ const LandingPage = () => {
                             viewport={{ once: true }}
                             className="relative rounded-[3rem] bg-slate-100 p-8"
                         >
-                            <div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-2xl">
+                            <div className="rounded-4xl border border-slate-200 bg-white p-8 shadow-2xl">
                                 <div className="mb-8 flex items-center justify-between border-b border-slate-100 pb-4">
                                     <span className="text-sm font-black tracking-widest text-slate-400 uppercase">
                                         Automation Preview
@@ -140,19 +146,19 @@ const LandingPage = () => {
                                     <div className="flex items-center gap-4 rounded-2xl bg-blue-50 p-4 text-blue-600">
                                         <FileCheck size={20} />
                                         <span className="font-bold">
-                                            Documents Folder Created
+                                            Folder Cleaner Preview
                                         </span>
                                         <span className="ml-auto text-xs font-black uppercase opacity-60">
-                                            PDF, DOCX
+                                            1.5 KES / file
                                         </span>
                                     </div>
                                     <div className="flex items-center gap-4 rounded-2xl bg-purple-50 p-4 text-purple-600">
                                         <Sparkles size={20} />
                                         <span className="font-bold">
-                                            Pictures Folder Created
+                                            File Merger Preview
                                         </span>
                                         <span className="ml-auto text-xs font-black uppercase opacity-60">
-                                            PNG, JPG
+                                            2.5 KES / page
                                         </span>
                                     </div>
                                     <div className="flex items-center gap-4 rounded-2xl bg-red-50 p-4 text-red-600 opacity-50">
@@ -226,7 +232,7 @@ const LandingPage = () => {
                             viewport={{ once: true }}
                             className="space-y-8"
                         >
-                            <div className="flex h-16 w-16 items-center justify-center rounded-[2rem] border border-white/10 bg-white/10 text-purple-400 shadow-sm">
+                            <div className="flex h-16 w-16 items-center justify-center rounded-4xl border border-white/10 bg-white/10 text-purple-400 shadow-sm">
                                 <GraduationCap size={32} />
                             </div>
                             <div>
@@ -272,63 +278,366 @@ const LandingPage = () => {
                                     </div>
                                 </div>
                             </div>
-                            {!isAuthenticated && (
-                                <button
-                                    onClick={() => navigate('/auth')}
-                                    className="inline-flex items-center gap-3 rounded-2xl bg-purple-600 px-8 py-4 font-bold text-white transition-all hover:gap-5 hover:bg-purple-700"
-                                >
-                                    Join Study Program <ArrowRight size={20} />
-                                </button>
-                            )}
                         </motion.div>
                     </div>
                 </div>
-
-                {/* Decorative background shape */}
-                <div className="absolute top-1/2 left-1/2 -z-10 h-[800px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-purple-600/10 blur-[200px]" />
             </section>
 
-            {/* Final CTA */}
-            {!isAuthenticated && (
-                <section className="bg-slate-50 py-32">
-                    <div className="container mx-auto px-6 text-center">
-                        <h2 className="mb-8 text-5xl font-black tracking-tight text-slate-900">
-                            Ready to Tidy Up?
-                        </h2>
-                        <p className="mx-auto mb-12 max-w-xl text-slate-500">
-                            Join thousands of students and developers who use
-                            Tidy Up to master their filesystem.
+            <CommonFooter isAuthenticated={true} />
+        </div>
+    );
+};
+
+const CommonFooter = ({ isAuthenticated }: { isAuthenticated?: boolean }) => (
+    <footer className="mt-auto bg-slate-900 pt-16 pb-12">
+        <div className="container mx-auto px-6">
+            <div className="mb-12 grid grid-cols-2 gap-8 border-b border-white/10 pb-12 md:grid-cols-4">
+                <div className="col-span-2 space-y-6 md:col-span-1">
+                    <div className="flex items-center gap-2 text-xl font-black tracking-tight text-white">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-600 text-white shadow-[0_0_15px_rgba(147,51,234,0.5)]">
+                            T
+                        </div>
+                        Tidy Up
+                    </div>
+                    <p className="max-w-xs text-sm leading-relaxed text-slate-400">
+                        Turn dense chaotic folders into perfectly organized
+                        structures. Merge multiple PDFs into single,
+                        deduplicated master files.
+                    </p>
+                </div>
+
+                <div>
+                    <h4 className="mb-6 text-xs font-bold tracking-widest text-slate-500 uppercase">
+                        Product
+                    </h4>
+                    <ul className="space-y-4 text-sm font-medium">
+                        {!isAuthenticated && (
+                            <li>
+                                <Link
+                                    to="/auth"
+                                    className="text-slate-300 transition-colors hover:text-white"
+                                >
+                                    Start free
+                                </Link>
+                            </li>
+                        )}
+                        {isAuthenticated && (
+                            <>
+                                <li>
+                                    <Link
+                                        to="/folder-cleaner"
+                                        className="text-slate-300 transition-colors hover:text-white"
+                                    >
+                                        Folder Cleaner
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link
+                                        to="/file-merger"
+                                        className="text-slate-300 transition-colors hover:text-white"
+                                    >
+                                        File Merger
+                                    </Link>
+                                </li>
+                            </>
+                        )}
+                        <li>
+                            <Link
+                                to="/how-it-works"
+                                className="text-slate-300 transition-colors hover:text-white"
+                            >
+                                How it works
+                            </Link>
+                        </li>
+                        <li>
+                            <Link
+                                to="/pricing"
+                                className="text-slate-300 transition-colors hover:text-white"
+                            >
+                                Pricing
+                            </Link>
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 className="mb-6 text-xs font-bold tracking-widest text-slate-500 uppercase">
+                        Company
+                    </h4>
+                    <ul className="space-y-4 text-sm font-medium">
+                        <li>
+                            <Link
+                                to="/about"
+                                className="text-purple-400 transition-colors hover:text-purple-300"
+                            >
+                                About
+                            </Link>
+                        </li>
+                        <li>
+                            <Link
+                                to="/contact"
+                                className="text-slate-300 transition-colors hover:text-white"
+                            >
+                                Contact
+                            </Link>
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 className="mb-6 text-xs font-bold tracking-widest text-slate-500 uppercase">
+                        Legal
+                    </h4>
+                    <ul className="space-y-4 text-sm font-medium">
+                        <li>
+                            <Link
+                                to="/privacy"
+                                className="text-slate-300 transition-colors hover:text-white"
+                            >
+                                Privacy
+                            </Link>
+                        </li>
+                        <li>
+                            <Link
+                                to="/terms"
+                                className="text-slate-300 transition-colors hover:text-white"
+                            >
+                                Terms
+                            </Link>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div className="text-center text-xs font-medium text-slate-500">
+                &copy; {new Date().getFullYear()} Tidy Up.
+            </div>
+        </div>
+    </footer>
+);
+
+const UnauthenticatedHome = () => {
+    const navigate = useNavigate();
+
+    return (
+        <div className="flex min-h-screen flex-col bg-slate-50 font-sans text-slate-900 selection:bg-purple-500/30">
+            {/* Nav simulation for unauthenticated users */}
+            <nav className="relative z-20 container mx-auto flex items-center justify-between px-6 py-6">
+                <div className="flex items-center gap-2 text-xl font-black tracking-tight">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-600 text-white shadow-md shadow-purple-500/20">
+                        T
+                    </div>
+                    Tidy Up
+                </div>
+                <div className="hidden items-center gap-8 text-sm font-bold text-slate-600 md:flex">
+                    <Link
+                        to="/"
+                        className="transition-colors hover:text-purple-600"
+                    >
+                        Home
+                    </Link>
+                    <Link
+                        to="/how-it-works"
+                        className="transition-colors hover:text-purple-600"
+                    >
+                        How it works
+                    </Link>
+                    <Link
+                        to="/pricing"
+                        className="transition-colors hover:text-purple-600"
+                    >
+                        Pricing
+                    </Link>
+                </div>
+                <div className="flex items-center gap-4 text-sm font-bold">
+                    <Link
+                        to="/auth"
+                        className="text-slate-600 transition-colors hover:text-purple-600"
+                    >
+                        Sign in
+                    </Link>
+                    <Link
+                        to="/auth"
+                        className="rounded-full bg-purple-600 px-5 py-2.5 text-white shadow-md shadow-purple-500/20 transition-colors hover:bg-purple-700"
+                    >
+                        Get started
+                    </Link>
+                </div>
+            </nav>
+
+            {/* Light Hero Section */}
+            <section className="relative overflow-hidden pt-20 pb-32">
+                <div className="relative z-10 container mx-auto px-6 text-center">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6 }}
+                        className="mx-auto max-w-4xl space-y-8"
+                    >
+                        <div className="inline-flex items-center gap-2 rounded-full border border-purple-200 bg-purple-50 px-4 py-1.5 text-xs font-bold text-purple-600">
+                            <Sparkles size={14} />
+                            <span>Precision workspace tools</span>
+                        </div>
+
+                        <h1 className="text-5xl leading-tight font-black tracking-tighter text-slate-900 md:text-7xl">
+                            Organize your chaotic files.
+                            <br className="hidden md:block" />
+                            <span className="text-purple-600">
+                                Merge your study materials.
+                            </span>
+                        </h1>
+
+                        <p className="mx-auto max-w-2xl text-lg leading-relaxed text-slate-600">
+                            Turn dense, chaotic folders into perfectly organized
+                            structures. Merge multiple PDFs into single,
+                            deduplicated master files. Pay only for what you
+                            process.
                         </p>
 
-                        <div className="flex flex-col justify-center gap-4 sm:flex-row">
+                        <div className="flex flex-col items-center justify-center gap-4 pt-4 sm:flex-row">
                             <button
                                 onClick={() => navigate('/auth')}
-                                className="rounded-[2rem] bg-slate-900 px-12 py-5 font-black text-white transition-all hover:bg-slate-800 active:scale-95"
+                                className="flex w-full items-center justify-center gap-2 rounded-full bg-purple-600 px-8 py-4 text-sm font-black text-white shadow-xl shadow-purple-500/20 transition-transform hover:scale-105 sm:w-auto"
                             >
-                                Create Account
+                                <Play size={16} className="fill-white" />
+                                Start organizing now
+                            </button>
+                            <button
+                                onClick={() => navigate('/how-it-works')}
+                                className="w-full rounded-full border border-slate-200 bg-white px-8 py-4 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50 sm:w-auto"
+                            >
+                                See how it works
+                            </button>
+                        </div>
+                    </motion.div>
+                </div>
+                {/* Floating elements for visual interest */}
+                <div className="absolute top-20 left-10 h-32 w-32 animate-pulse rounded-full bg-purple-200 opacity-30 blur-3xl" />
+                <div className="absolute right-10 bottom-20 h-64 w-64 rounded-full bg-purple-300 opacity-20 blur-[100px]" />
+            </section>
+
+            {/* Value Props */}
+            <section className="relative border-t border-slate-100 bg-white py-24">
+                <div className="container mx-auto px-6">
+                    <div className="mx-auto grid max-w-5xl gap-8 md:grid-cols-2">
+                        {/* Tool 1 */}
+                        <div className="group relative overflow-hidden rounded-3xl border border-slate-100 bg-slate-50 p-8 transition-all hover:border-purple-200 hover:shadow-xl lg:p-10">
+                            <div className="absolute top-0 right-0 p-6 text-purple-600 opacity-5 transition-opacity group-hover:opacity-10">
+                                <FolderTree size={120} />
+                            </div>
+                            <div className="relative z-10">
+                                <div className="mb-6 inline-flex rounded-2xl bg-purple-100 p-4 text-purple-600">
+                                    <FolderTree size={24} />
+                                </div>
+                                <h3 className="mb-4 text-2xl font-black text-slate-900">
+                                    Folder Cleaner
+                                </h3>
+                                <p className="mb-8 leading-relaxed text-slate-600">
+                                    Stop hoarding duplicates. Upload a chaotic
+                                    folder, and we'll analyze, deduplicate, and
+                                    organize your files into logical subfolders
+                                    automatically.
+                                </p>
+                                <ul className="space-y-3">
+                                    {[
+                                        'Identifies identical files',
+                                        'Sorts by file type',
+                                        'Calculates exact cost upfront',
+                                    ].map((feature, i) => (
+                                        <li
+                                            key={i}
+                                            className="flex items-center gap-3 text-sm font-medium text-slate-700"
+                                        >
+                                            <div className="rounded-full bg-purple-100 p-1 text-purple-600">
+                                                <FileCheck size={12} />
+                                            </div>
+                                            {feature}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div>
+
+                        {/* Tool 2 */}
+                        <div className="group relative overflow-hidden rounded-3xl border border-slate-100 bg-slate-50 p-8 transition-all hover:border-indigo-200 hover:shadow-xl lg:p-10">
+                            <div className="absolute top-0 right-0 p-6 text-indigo-600 opacity-5 transition-opacity group-hover:opacity-10">
+                                <Copy size={120} />
+                            </div>
+                            <div className="relative z-10">
+                                <div className="mb-6 inline-flex rounded-2xl bg-indigo-100 p-4 text-indigo-600">
+                                    <Copy size={24} />
+                                </div>
+                                <h3 className="mb-4 text-2xl font-black text-slate-900">
+                                    File Merger
+                                </h3>
+                                <p className="mb-8 leading-relaxed text-slate-600">
+                                    Built for students. Merge past papers into a
+                                    single master PDF. We identify duplicate
+                                    questions across years to save you study
+                                    time.
+                                </p>
+                                <ul className="space-y-3">
+                                    {[
+                                        'Merges multiple PDFs',
+                                        'Deduplicates questions',
+                                        'Billed transparently per page',
+                                    ].map((feature, i) => (
+                                        <li
+                                            key={i}
+                                            className="flex items-center gap-3 text-sm font-medium text-slate-700"
+                                        >
+                                            <div className="rounded-full bg-indigo-100 p-1 text-indigo-600">
+                                                <FileCheck size={12} />
+                                            </div>
+                                            {feature}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Bottom CTA */}
+            <section className="relative py-32">
+                <div className="container mx-auto px-6">
+                    <div className="relative overflow-hidden rounded-[3rem] bg-purple-600 p-12 text-center text-white shadow-2xl shadow-purple-600/20 md:p-20">
+                        <div className="absolute top-1/2 left-1/2 h-full w-full -translate-x-1/2 -translate-y-1/2 bg-[radial-gradient(ellipse_at_center,_rgba(255,255,255,0.2)_0%,_transparent_70%)]"></div>
+
+                        <div className="relative z-10">
+                            <h2 className="mb-6 text-4xl font-black md:text-5xl">
+                                Experience the magic firsthand.
+                            </h2>
+                            <p className="mx-auto mb-10 max-w-xl text-lg text-purple-100">
+                                Join today and get starter credits. Run a folder
+                                or merge PDFs and see exactly how Tidy Up works
+                                before paying a cent.
+                            </p>
+                            <button
+                                onClick={() => navigate('/auth')}
+                                className="rounded-full bg-white px-10 py-4 font-bold text-purple-600 shadow-xl transition-transform hover:scale-105"
+                            >
+                                Get started for free
                             </button>
                         </div>
                     </div>
-                </section>
-            )}
-
-            <footer className="border-t border-slate-200 bg-white py-12">
-                <div className="container mx-auto flex flex-col items-center justify-between gap-6 px-6 md:flex-row">
-                    <div className="flex items-center gap-1.5 opacity-50 grayscale">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 text-white">
-                            <span className="font-black">T</span>
-                        </div>
-                        <span className="leading-none font-black tracking-tight text-slate-900">
-                            idy Up
-                        </span>
-                    </div>
-                    <p className="text-sm font-medium text-slate-400">
-                        &copy; {year} Tidy Up. Built for precision.
-                    </p>
                 </div>
-            </footer>
+            </section>
+
+            <CommonFooter isAuthenticated={false} />
         </div>
     );
+};
+
+const LandingPage = () => {
+    const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+
+    if (isAuthenticated) {
+        return <AuthenticatedHome />;
+    }
+
+    return <UnauthenticatedHome />;
 };
 
 export default LandingPage;

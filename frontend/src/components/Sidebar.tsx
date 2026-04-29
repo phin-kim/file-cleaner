@@ -10,10 +10,12 @@ import {
     ChevronRight,
     LogOut,
     Sparkles,
+    Settings,
+    User,
     BrushCleaning,
     Combine,
 } from 'lucide-react';
-
+import { useProfileStore } from '../Store/profileStore';
 import { useAuthStore } from '../Store/authStore';
 
 const Sidebar = ({
@@ -40,7 +42,7 @@ const Sidebar = ({
 
     const isMobile = windowWidth < 1024;
     const navItems = [
-        { icon: LayoutDashboard, label: 'Home', path: '/' },
+        { icon: LayoutDashboard, label: 'Home', path: '/home' },
         {
             icon: BrushCleaning,
             label: 'Folder Cleaner',
@@ -51,9 +53,16 @@ const Sidebar = ({
         { icon: History, label: 'History', path: '/history' },
     ];
 
-    const bottomItems: any[] = [];
-    const userEmail = currentUser?.email || 'User';
+    const bottomItems = [
+        { icon: User, label: 'Profile', path: '/profile' },
+        { icon: Settings, label: 'Settings', path: '/settings' },
+    ];
 
+    const userEmail = currentUser?.email || 'User';
+    const getInitials = (email: string) => {
+        return email.substring(0, 2).toUpperCase();
+    };
+    const profilePic = useProfileStore((state) => state.profilePic);
     return (
         <>
             {/* Mobile Overlay */}
@@ -180,15 +189,59 @@ const Sidebar = ({
                             );
                         })}
                     </nav>
-
+                    <div className="space-y-2 px-4 py-8">
+                        {bottomItems.map((item) => {
+                            const isActive = location.pathname === item.path;
+                            return (
+                                <button
+                                    key={item.path}
+                                    onClick={() => navigate(item.path)}
+                                    className={`group relative flex w-full items-center gap-4 rounded-2xl p-4 transition-all ${
+                                        isActive
+                                            ? 'bg-purple-50 text-purple-600'
+                                            : 'hover:bg-slate-50 hover:text-slate-900'
+                                    }`}
+                                >
+                                    <item.icon
+                                        size={22}
+                                        className={
+                                            isActive
+                                                ? 'text-purple-600'
+                                                : 'transition-colors group-hover:text-purple-600'
+                                        }
+                                    />
+                                    {!isCollapsed && (
+                                        <motion.span
+                                            initial={{ opacity: 0, x: -10 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            className="text-sm font-bold text-slate-500 group-hover:text-slate-900"
+                                        >
+                                            {item.label}
+                                        </motion.span>
+                                    )}
+                                </button>
+                            );
+                        })}
+                    </div>
                     {/* User Section */}
                     <div className="mt-auto border-t border-slate-100 p-4">
                         <div
                             className={`flex items-center gap-3 overflow-hidden rounded-2xl bg-slate-50 p-3 ${isCollapsed && !isMobile ? 'justify-center' : ''}`}
                         >
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-300 bg-slate-200 text-sm font-black text-slate-900">
-                                {userEmail.substring(0, 2).toUpperCase()}
+                            <div className="group relative">
+                                {profilePic ? (
+                                    <img
+                                        src={profilePic}
+                                        alt="Profile"
+                                        className="h-10 w-10 rounded-full border-2 border-slate-200 object-cover"
+                                    />
+                                ) : (
+                                    <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-slate-200 bg-purple-100 text-sm font-bold text-purple-600">
+                                        {getInitials(userEmail)}
+                                    </div>
+                                )}
                             </div>
+
                             {(!isCollapsed || isMobile) && (
                                 <div className="min-w-0 flex-1 overflow-hidden">
                                     <p className="truncate text-xs font-bold tracking-tight text-slate-900 uppercase">
