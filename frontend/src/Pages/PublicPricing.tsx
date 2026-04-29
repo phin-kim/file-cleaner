@@ -14,7 +14,7 @@ export default function PublicPricing() {
             : MERGER_COST_PER_PAGE_KES;
     const chargeableAmount = units * rate;
     const walletBalance = 60; // Mock balance
-    const afterDeduction = walletBalance - chargeableAmount;
+    //const afterDeduction = walletBalance - chargeableAmount;
 
     return (
         <div className="min-h-screen bg-slate-50 font-sans text-slate-900 selection:bg-purple-500/30">
