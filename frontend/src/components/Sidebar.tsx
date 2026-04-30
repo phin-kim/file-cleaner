@@ -55,7 +55,7 @@ const Sidebar = ({
 
     const bottomItems = [
         { icon: User, label: 'Profile', path: '/profile' },
-        { icon: Settings, label: 'Settings', path: '/settings' },
+        // { icon: Settings, label: 'Settings', path: '/settings' },
     ];
 
     const userEmail = currentUser?.email || 'User';
