@@ -48,7 +48,7 @@ useAuthStore()	Full store hook	✅ Yes (all)	Avoid unless necessary
 useAuthStore.getState()	Store getters	❌ No	Non-React code (interceptors, helpers, outside components)
 */
 function App() {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    //const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const refreshExecuted = useRef(false);
     const setTierId = useTierStore((state) => state.setTierId);
     const isAuthenticated = useAuthStore((state) => state.isAuthenticated);

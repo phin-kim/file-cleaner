@@ -1534,7 +1534,7 @@ export async function refundWalletCharge(
     const user = await UserModel.findByIdAndUpdate(
         userId,
         { $inc: { walletBalance: chargeTx.amount } },
-        { new: true, select: 'walletBalance email' }
+        { returnDocument: 'after', select: 'walletBalance email' }
     );
     const amountNum = Number(chargeTx.amount);
     if (!Number.isFinite(amountNum)) {

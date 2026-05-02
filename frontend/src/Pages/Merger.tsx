@@ -341,7 +341,7 @@ const FolderQuestionAnalyzer = () => {
                                             className="flex w-full items-center justify-center gap-3 rounded-xl bg-linear-to-r from-purple-500 to-indigo-500 py-4 text-lg font-semibold text-white shadow-lg transition-all hover:from-purple-600 hover:to-indigo-600"
                                         >
                                             <Download className="h-6 w-6" />
-                                            Download PDF Report
+                                            Download Merged PDF
                                         </motion.button>
                                         <motion.button
                                             whileHover={{ scale: 1.02 }}

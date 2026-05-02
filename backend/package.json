@@ -13,6 +13,7 @@
         "start": " node  dist/App.js"
     },
     "dependencies": {
+        "@google-cloud/storage": "^7.19.0",
         "@google/genai": "^1.38.0",
         "@huggingface/inference": "^4.13.10",
         "archiver": "^7.0.1",

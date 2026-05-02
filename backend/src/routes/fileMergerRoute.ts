@@ -126,6 +126,19 @@ mergerRoute.post(
                 .readdirSync(sessionPath)
                 .map((file) => path.join(sessionPath, file))
                 .filter((filePath) => fs.statSync(filePath).isFile());
+
+            // Check for invalid file types (Only PDF and DOCX allowed)
+            const invalidFiles = filesInFolder.filter((filePath) => {
+                const ext = path.extname(filePath).toLowerCase();
+                return ext !== '.pdf' && ext !== '.docx';
+            });
+
+            if (invalidFiles.length > 0) {
+                return res.status(400).json({
+                    error: 'Invalid file type. Please upload only PDF or DOCX documents.',
+                });
+            }
+
             const pdfFilesInFolder = filesInFolder.filter((filePath) =>
                 filePath.toLowerCase().endsWith('.pdf')
             );

@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import crypto from 'node:crypto';
-import type { JWTTokenPayload } from '../Types/authenticate.js';
+import type { JWTUserPayload } from '../Types/authenticate.js';
 import createLogger from './logger.js';
 import 'dotenv/config';
 
@@ -13,14 +13,14 @@ const REFRESH_EXPIRES_IN = '14d';
 export const hashToken = (token: string): string => {
     return crypto.createHash('sha256').update(token).digest('hex');
 };
-export const signAccessToken = (payload: JWTTokenPayload) => {
+export const signAccessToken = (payload: JWTUserPayload) => {
     if (!accessSecret) {
         log.error('JWT_ACCESS_SECRET not configured');
         return;
     }
     return jwt.sign(payload, accessSecret, { expiresIn: ACCESS_EXPIRES_IN });
 };
-export const signRefreshToken = (payload: JWTTokenPayload) => {
+export const signRefreshToken = (payload: JWTUserPayload) => {
     if (!refreshSecret) {
         log.error('JWT_REFRESH_TOKEN not configured');
         return;
