@@ -110,7 +110,7 @@ export class GeminiNativePdfProcessor {
         const merged = this.mergeBatchItems(batchResponses);
         return this.buildFinalResponse(merged);
     }
-    private async uploadPdfs(
+    /* private async uploadPdfs(
         pdfPaths: string[]
     ): Promise<GeminiFileResponse[]> {
         log.highlight(
@@ -155,7 +155,7 @@ export class GeminiNativePdfProcessor {
             `Successfully uploaded ${successfulUploads.length}/${pdfPaths.length} files.`
         );
         return successfulUploads;
-    }
+    } */
     //returns the GCS path this is a replacement for uplod pdfs coz Vertex AI cant process files directly like AIstudio
     private async getGcsFileReference(
         pdfPaths: string[]
@@ -388,7 +388,7 @@ HTML RULES:
     /**
      * Build fallback HTML for unparseable responses
      */
-    private buildFallbackHtml(content: string): string {
+    /* private buildFallbackHtml(content: string): string {
         return `<!DOCTYPE html>
         <html><head><meta charset="UTF-8">
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
@@ -397,7 +397,7 @@ HTML RULES:
         body{font-family:Georgia,serif;max-width:900px;margin:40px auto;padding:20px;line-height:1.6;color:#333}
         h1{text-align:center;border-bottom:2px solid #333;padding-bottom:10px}
         </style></head><body><h1>Unique Questions</h1><pre>${content.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre></body></html>`;
-    }
+    } */
 }
 export async function processPdfsNative(
     pdfPaths: string[],
