@@ -1,9 +1,9 @@
 import puppeteer from 'puppeteer';
 import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
-import createLogger from './logger';
+import createLogger from './logger.js';
 //import { executablePath } from 'puppeteer';
-import { appConfig } from '../constants/appConfig';
+import { appConfig } from '../constants/appConfig.js';
 const log = createLogger('htmltoPdf');
 /**
  * Converts HTML content to a styles PDF using puppeteer

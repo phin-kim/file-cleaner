@@ -1,10 +1,9 @@
 import { GoogleGenAI, type Content } from '@google/genai';
-import { readFileSync, existsSync } from 'fs';
-import createLogger from '../utils/logger';
+import createLogger from '../utils/logger.js';
 const log = createLogger('GeminiPdfMerger');
-import type { QuestionExtractionResponse } from '../Types/filer-merger';
-import { appConfig } from '../constants/appConfig';
-import AppError from '../utils/appError';
+import type { QuestionExtractionResponse } from '../Types/filer-merger.js';
+import { appConfig } from '../constants/appConfig.js';
+import AppError from '../utils/appError.js';
 import { Storage } from '@google-cloud/storage';
 import pLimit from 'p-limit';
 interface GeminiFileResponse {
@@ -34,12 +33,17 @@ export class GeminiNativePdfProcessor {
         maxRetries = appConfig.maxRetries,
         retryDelayMs = appConfig.retryDelayMs
     ) {
-        log.debug(`Initializing Gemini processor with Model: ${model}, Project: ${projectId}, Location: ${location}`);
+        log.debug(
+            `Initializing Gemini processor with Model: ${model}, Project: ${projectId}, Location: ${location}`
+        );
 
         if (appConfig.useVertexAi) {
             if (!projectId) {
                 log.error('GOOGLE_CLOUD_PROJECT is missing from environment');
-                throw new AppError('GOOGLE_CLOUD_PROJECT is required for Vertex AI', 500);
+                throw new AppError(
+                    'GOOGLE_CLOUD_PROJECT is required for Vertex AI',
+                    500
+                );
             }
             this.client = new GoogleGenAI({
                 vertexai: true,
@@ -49,7 +53,10 @@ export class GeminiNativePdfProcessor {
         } else {
             if (!appConfig.geminiApiKey) {
                 log.error('GEMINI_API_KEY is missing from environment');
-                throw new AppError('GEMINI_API_KEY is required for Gemini API', 500);
+                throw new AppError(
+                    'GEMINI_API_KEY is required for Gemini API',
+                    500
+                );
             }
             this.client = new GoogleGenAI({
                 apiKey: appConfig.geminiApiKey,
@@ -379,7 +386,10 @@ HTML RULES:
         return itemHtml
             .replace(/<[^>]+>/g, ' ') // Remove HTML tags
             .replace(/&nbsp;/gi, ' ')
-            .replace(/^(?:question|q|part|item)\s*(?:\d+|[a-z]|[ivx]+)[:.)\s-]*/i, '') // Remove "Question 1:", "Q1.", "a)", "(i)" etc.
+            .replace(
+                /^(?:question|q|part|item)\s*(?:\d+|[a-z]|[ivx]+)[:.)\s-]*/i,
+                ''
+            ) // Remove "Question 1:", "Q1.", "a)", "(i)" etc.
             .replace(/^[0-9a-z]{1,2}[:.)\s-]+/i, '') // Remove "1.", "a.", "1)" at the start
             .replace(/\s+/g, ' ') // Normalize whitespace
             .trim()
