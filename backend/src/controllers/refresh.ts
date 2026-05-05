@@ -93,14 +93,14 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
             return next(AppError.unauthorized('Refresh token has expired'));
         }
         //rotate tokens - keep old token until new one is sent to client
-        const payload: JWTUserPayload = {
+        const userPayload: JWTUserPayload = {
             uid: user._id.toString(),
             email: user.email,
             subscriptionStatus: user.tierId as Subscription,
             role: user.role,
             displayName: user.email.split('@')[0],
         };
-        const newRefreshToken = signRefreshToken(payload);
+        const newRefreshToken = signRefreshToken(userPayload);
 
         const newRefreshHashedToken = hashToken(newRefreshToken!);
         //add new token to DB FIRST before removing old one
@@ -134,7 +134,7 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
             maxAge: 30 * 24 * 60 * 60 * 1000,
         });
         //send the new access token
-        const newAccessToken = signAccessToken(payload);
+        const newAccessToken = signAccessToken(userPayload);
         res.status(200).json({
             success: true,
             accessToken: newAccessToken,
