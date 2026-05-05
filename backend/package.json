@@ -9,7 +9,7 @@
         "lint": "eslint .",
         "ignore": "temp/**/*|uploads/**/*|backend/temp/**/*|",
         "dev": "cross-env NODE_ENV=development tsx src/App.ts",
-        "build:backend": "tsc -b ../tsconfig.node.json --force",
+        "build:backend": "tsc",
         "start": " node  dist/App.js"
     },
     "dependencies": {
