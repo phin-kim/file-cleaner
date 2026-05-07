@@ -19,6 +19,11 @@ import errorHandler from './utils/errorHandler.js';
 import { connectDatabases } from './config/DB.js';
 import { paymentRoute } from './routes/paymentRoute.js';
 import { webhook } from './routes/webhookRoute.js';
+import {
+    generalRateLimiter,
+    uploadRateLimiter,
+    paymentRateLimiter,
+} from './middleware/rateLimiters.js';
 
 const log = createLogger('APP.TS');
 const PORT = process.env.PORT;
@@ -32,6 +37,7 @@ app.use(
     cors({
         origin: [
             'http://localhost:5173',
+            'http://localhost:5174',
             'https://tidy-upp.netlify.app',
             'http://localhost:4173',
             'https://unparasitical-unsigned-lasonya.ngrok-free.dev',
@@ -46,12 +52,13 @@ app.use(
 );
 app.use(express.json());
 app.use(cookieParser(cookieSecret));
+app.use('/api', generalRateLimiter);
 app.use('/api', cleanerRoute);
 app.use('/api', subRouter);
-app.use('/api', mergerRoute);
+app.use('/api', uploadRateLimiter, mergerRoute);
 app.use('/api/auth', authRoute);
-app.use('/api/payment', webhook);
-app.use('/api/payment', paymentRoute);
+app.use('/api/payment', paymentRateLimiter, webhook);
+app.use('/api/payment', paymentRateLimiter, paymentRoute);
 app.use('/downloads', express.static(path.join(process.cwd(), 'backend/temp')));
 
 const PROJECT_ROOT = path.resolve(__dirname, '../');
