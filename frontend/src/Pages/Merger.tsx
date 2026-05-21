@@ -8,9 +8,9 @@ import {
     Download,
     Loader2,
     CheckCircle2,
+    AlertTriangle,
     MousePointerClick,
     AlertCircle,
-    AlertTriangle,
     Coins,
 } from 'lucide-react';
 import { useTransactions } from '../Store/TransactionStore';
@@ -60,7 +60,7 @@ const FolderQuestionAnalyzer = () => {
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
-                        className="z-[200] fixed top-4 left-1/2 max-w-lg -translate-x-1/2 px-6"
+                        className="fixed top-4 left-1/2 z-200 max-w-lg -translate-x-1/2 px-6"
                     >
                         <div className="relative flex items-center gap-6 overflow-hidden rounded-3xl border border-amber-500/30 bg-white p-6 shadow-2xl backdrop-blur-xl">
                             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-amber-100 text-amber-600">
@@ -75,7 +75,8 @@ const FolderQuestionAnalyzer = () => {
                                     Processing in Progress
                                 </h3>
                                 <p className="text-sm font-bold text-slate-500">
-                                    {statusMessage || 'Please keep this tab open until finished.'}
+                                    {statusMessage ||
+                                        'Please keep this tab open until finished.'}
                                 </p>
                                 <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
                                     <motion.div
@@ -217,7 +218,7 @@ const FolderQuestionAnalyzer = () => {
                                         onClick={handleFolderSelectClick}
                                         className="group mb-6 inline-flex items-center gap-3 rounded-xl bg-purple-500/20 px-6 py-3 text-purple-300 transition-all hover:bg-purple-500/30 hover:text-purple-200"
                                     >
-                                        <MousePointerClick className="h-5 w-5 transition-transform group-hover:rotate-12" />
+                                        <MousePointerClick className="h-10 w-10 transition-transform group-hover:rotate-12" />
                                         <span className="font-medium">
                                             Click to select a folder
                                         </span>
@@ -340,7 +341,7 @@ const FolderQuestionAnalyzer = () => {
                                             className="flex w-full items-center justify-center gap-3 rounded-xl bg-linear-to-r from-purple-500 to-indigo-500 py-4 text-lg font-semibold text-white shadow-lg transition-all hover:from-purple-600 hover:to-indigo-600"
                                         >
                                             <Download className="h-6 w-6" />
-                                            Download PDF Report
+                                            Download Merged PDF
                                         </motion.button>
                                         <motion.button
                                             whileHover={{ scale: 1.02 }}
@@ -348,7 +349,7 @@ const FolderQuestionAnalyzer = () => {
                                             onClick={handleReset}
                                             className="rounded-xl bg-white/10 px-6 py-4 font-semibold text-white transition-colors hover:bg-white/20"
                                         >
-                                            Clean Another
+                                            Merge Another
                                         </motion.button>
                                     </div>
                                 </motion.div>
@@ -486,8 +487,9 @@ const FolderQuestionAnalyzer = () => {
                         <div className="flex items-center justify-center gap-2 text-sm text-purple-200/80">
                             <AlertCircle className="h-4 w-4" />
                             <span>
-                                Wallet charges are tracked; failed processing is
-                                auto-refunded and logged as refund history.
+                                Please avoid uploading papers with complex
+                                mathematical formulas, as they may not process
+                                correctly.
                             </span>
                         </div>
                     </motion.div>
@@ -512,6 +514,12 @@ const FolderQuestionAnalyzer = () => {
                     Upload folders containing documents, PDFs, or text files for
                     analysis
                 </motion.p>
+                <div className="flex items-center justify-center gap-2 text-sm text-slate-200">
+                    <AlertCircle className="h-4 w-4" />
+                    <span>
+                        Your files are processed securely and never stored
+                    </span>
+                </div>
             </motion.div>
         </div>
     );

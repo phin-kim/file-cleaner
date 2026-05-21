@@ -6,20 +6,17 @@ import multer from 'multer';
 import { fileURLToPath } from 'url';
 
 import { isUserDocument } from '../helpers/miniHelpers.js';
-import { processUploadedFiles } from '../utils/fileMerger.js';
-import generatePDF from '../utils/generatePDF.js';
 import uploadLimiter from '../utils/rateLimiter.js';
 import createLogger from '../utils/logger.js';
 //import { TIER_CONFIG } from '../config/tiers.js';
 import AppError from '../utils/appError.js';
-import { sendEmailAlert } from '../utils/sendEmail.js';
 //import { ConnectionCheckedOutEvent } from 'mongodb';
 import checkDailyLimit from '../middleware/limitCheck.js';
 import { UserModel } from '../schema/UsersSchema.js';
 import type { AuthenticatedRequest } from '../Types/authenticate.js';
 import authenticate from '../middleware/authenticate.js';
 import { processPdfsNative } from '../utils/GeminiPdfMerger.js';
-import { convertHtmlToPdf, saveHtml } from '../utils/html-pdf.js';
+import { convertHtmlToPdf } from '../utils/html-pdf.js';
 import { countPdfPagesFromPaths } from '../utils/pdfPageCounter.js';
 import { mergerChargeAmountKes } from '../constants/mergerPricing.js';
 const __filename = fileURLToPath(import.meta.url);
@@ -129,6 +126,19 @@ mergerRoute.post(
                 .readdirSync(sessionPath)
                 .map((file) => path.join(sessionPath, file))
                 .filter((filePath) => fs.statSync(filePath).isFile());
+
+            // Check for invalid file types (Only PDF and DOCX allowed)
+            const invalidFiles = filesInFolder.filter((filePath) => {
+                const ext = path.extname(filePath).toLowerCase();
+                return ext !== '.pdf' && ext !== '.docx';
+            });
+
+            if (invalidFiles.length > 0) {
+                return res.status(400).json({
+                    error: 'Invalid file type. Please upload only PDF or DOCX documents.',
+                });
+            }
+
             const pdfFilesInFolder = filesInFolder.filter((filePath) =>
                 filePath.toLowerCase().endsWith('.pdf')
             );
@@ -153,7 +163,10 @@ mergerRoute.post(
             const safeFolderName = folderName.replace(/[^a-z0-9_-]/gi, '_');
 
             //creates the folder if missing
-            const outputFile = path.join(outputDir, `${safeFolderName}-tidyup-summary.pdf`);
+            const outputFile = path.join(
+                outputDir,
+                `${safeFolderName}-tidyup-summary.pdf`
+            );
 
             await convertHtmlToPdf(
                 mergedQuestions.html,

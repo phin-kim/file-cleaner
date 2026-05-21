@@ -10,7 +10,9 @@ const MERGER_OUTPUTS = path.join(MERGER_BASE_DIR, 'outputs');
 export const appConfig = {
     /** Google Gemini API Key */
     geminiApiKey: process.env.GEMINI_API_KEY || '',
-
+    location: process.env.GOOGLE_CLOUD_LOCATION || 'global',
+    projectId: process.env.GOOGLE_CLOUD_PROJECT,
+    useVertexAi: process.env.GOOGLE_GENAI_USE_VERTEXAI === 'True' || process.env.GOOGLE_GENAI_USE_VERTEXAI === 'true',
     /** Gemini model to use */
     geminiModel: process.env.GEMINI_MODEL || 'gemini-3-flash-preview',
 

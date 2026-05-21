@@ -5,6 +5,7 @@ import AuthForm from './Pages/Auth';
 import FolderCleanerUI from './Pages/Cleaner';
 import BillingPage from './Pages/Billing';
 import FolderQuestionAnalyzer from './Pages/Merger';
+import { Analytics } from '@vercel/analytics/react';
 import {
     BrowserRouter,
     Routes,
@@ -47,7 +48,7 @@ useAuthStore()	Full store hook	✅ Yes (all)	Avoid unless necessary
 useAuthStore.getState()	Store getters	❌ No	Non-React code (interceptors, helpers, outside components)
 */
 function App() {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    //const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const refreshExecuted = useRef(false);
     const setTierId = useTierStore((state) => state.setTierId);
     const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -95,9 +96,9 @@ function App() {
                     }
                     const profileImageUrl = response.data.profileImageUrl;
                     if (typeof profileImageUrl === 'string') {
-                        useProfileStore.getState().setProfilePic(
-                            profileImageUrl || null
-                        );
+                        useProfileStore
+                            .getState()
+                            .setProfilePic(profileImageUrl || null);
                     }
                     const syncProfile = async () => {
                         const dbUser = response.data;
@@ -137,6 +138,8 @@ function App() {
         <>
             <ErrorToast />
             <SuccessToast />
+            <Analytics />
+
             <BrowserRouter>
                 {/**
                         <Route
@@ -173,10 +176,11 @@ function App() {
                     />
                     <Route path="/privacy" element={<PrivacyPolicy />} />
                     <Route path="/terms" element={<TermsOfService />} />
-                    <Route element={<ProtectedRoutes />}>
-                        <Route element={<AppLayout />}>
-                            <Route path="/home" element={<WelcomeModal />} />
+                    <Route element={<ProtectedRoutes />} />
+                    <Route element={<AppLayout />}>
+                        <Route path="/home" element={<WelcomeModal />} />
 
+                        <Route element={<ProtectedRoutes />}>
                             <Route
                                 path="/folder-cleaner"
                                 element={<FolderCleanerUI />}

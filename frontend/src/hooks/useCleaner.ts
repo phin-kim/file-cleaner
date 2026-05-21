@@ -9,7 +9,7 @@ import useErrorStore from '../Store/ErrorStore';
 import createClientLogger from '../utils/clientLogger';
 import handleApiError from '../utils/apiError';
 import { useTierStore } from '../Store/tierStore';
-import { TIER_CONFIG } from '../library/tier';
+//import { TIER_CONFIG } from '../library/tier';
 //import { AxiosError } from 'axios';
 import { useGeneralStore } from '../Store/generalStore';
 import type { BackendError, UnknownApiError } from '../types/types';
@@ -58,10 +58,7 @@ async function chargeWalletForCleanerUpload(
             amount: number;
             chargeReference: string;
             walletBalance: number;
-        }>(
-            chargeUrl,
-            isMerger ? { pageCount: count } : { fileCount: count }
-        );
+        }>(chargeUrl, isMerger ? { pageCount: count } : { fileCount: count });
         setBalanceFromServer(Number(data.walletBalance ?? 0));
         if (!data.chargeReference) {
             setError('Could not confirm wallet charge reference.');
@@ -118,8 +115,8 @@ export default function useCleaner() {
     const payProcessInFlight = useRef(false);
     const tierId = useTierStore((state) => state.tierId);
     const fileNoCheck = useTransactions((state) => state.fileNoCheck);
-    const CURRENT_LIMIT =
-        TIER_CONFIG[tierId as keyof typeof TIER_CONFIG]?.maxUploads;
+    /*const CURRENT_LIMIT =
+        TIER_CONFIG[tierId as keyof typeof TIER_CONFIG]?.maxUploads;*/
 
     /* ---------- Handlers ---------- */
     const handleDragEnter = (event: React.DragEvent<HTMLDivElement>) => {
@@ -216,7 +213,7 @@ export default function useCleaner() {
         folderName: string,
         path: string,
         uploadLimit: UploadLimitResult,
-        progressInterval: ReturnType<typeof setInterval> | null,
+        progressInterval: ReturnType<typeof setInterval> | undefined,
         chargedWallet: { amount: number; chargeReference: string } | null,
         resumeAwaitingPaymentOnError: boolean,
         clearPendingCleanOnSuccess: boolean
@@ -227,10 +224,10 @@ export default function useCleaner() {
 
         try {
             // Artificial "Scanning" delay to feel more realistic
-            await new Promise(resolve => setTimeout(resolve, 800));
+            await new Promise((resolve) => setTimeout(resolve, 800));
             setStatusMessage('Optimizing for upload...');
             setProgress(3);
-            await new Promise(resolve => setTimeout(resolve, 600));
+            await new Promise((resolve) => setTimeout(resolve, 600));
             const formData = new FormData();
             formData.append('folderName', folderName || 'folder');
             files.forEach((file) => formData.append('files', file, file.name));
@@ -248,7 +245,8 @@ export default function useCleaner() {
             }
 
             // Simulated processing progress after upload reaches 100%
-            let processingInterval: ReturnType<typeof setInterval> | null = null;
+            let processingInterval: ReturnType<typeof setInterval> | null =
+                null;
 
             const parsed = JSON.parse(storage);
             const userId = parsed.state.user.id;
@@ -258,13 +256,16 @@ export default function useCleaner() {
                 {
                     headers: { 'Content-Type': 'multipart/form-data' },
                     onUploadProgress: (progressEvent) => {
-                        const total = progressEvent.total || (files.length * 500000); // fallback 500KB per file
-                        const percent = Math.round((progressEvent.loaded * 100) / total);
-                        
+                        const total =
+                            progressEvent.total || files.length * 500000; // fallback 500KB per file
+                        const percent = Math.round(
+                            (progressEvent.loaded * 100) / total
+                        );
+
                         // Map 0-100% upload to 5-45% progress (Slower upload visual)
-                        const mappedProgress = 5 + (percent * 0.40);
+                        const mappedProgress = 5 + percent * 0.4;
                         setProgress(Math.floor(mappedProgress));
-                        
+
                         if (percent < 100) {
                             setStatusMessage(`Uploading: ${percent}%`);
                         } else {
@@ -272,30 +273,36 @@ export default function useCleaner() {
                             // Start slow processing simulation from 45% to 98%
                             if (!processingInterval) {
                                 processingInterval = setInterval(() => {
-                                    setProgress(prev => {
+                                    setProgress((prev) => {
                                         if (prev >= 98) {
-                                            if (processingInterval) clearInterval(processingInterval);
+                                            if (processingInterval)
+                                                clearInterval(
+                                                    processingInterval
+                                                );
                                             return 98;
                                         }
                                         // Even slower crawl
-                                        const increment = prev > 85 ? 0.05 : 0.2;
+                                        const increment =
+                                            prev > 85 ? 0.05 : 0.2;
                                         return +(prev + increment).toFixed(2);
                                     });
-                                    
+
                                     // Rotate messages
                                     const msgs = [
                                         'Extracting questions...',
                                         'Analyzing document structure...',
                                         'Removing duplicates...',
                                         'Finalizing study worksheet...',
-                                        'Polishing results...'
+                                        'Polishing results...',
                                     ];
-                                    const msgIndex = Math.floor((Date.now() / 3000) % msgs.length);
+                                    const msgIndex = Math.floor(
+                                        (Date.now() / 3000) % msgs.length
+                                    );
                                     setStatusMessage(msgs[msgIndex]);
                                 }, 200);
                             }
                         }
-                    }
+                    },
                 }
             );
             if (processingInterval) clearInterval(processingInterval);
@@ -426,8 +433,7 @@ export default function useCleaner() {
             setStatus('uploading');
             setProgress(0);
             setStatusMessage('Initializing...');
-            const progressInterval = null;
-
+            const progressInterval = null as unknown as number;
             try {
                 try {
                     const prof = await welcomePageApi.get<{
@@ -576,9 +582,8 @@ export default function useCleaner() {
             return;
         }
 
-        const MAX_UPLOADS =
-            TIER_CONFIG[tierId as keyof typeof TIER_CONFIG].maxUploads;
-        log.info(`Confirming the max uploads based on the tier ${MAX_UPLOADS}`);
+        /*const MAX_UPLOADS =
+            TIER_CONFIG[tierId as keyof typeof TIER_CONFIG].maxUploads;*/
 
         try {
             const firstFile = files[0];
@@ -586,11 +591,9 @@ export default function useCleaner() {
             const folderName = firstFile.webkitRelativePath.split('/')[0];
             log.highlight('Folder name', { data: folderName });
             const fileArray = Array.from(files);
-            const uploadLimit = uploadLimiter(fileArray.length);
+            const uploadLimit = uploadLimiter();
             if (!uploadLimit.allowed) {
-                setError(
-                    'Daily limit reached for large files. Resets at midnight.'
-                );
+                setError('Daily limit reached. Resets at midnight.');
                 setStatus('idle');
                 return;
             }
@@ -628,7 +631,7 @@ export default function useCleaner() {
             setStatus('uploading');
             setProgress(0);
             setStatusMessage('Initializing...');
-            const progressInterval = null;
+            const progressInterval = null as unknown as number;
             try {
                 await processFolderUploadPipeline(
                     fileArray,
@@ -664,13 +667,28 @@ export default function useCleaner() {
         };
         const progressInterval = setInterval(() => {
             setProgress((prev) => {
-                if (prev >= 95) return prev;
-                return prev + 3;
+                if (prev >= 96) return prev;
+
+                // Realistic variable logic:
+                // - Fast at the start
+                // - Tiny increments after 80% (simulating server waiting)
+                let increment = 0;
+                if (prev < 30) {
+                    increment = Math.floor(Math.random() * 5) + 2; // Fast (2-7%)
+                } else if (prev < 70) {
+                    increment = Math.floor(Math.random() * 3) + 1; // Medium (1-4%)
+                } else if (prev < 90) {
+                    increment = Math.random() * 1; // Slow (0-1%)
+                } else {
+                    increment = 0.1; // Crawl (waiting for server)
+                }
+
+                return Math.min(prev + increment, 96);
             });
-        }, 100);
+        }, 200); // Increased interval slightly for a smoother feel
 
         try {
-            const startTime = Date.now();
+            //const startTime = Date.now();
             const files: File[] = [];
             let folderName = 'folder';
             const items = event.dataTransfer.items;
@@ -678,7 +696,7 @@ export default function useCleaner() {
 
             if (items.length > 1) {
                 setError(
-                    `${items.length} folders detected. Kindly upload one at a time`
+                    `${items.length} items detected. Kindly upload one at a time`
                 );
                 stopProgressInterval(progressInterval);
                 setStatus('idle');
@@ -704,7 +722,7 @@ export default function useCleaner() {
                                 `[FRONTEND] processing folder ${dirEntry.name}`
                             );
                             const dirFiles = await traverseDirectory(dirEntry);
-                            log.debug(`current limit ${CURRENT_LIMIT}`);
+
                             /*if (dirFiles.length > CURRENT_LIMIT) {
                                 log.debug(
                                     `The limit detected after ${Date.now() - startTime}ms`
@@ -718,17 +736,6 @@ export default function useCleaner() {
                                 setIsDragging(false);
                                 return;
                             }*/
-                            uploadLimit = uploadLimiter(dirFiles.length);
-                            log.debug('Upload limit', { data: uploadLimit });
-                            if (!uploadLimit.allowed) {
-                                setError(
-                                    'Daily limit reached for large files. Resets at midnight.'
-                                );
-                                stopProgressInterval(progressInterval);
-                                setStatus('idle');
-                                setIsDragging(false);
-                                return;
-                            }
 
                             log.info(
                                 `[FRONTEND] ${dirFiles.length} found in folder`

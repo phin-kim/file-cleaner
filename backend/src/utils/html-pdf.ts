@@ -1,9 +1,9 @@
 import puppeteer from 'puppeteer';
 import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
-import createLogger from './logger';
-import { executablePath } from 'puppeteer';
-import { appConfig } from '../constants/appConfig';
+import createLogger from './logger.js';
+//import { executablePath } from 'puppeteer';
+import { appConfig } from '../constants/appConfig.js';
 const log = createLogger('htmltoPdf');
 /**
  * Converts HTML content to a styles PDF using puppeteer
@@ -420,7 +420,7 @@ function ensureProperHtml(
 </body>
 </html>`;
 }
-function injectMathJax(html: string, title: string): string {
+function injectMathJax(html: string, _title: string): string {
     // Insert MathJax script before closing </head>
     const mathJaxScripts = `
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>

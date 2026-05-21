@@ -12,6 +12,8 @@ import handleApiError from '../../utils/apiError';
 import createClientLogger from '../../utils/clientLogger';
 import { FaShieldHalved } from 'react-icons/fa6';
 import { Eye, EyeOff } from 'lucide-react';
+import { useDebounce } from '../../hooks/useDebounce';
+import ButtonLoader from '../ButtonLoader';
 
 interface RegisterFormProps {
     onToggle: () => void;
@@ -19,6 +21,7 @@ interface RegisterFormProps {
 const log = createClientLogger('AuthForm');
 const RegistrationForm = ({ onToggle }: RegisterFormProps) => {
     const [showPassword, setShowPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const { setError } = useErrorStore();
 
@@ -31,7 +34,9 @@ const RegistrationForm = ({ onToggle }: RegisterFormProps) => {
     } = useForm<RegisterInput>({
         resolver: zodResolver(registerSchema),
     });
-    const handleRegister = async (data: RegisterInput) => {
+
+    const performRegister = async (data: RegisterInput) => {
+        setIsLoading(true);
         try {
             const res = await registerUser(data.email, data.password);
             log.info('User details sent to backend from the form', {
@@ -45,7 +50,15 @@ const RegistrationForm = ({ onToggle }: RegisterFormProps) => {
         } catch (error) {
             log.error('Error sending the client info', { data: { error } });
             handleApiError(error, setError);
+        } finally {
+            setIsLoading(false);
         }
+    };
+
+    const debouncedRegister = useDebounce(performRegister, 2000);
+
+    const handleRegister = async (data: RegisterInput) => {
+        debouncedRegister(data);
     };
 
     return (
@@ -113,13 +126,14 @@ const RegistrationForm = ({ onToggle }: RegisterFormProps) => {
 
                 <button
                     type="submit"
-                    disabled={isSubmitting}
-                    className="w-full rounded-2xl bg-purple-600 px-6 py-5 text-lg font-bold text-white shadow-xl shadow-purple-500/30 transition-all hover:scale-[1.01] hover:bg-purple-700 active:scale-[0.99]"
+                    disabled={isSubmitting || isLoading}
+                    className="w-full rounded-2xl bg-purple-600 px-6 py-5 text-lg font-bold text-white shadow-xl shadow-purple-500/30 transition-all hover:scale-[1.01] hover:bg-purple-700 active:scale-[0.99] disabled:opacity-70 disabled:cursor-not-allowed"
                 >
-                    {' '}
-                    <span>
-                        {isSubmitting ? 'Registering ...' : 'Continue '}
-                    </span>
+                    {isLoading || isSubmitting ? (
+                        <ButtonLoader size="md" color="#fff" />
+                    ) : (
+                        <span>Continue</span>
+                    )}
                 </button>
             </form>
 

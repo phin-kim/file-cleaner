@@ -1,5 +1,5 @@
 import { Schema } from 'mongoose';
-import { TidyUpConnection } from '../config/DB';
+import { TidyUpConnection } from '../config/DB.js';
 interface DeletedAccount {
     email: string;
     deletedAt: Date;

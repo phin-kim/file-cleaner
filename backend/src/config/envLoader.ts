@@ -65,6 +65,18 @@ log.debug(
 log.debug(
     `CLOUDINARY_API_SECRET:, ${process.env.CLOUDINARY_API_SECRET ? '✅ Set' : '❌ Missing'}`
 );
+log.debug(
+    `GOOGLE_CLOUD_PROJECT:, ${process.env.GOOGLE_CLOUD_PROJECT ? '✅ Set' : '❌ Missing'}`
+);
+log.debug(
+    `GOOGLE_CLOUD_LOCATION:, ${process.env.GOOGLE_CLOUD_LOCATION ? '✅ Set' : '❌ Missing'}`
+);
+log.debug(
+    `GEMINI_MODEL:, ${process.env.GEMINI_MODEL ? '✅ Set' : '❌ Missing'}`
+);
+log.debug(
+    `GOOGLE_GENAI_USE_VERTEXAI:, ${process.env.GOOGLE_GENAI_USE_VERTEXAI ? '✅ Set' : '❌ Missing'}`
+);
 
 // Export the keys with fallbacks
 export const GEMINI_API_KEY =
@@ -77,9 +89,30 @@ export const FRONTEND_URL = process.env.FRONTEND_URL;
 export const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME;
 export const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY;
 export const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET;
+export const GOOGLE_CLOUD_PROJECT = process.env.GOOGLE_CLOUD_PROJECT;
+export const GOOGLE_CLOUD_LOCATION = process.env.GOOGLE_CLOUD_LOCATION;
+export const GOOGLE_GENAI_USE_VERTEXAI = process.env.GOOGLE_GENAI_USE_VERTEXAI;
+export const GEMINI_MODEL = process.env.GEMINI_MODEL;
+
 // Validate required keys
-if (!GEMINI_API_KEY) {
+/*if (!GEMINI_API_KEY) {
     log.error('❌ GEMINI_API_KEY or GOOGLE_API_KEY is required in .env file');
+    process.exit(1);
+}*/
+if (!GOOGLE_CLOUD_PROJECT) {
+    log.error('❌ GOOGLE_CLOUD_PROJECT is required in .env file');
+    process.exit(1);
+}
+if (!GOOGLE_CLOUD_LOCATION) {
+    log.error('❌GOOGLE_CLOUD_LOCATION is required in .env file');
+    process.exit(1);
+}
+if (!GOOGLE_GENAI_USE_VERTEXAI) {
+    log.error('❌ GOOGLE_GENAI_USE_VERTEXAI is required in .env file');
+    process.exit(1);
+}
+if (!GEMINI_MODEL) {
+    log.error('❌ GEMINI_MODEL is required in .env file');
     process.exit(1);
 }
 if (!BREVO_API_KEY) {

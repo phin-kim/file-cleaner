@@ -7,9 +7,8 @@ import { hashToken, signAccessToken, signRefreshToken } from '../utils/jwt.js';
 import createLogger from '../utils/logger.js';
 import validateAndNormalizeEmail from '../middleware/emailValidator.js';
 import axios from 'axios';
-import { request } from 'node:http';
 import { DeletedAccountModel } from '../schema/DeletedAccountSchema.js';
-import type { AuthenticatedRequest } from '../Types/authenticate.js';
+import type { AuthenticatedRequest, JWTUserPayload, Subscription } from '../Types/authenticate.js';
 import { isUserDocument } from '../helpers/miniHelpers.js';
 import cloudinary from '../utils/cloudinary.js';
 const BREVO_API_KEY = process.env.BREVO_API_KEY;
@@ -39,10 +38,15 @@ export async function register(req: Request, res: Response) {
         email,
         passwordHash,
     });
-    const accessToken = signAccessToken({ uid: user._id.toString() });
-    const refreshToken = signRefreshToken({
+    const payload: JWTUserPayload = {
         uid: user._id.toString(),
-    });
+        email: user.email,
+        subscriptionStatus: user.tierId as Subscription,
+        role: user.role,
+        displayName: user.email.split('@')[0],
+    };
+    const accessToken = signAccessToken(payload);
+    const refreshToken = signRefreshToken(payload);
     const deletedUser = await DeletedAccountModel.findOne({ email });
     if (deletedUser) {
         user.walletBalance = 0;
@@ -125,8 +129,15 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     if (!isMatched) {
         return next(AppError.unauthorized('Wrong password input.'));
     }
-    const accessToken = signAccessToken({ uid: user._id.toString() });
-    const refreshToken = signRefreshToken({ uid: user._id.toString() });
+    const payload: JWTUserPayload = {
+        uid: user._id.toString(),
+        email: user.email,
+        subscriptionStatus: user.tierId as Subscription,
+        role: user.role,
+        displayName: user.email.split('@')[0],
+    };
+    const accessToken = signAccessToken(payload);
+    const refreshToken = signRefreshToken(payload);
 
     const refreshTokenHash = hashToken(refreshToken!);
 
@@ -168,11 +179,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
 }
 const TEMPLATE_ID = 6;
 const ADMIN_TEMPLATE_ID = 5;
-export async function forgotPassword(
-    req: Request,
-    res: Response,
-    next: NextFunction
-) {
+export async function forgotPassword(req: Request, res: Response) {
     const { email } = req.body;
     const user = await UserModel.findOne({ email });
     if (!user) {

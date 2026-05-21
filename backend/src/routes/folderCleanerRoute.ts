@@ -14,7 +14,6 @@ import asyncHandler from '../middleware/asyncHandler.js';
 import uploadLimiter from '../utils/rateLimiter.js';
 //import { TIER_CONFIG } from '../config/tiers.js';
 import { sendEmailAlert } from '../utils/sendEmail.js';
-import type { JWTUserPayload } from '../Types/authenticate.js';
 import { isUserDocument } from '../helpers/miniHelpers.js';
 import {
     organizeByExtension,

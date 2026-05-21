@@ -9,14 +9,13 @@ import {
     FileCheck,
     Plus,
     Sparkles,
-    ArrowRight,
     Play,
 } from 'lucide-react';
 import { useAuthStore } from '../Store/authStore';
 
 const AuthenticatedHome = () => {
     const navigate = useNavigate();
-    const year = new Date().getFullYear();
+    //const year = new Date().getFullYear();
 
     return (
         <div className="min-h-screen bg-slate-50">

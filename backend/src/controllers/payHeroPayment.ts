@@ -23,7 +23,7 @@ import {
 import { UserModel } from '../schema/UsersSchema.js';
 import { cleanerChargeAmountKes } from '../constants/cleanerPricing.js';
 import { mergerChargeAmountKes } from '../constants/mergerPricing.js';
-import { maxFolderFilesForTier } from '../constants/tierUploadLimits.js';
+//import { maxFolderFilesForTier } from '../constants/tierUploadLimits.js';
 
 const log = createLogger('payHeroPayment.ts');
 
@@ -442,23 +442,28 @@ export async function initiateFolderCleanStk(
         return next(AppError.notFound('User not found'));
     }
 
-    const maxFiles = maxFolderFilesForTier(user.tierId);
+    /*const maxFiles = maxFolderFilesForTier(user.tierId);
     if (count > maxFiles) {
         return next(
             AppError.badRequest(
                 `fileCount exceeds plan limit of ${maxFiles} files`
             )
         );
-    }
+    }*/
 
     const expectedAmount = cleanerChargeAmountKes(count);
     if (expectedAmount <= 0) {
         return next(AppError.badRequest('Invalid payment amount'));
     }
+    const amountNum = Number(expectedAmount);
+    if (!Number.isFinite(amountNum)) {
+        return next(AppError.badRequest('amount must be a number'));
+    }
+    const roundedExpectedAmount = Math.ceil(amountNum);
 
     const reference = 'MPESA_' + crypto.randomUUID();
     const payload = {
-        amount: expectedAmount,
+        amount: roundedExpectedAmount,
         customer_name: user.email,
         channel_id: PAYHERO_CHANNEL_ID,
         phone_number: String(phoneNumber).trim(),
@@ -510,7 +515,7 @@ export async function initiateFolderCleanStk(
         try {
             await TransactionsModel.create({
                 userId,
-                amount: expectedAmount,
+                amount: roundedExpectedAmount,
                 email: user.email,
                 status: 'pending',
                 reference,
@@ -542,7 +547,7 @@ export async function initiateFolderCleanStk(
                 reference,
                 /** PayHero’s id when present — same as stored on transaction.payheroInternalRef. */
                 payheroReference: payheroInternalRef ?? null,
-                amount: expectedAmount,
+                amount: roundedExpectedAmount,
                 fileCount: count,
             },
         });
@@ -573,7 +578,7 @@ export async function initiateFolderCleanStk(
         return next(error);
     }
 }
-
+//this is what updates the transaction collection
 export async function pollFolderCleanPaymentStatus(
     req: Request,
     res: Response,
@@ -605,6 +610,7 @@ export async function pollFolderCleanPaymentStatus(
         userId,
         paymentKind: 'folder_clean',
     });
+    log.debug('TX shape', { data: { tx } });
     if (!tx) {
         return next(AppError.notFound('Transaction not found'));
     }
@@ -794,7 +800,7 @@ export async function initiateWalletTopupStk(
     if (!Number.isFinite(amountNum)) {
         return next(AppError.badRequest('amount must be a number'));
     }
-    const rounded = Math.round(amountNum * 100) / 100;
+    const rounded = Math.ceil(amountNum);
     if (rounded < MIN_WALLET_TOPUP_KES) {
         return next(
             AppError.badRequest(
@@ -845,7 +851,7 @@ export async function initiateWalletTopupStk(
         }
 
         const payheroInternalRef = extractPayHeroInitiateTransactionId(body);
-
+        log.debug(`Whats the rounded amount ${rounded}`);
         try {
             await TransactionsModel.create({
                 userId,
@@ -943,12 +949,13 @@ export async function pollWalletTopupPaymentStatus(
     if (!tx) {
         return next(AppError.notFound('Transaction not found'));
     }
+    const rounded = Math.ceil(tx.amount);
 
     if (tx.status === 'success') {
         const user = await UserModel.findById(userId).select('walletBalance');
         return res.json({
             status: 'success' as const,
-            amount: tx.amount,
+            amount: rounded,
             walletBalance: user?.walletBalance ?? 0,
         });
     }
@@ -1122,7 +1129,9 @@ export async function initiateFileMergerStk(
     }
     const count = Number(pageCount);
     if (!Number.isFinite(count) || count < 1) {
-        return next(AppError.badRequest('pageCount must be a positive integer'));
+        return next(
+            AppError.badRequest('pageCount must be a positive integer')
+        );
     }
 
     const user = await UserModel.findById(userId).select('email');
@@ -1190,7 +1199,9 @@ export async function initiateFileMergerStk(
                     error.response.data?.data?.message ||
                     error.response.data?.message ||
                     error.response.statusText;
-                return next(AppError.badRequest(msg || 'PayHero request failed'));
+                return next(
+                    AppError.badRequest(msg || 'PayHero request failed')
+                );
             }
             if (error.request) {
                 return next(
@@ -1356,10 +1367,11 @@ export async function chargeWalletForFolderCleaner(
     }
 
     const amount = cleanerChargeAmountKes(count);
+    const chargingAmount = Math.ceil(amount);
     if (amount <= 0) {
         return next(AppError.badRequest('Invalid charge amount'));
     }
-
+    log.debug(`This is the charging amount ${chargingAmount}`);
     const userAfterDebit = await UserModel.findOneAndUpdate(
         { _id: userId, walletBalance: { $gte: amount } },
         { $inc: { walletBalance: -amount } },
@@ -1374,10 +1386,16 @@ export async function chargeWalletForFolderCleaner(
     }
 
     const chargeReference = `WALLET_CHARGE_${crypto.randomUUID()}`;
+    const amountNum = Number(amount);
+    if (!Number.isFinite(amountNum)) {
+        return next(AppError.badRequest('amount must be a number'));
+    }
+    const rounded = Math.ceil(amountNum);
+    log.debug(`Whats the rounded amount ${rounded}`);
     try {
         await TransactionsModel.create({
             userId,
-            amount,
+            amount: rounded,
             email: userAfterDebit.email,
             status: 'success',
             reference: chargeReference,
@@ -1397,7 +1415,7 @@ export async function chargeWalletForFolderCleaner(
     return res.status(200).json({
         status: 'success',
         walletBalance: userAfterDebit.walletBalance ?? 0,
-        amount,
+        amount: chargingAmount,
         chargeReference,
     });
 }
@@ -1417,7 +1435,9 @@ export async function chargeWalletForFileMerger(
     const { pageCount } = req.body as { pageCount?: number };
     const count = Number(pageCount);
     if (!Number.isFinite(count) || count < 1) {
-        return next(AppError.badRequest('pageCount must be a positive integer'));
+        return next(
+            AppError.badRequest('pageCount must be a positive integer')
+        );
     }
 
     const amount = mergerChargeAmountKes(count);
@@ -1514,12 +1534,16 @@ export async function refundWalletCharge(
     const user = await UserModel.findByIdAndUpdate(
         userId,
         { $inc: { walletBalance: chargeTx.amount } },
-        { new: true, select: 'walletBalance email' }
+        { returnDocument: 'after', select: 'walletBalance email' }
     );
-
+    const amountNum = Number(chargeTx.amount);
+    if (!Number.isFinite(amountNum)) {
+        return next(AppError.badRequest('amount must be a number'));
+    }
+    const rounded = Math.ceil(amountNum);
     await TransactionsModel.create({
         userId,
-        amount: chargeTx.amount,
+        amount: rounded,
         email: user?.email ?? chargeTx.email,
         status: 'success',
         reference: refundReference,

@@ -12,14 +12,15 @@ import { deleteAccount } from '../controllers/deleteController.js';
 import { logout } from '../controllers/logoutController.js';
 import authenticate from '../middleware/authenticate.js';
 import { refresh } from '../controllers/refresh.js';
+import authRateLimiter from '../middleware/authRateLimiter.js';
 import multer from 'multer';
 export const authRoute: Router = Router();
 const profileUpload = multer({
     storage: multer.memoryStorage(),
     limits: { fileSize: 5 * 1024 * 1024 },
 });
-authRoute.post('/register', asyncHandler(register));
-authRoute.post('/login', asyncHandler(login));
+authRoute.post('/register', authRateLimiter, asyncHandler(register));
+authRoute.post('/login', authRateLimiter, asyncHandler(login));
 authRoute.patch('/reset-password/:token', asyncHandler(resetPassword));
 authRoute.post('/forgot-password', asyncHandler(forgotPassword));
 authRoute.post('/refresh', refresh);

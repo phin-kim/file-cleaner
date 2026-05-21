@@ -1,16 +1,21 @@
 import { GoogleGenAI, type Content } from '@google/genai';
-import { readFileSync, existsSync } from 'fs';
-import createLogger from '../utils/logger';
+import createLogger from '../utils/logger.js';
 const log = createLogger('GeminiPdfMerger');
-import type { QuestionExtractionResponse } from '../Types/filer-merger';
-import { appConfig } from '../constants/appConfig';
-import AppError from '../utils/appError';
+import type { QuestionExtractionResponse } from '../Types/filer-merger.js';
+import { appConfig } from '../constants/appConfig.js';
+import AppError from '../utils/appError.js';
+import { Storage } from '@google-cloud/storage';
 import pLimit from 'p-limit';
 interface GeminiFileResponse {
     name: string;
     mimeType: string;
     uri: string;
 }
+const storage = new Storage({
+    projectId: appConfig.projectId,
+});
+const BUCKET_NAME = 'tidy-up-exam-files';
+
 /**
  * native pdf processor using Gemini's built-in document vision capabilities
  * This approach uploads PDFs directly to Gemini and leverages its visual understanding
@@ -22,12 +27,42 @@ export class GeminiNativePdfProcessor {
     private maxRetries: number;
     private retryDelayMs: number;
     constructor(
-        apiKey = appConfig.geminiApiKey,
-        model = appConfig.geminiModel,
+        location = appConfig.location || 'us-central1',
+        projectId = appConfig.projectId,
+        model = appConfig.geminiModel || 'gemini-1.5-flash',
         maxRetries = appConfig.maxRetries,
         retryDelayMs = appConfig.retryDelayMs
     ) {
-        this.client = new GoogleGenAI({ apiKey });
+        log.debug(
+            `Initializing Gemini processor with Model: ${model}, Project: ${projectId}, Location: ${location}`
+        );
+
+        if (appConfig.useVertexAi) {
+            if (!projectId) {
+                log.error('GOOGLE_CLOUD_PROJECT is missing from environment');
+                throw new AppError(
+                    'GOOGLE_CLOUD_PROJECT is required for Vertex AI',
+                    500
+                );
+            }
+            this.client = new GoogleGenAI({
+                vertexai: true,
+                location: location,
+                project: projectId,
+            });
+        } else {
+            if (!appConfig.geminiApiKey) {
+                log.error('GEMINI_API_KEY is missing from environment');
+                throw new AppError(
+                    'GEMINI_API_KEY is required for Gemini API',
+                    500
+                );
+            }
+            this.client = new GoogleGenAI({
+                apiKey: appConfig.geminiApiKey,
+            });
+        }
+
         this.model = model;
         this.maxRetries = maxRetries;
         this.retryDelayMs = retryDelayMs;
@@ -36,10 +71,10 @@ export class GeminiNativePdfProcessor {
         log.highlight('Using native pdf vision approach');
         log.info('Uploading PDFs to gemini api...');
         //upload pdfs using files api
-        const uploadedFiles = await this.uploadPdfs(pdfPaths);
-        log.info(`Uploaded ${uploadedFiles.length} PDF(s)`);
+        const uploadedFiles = await this.getGcsFileReference(pdfPaths);
+        log.info(`Ready to process ${uploadedFiles.length} GCS reference(s)`);
         log.info('Sending to Gemini for visual analysis and deduplication...');
-        const BATCH_SIZE = 5;
+        const BATCH_SIZE = 10;
         const limit = pLimit(2);
         const fileChunks: GeminiFileResponse[][] = [];
         for (let i = 0; i < uploadedFiles.length; i += BATCH_SIZE) {
@@ -82,7 +117,7 @@ export class GeminiNativePdfProcessor {
         const merged = this.mergeBatchItems(batchResponses);
         return this.buildFinalResponse(merged);
     }
-    private async uploadPdfs(
+    /* private async uploadPdfs(
         pdfPaths: string[]
     ): Promise<GeminiFileResponse[]> {
         log.highlight(
@@ -95,10 +130,16 @@ export class GeminiNativePdfProcessor {
                 try {
                     log.info(`Uploading :${path.split('\\').pop()}`);
                     const fileData = readFileSync(path);
+                    const ext = path.toLowerCase().split('.').pop();
+                    const mimeType =
+                        ext === 'docx'
+                            ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                            : 'application/pdf';
+
                     const uploadResult = (await this.client.files.upload({
                         file: new Blob([fileData]),
                         config: {
-                            mimeType: 'application/pdf',
+                            mimeType,
                         },
                     })) as GeminiFileResponse;
                     // files.push(uploadResult);
@@ -121,6 +162,42 @@ export class GeminiNativePdfProcessor {
             `Successfully uploaded ${successfulUploads.length}/${pdfPaths.length} files.`
         );
         return successfulUploads;
+    } */
+    //returns the GCS path this is a replacement for uplod pdfs coz Vertex AI cant process files directly like AIstudio
+    private async getGcsFileReference(
+        pdfPaths: string[]
+    ): Promise<GeminiFileResponse[]> {
+        log.highlight(
+            `Syncing ${pdfPaths.length} local files to Google Cloud Storage...`
+        );
+
+        const bucket = storage.bucket(BUCKET_NAME);
+
+        const uploadTasks = pdfPaths.map(async (localPath) => {
+            const fileName = localPath.split(/[\\/]/).pop() || '';
+
+            // Upload the local file to GCS
+            await bucket.upload(localPath, {
+                destination: fileName,
+            });
+
+            log.info(`Synced to GCS: ${fileName}`);
+
+            const ext = fileName.toLowerCase().split('.').pop();
+            const mimeType =
+                ext === 'docx'
+                    ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                    : 'application/pdf';
+
+            return {
+                uri: `gs://${BUCKET_NAME}/${fileName}`,
+                mimeType,
+                name: fileName,
+            };
+        });
+
+        const fileReferences = await Promise.all(uploadTasks);
+        return fileReferences as unknown as GeminiFileResponse[];
     }
     /**
      * build the extraction prompt for native pdf processing
@@ -132,12 +209,10 @@ Attached files (${fileNames.length}): ${fileNames.join(', ')}.
 STRICT GROUNDING & ACADEMIC RULES:
 - Read all the documents thoroughly. Extract the questions exactly as they appear in the source.
 - Group related sub-questions (e.g., a, b, c) under their main question.
-- DO NOT repeat the main question header (like "QUESTION ONE") for every sub-question.
-- DO NOT add any prefixes like ".." or "-" to the start of the <li> tags.
-- Strip away redundant document headers like "QUESTION 1" or "Question 2" from the start of the <li>. The HTML list will provide its own numbers.
-- Merge exact duplicates only.
+- Merge exact duplicates and near-duplicates. If two questions are semantically the same but worded slightly differently, keep ONLY ONE.
+- Normalize the start of each extracted question: Strip away ALL leading numbering, bullets, or headers like "QUESTION 1", "Q1.", "(i)", etc. The output HTML should start directly with the question text.
 - Retain marks allocation (e.g., [4 marks]) neatly.
-- Do not include document preambles, explanations, or code fences.
+- Do not include document preambles, explanations, instructions, or code fences.
 - Use ONLY information found in the attached files.
 
 OUTPUT FORMAT (JSON ONLY):
@@ -171,6 +246,9 @@ HTML RULES:
                     config: {
                         temperature: 0.1,
                         topP: 0.95,
+                        thinkingConfig: {
+                            includeThoughts: false,
+                        },
                         maxOutputTokens: 16384,
                     },
                 });
@@ -306,16 +384,21 @@ HTML RULES:
     }
     private fingerprintItem(itemHtml: string): string {
         return itemHtml
-            .replace(/<[^>]+>/g, ' ')
+            .replace(/<[^>]+>/g, ' ') // Remove HTML tags
             .replace(/&nbsp;/gi, ' ')
-            .replace(/\s+/g, ' ')
+            .replace(
+                /^(?:question|q|part|item)\s*(?:\d+|[a-z]|[ivx]+)[:.)\s-]*/i,
+                ''
+            ) // Remove "Question 1:", "Q1.", "a)", "(i)" etc.
+            .replace(/^[0-9a-z]{1,2}[:.)\s-]+/i, '') // Remove "1.", "a.", "1)" at the start
+            .replace(/\s+/g, ' ') // Normalize whitespace
             .trim()
             .toLowerCase();
     }
     /**
      * Build fallback HTML for unparseable responses
      */
-    private buildFallbackHtml(content: string): string {
+    /* private buildFallbackHtml(content: string): string {
         return `<!DOCTYPE html>
         <html><head><meta charset="UTF-8">
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
@@ -324,14 +407,15 @@ HTML RULES:
         body{font-family:Georgia,serif;max-width:900px;margin:40px auto;padding:20px;line-height:1.6;color:#333}
         h1{text-align:center;border-bottom:2px solid #333;padding-bottom:10px}
         </style></head><body><h1>Unique Questions</h1><pre>${content.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre></body></html>`;
-    }
+    } */
 }
 export async function processPdfsNative(
     pdfPaths: string[],
     model = appConfig.geminiModel
 ): Promise<QuestionExtractionResponse> {
     const processor = new GeminiNativePdfProcessor(
-        appConfig.geminiApiKey,
+        appConfig.location,
+        appConfig.projectId,
         model
     );
     return processor.processPdfs(pdfPaths);

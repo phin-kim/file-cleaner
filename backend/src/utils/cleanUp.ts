@@ -81,7 +81,7 @@ export async function cleanupByAge(
                                 }
                             }
                             //update the directory modification time to now since we cleaned it
-                            await fs.utimes(fullPath, new Date(), new Date());
+                            //await fs.utimes(fullPath, new Date(), new Date());
 
                             //recursively delete contents first
                             log.info(
@@ -248,4 +248,18 @@ export async function cleanupOrphanedFiles(
         }
     }
     await scan(baseDir);
+}
+export async function cleanupEmbeddings(dir: string): Promise<void> {
+    try {
+        await fs.access(dir);
+        //overwrite with an empty array
+        await fs.writeFile(dir, JSON.stringify([], null, 2), 'utf-8');
+        log.warn('Embeddings cache cleared successfully ');
+    } catch (error) {
+        if (error instanceof Error) {
+            log.error(`Error clearing cache: ${error.message}`);
+        } else {
+            log.error('An unknown error occurred while clearing the cache.');
+        }
+    }
 }

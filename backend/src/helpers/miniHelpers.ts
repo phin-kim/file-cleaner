@@ -1,19 +1,18 @@
-const MAX_CACHE_ENTRIES = 10000;
-import { embeddingCache } from '../utils/fileMerger.js';
-import createLogger from '../utils/logger.js';
-import { saveEmbeddingsCache } from '../utils/fileMerger.js';
+// const MAX_CACHE_ENTRIES = 10000;
+//import { embeddingCache } from '../utils/fileMerger.js';
+//import { saveEmbeddingsCache } from '../utils/fileMerger.js';
 
 import type { JWTUserPayload, UserDocument } from '../Types/authenticate.js';
 //import type { Request } from 'express';
 
-const log = createLogger('Mini Helpers');
+// const log = createLogger('Mini Helpers');
 export function normalizeQuestions(question: string) {
     return question.toLocaleLowerCase().replace(/\s+/g, ' ').trim();
 }
 export function sleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
-export function trimEmbeddingsCache() {
+/*export function trimEmbeddingsCache() {
     if (Object.keys(embeddingCache).length > MAX_CACHE_ENTRIES) {
         const entries = Object.entries(embeddingCache);
         const toRemove = entries.slice(0, entries.length - MAX_CACHE_ENTRIES);

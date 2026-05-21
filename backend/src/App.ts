@@ -6,7 +6,12 @@ import './config/envLoader.js';
 import cookieParser from 'cookie-parser';
 import { cleanerRoute } from './routes/folderCleanerRoute.js';
 import { subRouter } from './routes/subscription.js';
-import { startPeriodicCleanup, cleanupOrphanedFiles } from './utils/cleanUp.js';
+import {
+    startPeriodicCleanup,
+    cleanupOrphanedFiles,
+    cleanupEmbeddings,
+} from './utils/cleanUp.js';
+import fs from 'fs-extra';
 import { mergerRoute } from './routes/fileMergerRoute.js';
 import createLogger from './utils/logger.js';
 import { authRoute } from './routes/auth.js';
@@ -14,6 +19,11 @@ import errorHandler from './utils/errorHandler.js';
 import { connectDatabases } from './config/DB.js';
 import { paymentRoute } from './routes/paymentRoute.js';
 import { webhook } from './routes/webhookRoute.js';
+import {
+    generalRateLimiter,
+    uploadRateLimiter,
+    paymentRateLimiter,
+} from './middleware/rateLimiters.js';
 
 const log = createLogger('APP.TS');
 const PORT = process.env.PORT;
@@ -27,10 +37,13 @@ app.use(
     cors({
         origin: [
             'http://localhost:5173',
+            'http://localhost:5174',
             'https://tidy-upp.netlify.app',
             'http://localhost:4173',
             'https://unparasitical-unsigned-lasonya.ngrok-free.dev',
             'https://tidyupp.site',
+            'https://file-cleaner-git-main-phin-kims-projects.vercel.app/',
+            'https://file-cleaner-75ltxmcpm-phin-kims-projects.vercel.app/',
             'https://literalistically-paleobiologic-leatrice.ngrok-free.dev',
         ],
         credentials: true,
@@ -39,15 +52,17 @@ app.use(
 );
 app.use(express.json());
 app.use(cookieParser(cookieSecret));
+app.use('/api', generalRateLimiter);
 app.use('/api', cleanerRoute);
 app.use('/api', subRouter);
-app.use('/api', mergerRoute);
+app.use('/api', uploadRateLimiter, mergerRoute);
 app.use('/api/auth', authRoute);
-app.use('/api/payment', webhook);
-app.use('/api/payment', paymentRoute);
+app.use('/api/payment', paymentRateLimiter, webhook);
+app.use('/api/payment', paymentRateLimiter, paymentRoute);
 app.use('/downloads', express.static(path.join(process.cwd(), 'backend/temp')));
 
 const PROJECT_ROOT = path.resolve(__dirname, '../');
+const EMBEDDINGS_FILE = path.join(PROJECT_ROOT, 'embeddings-cache.json');
 const MERGER_BASE_DIR = path.join(PROJECT_ROOT, 'output/file-merger-temps');
 const CLEANER_BASE_DIR = path.join(PROJECT_ROOT, 'output/folder-cleaner-temps');
 
@@ -70,7 +85,10 @@ const CLEAN_UP_DIRS = [
     FOLDER_STORAGE_TEMPS,
     FOLDER_UPLOADS,
 ];
-
+const pathExists = await fs.pathExists(EMBEDDINGS_FILE);
+if (pathExists) {
+    cleanupEmbeddings(EMBEDDINGS_FILE);
+}
 // ───── startup cleanup ─────1
 log.highlight('CLEANUP STARTING', { context: 'Cleanup' });
 startPeriodicCleanup(CLEAN_UP_DIRS);

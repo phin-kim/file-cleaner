@@ -3,10 +3,10 @@ import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     ArrowUp,
-    Gift,
+    //Gift,
     X,
-    CreditCard,
-    ChevronRight,
+    //CreditCard,
+    //ChevronRight,
     Loader2,
 } from 'lucide-react';
 import authApi from '../library/authApi';
@@ -17,24 +17,21 @@ import { useWalletStore } from '../Store/walletStore';
 const WalletWidget = () => {
     const { balance, currency, setBalanceFromServer } = useWalletStore();
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [amount, setAmount] = useState('500');
+    const [amount, setAmount] = useState('');
     const [mpesaPhone, setMpesaPhone] = useState('');
     const [loading, setLoading] = useState(false);
     const [inlineError, setInlineError] = useState<string | null>(null);
 
-    const mpesaDigitsOk = mpesaPhone.replace(/\D/g, '').length >= 9;
+    const mpesaDigitsOk = mpesaPhone.replace(/\D/g, '').length >= 10;
 
     useEffect(() => {
         let mounted = true;
         const syncBalance = async () => {
             try {
-                const prof = await welcomePageApi.get<{ walletBalance?: number }>(
-                    '/fetch-profile'
-                );
-                if (
-                    mounted &&
-                    typeof prof.data?.walletBalance === 'number'
-                ) {
+                const prof = await welcomePageApi.get<{
+                    walletBalance?: number;
+                }>('/fetch-profile');
+                if (mounted && typeof prof.data?.walletBalance === 'number') {
                     setBalanceFromServer(prof.data.walletBalance);
                 }
             } catch {
@@ -78,8 +75,7 @@ const WalletWidget = () => {
                 );
             }
 
-            const { walletBalance } =
-                await pollWalletTopupPayment(reference);
+            const { walletBalance } = await pollWalletTopupPayment(reference);
             setBalanceFromServer(walletBalance);
             setIsModalOpen(false);
             setMpesaPhone('');
@@ -133,12 +129,6 @@ const WalletWidget = () => {
                     className="flex h-14 flex-1 items-center justify-center gap-2 rounded-2xl bg-purple-600 font-bold text-white shadow-lg shadow-purple-500/20 transition-all hover:bg-purple-700 active:scale-[0.98]"
                 >
                     Top up <ArrowUp size={18} />
-                </button>
-                <button
-                    type="button"
-                    className="flex h-14 w-14 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 text-slate-400 transition-all hover:bg-slate-100 active:scale-[0.98]"
-                >
-                    <Gift size={20} />
                 </button>
             </div>
 
@@ -208,14 +198,12 @@ const WalletWidget = () => {
                                         Quick select
                                     </p>
                                     <div className="grid grid-cols-3 gap-2">
-                                        {['100', '500', '1000'].map((val) => (
+                                        {['10', '50', '100'].map((val) => (
                                             <button
                                                 key={val}
                                                 type="button"
                                                 disabled={loading}
-                                                onClick={() =>
-                                                    setAmount(val)
-                                                }
+                                                onClick={() => setAmount(val)}
                                                 className={`rounded-xl border py-3 text-sm font-bold transition-all disabled:opacity-50 ${
                                                     amount === val
                                                         ? 'border-purple-600 bg-purple-600 text-white shadow-md'
@@ -228,7 +216,7 @@ const WalletWidget = () => {
                                     </div>
                                 </div>
 
-                                <div className="flex items-center gap-4 rounded-2xl bg-slate-50 p-4">
+                                {/*<div className="flex items-center gap-4 rounded-2xl bg-slate-50 p-4">
                                     <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white">
                                         <CreditCard
                                             size={18}
@@ -247,18 +235,20 @@ const WalletWidget = () => {
                                         size={16}
                                         className="text-slate-300"
                                     />
-                                </div>
+                                </div>*/}
 
                                 <p className="text-xs leading-relaxed text-slate-500">
-                                    After you tap <strong>Confirm top up</strong>,
-                                    an M-Pesa prompt appears on your phone —
-                                    enter your{' '}
-                                    <strong>M-Pesa PIN on the phone keypad</strong>{' '}
+                                    After you tap{' '}
+                                    <strong>Confirm top up</strong>, an M-Pesa
+                                    prompt appears on your phone — enter your{' '}
+                                    <strong>
+                                        M-Pesa PIN on the phone keypad
+                                    </strong>{' '}
                                     (Safaricom never asks for your PIN inside
                                     this website). When payment succeeds, your
-                                    wallet balance matches the server and you can
-                                    use Pay &amp; Process from wallet when you
-                                    have enough balance.
+                                    wallet balance matches the server and you
+                                    can use Pay &amp; Process from wallet when
+                                    you have enough balance.
                                 </p>
 
                                 {inlineError && (
@@ -284,7 +274,9 @@ const WalletWidget = () => {
                                             size={20}
                                         />
                                     )}
-                                    {loading ? 'Waiting for M-Pesa…' : 'Confirm top up'}
+                                    {loading
+                                        ? 'Waiting for M-Pesa…'
+                                        : 'Confirm top up'}
                                 </button>
                             </div>
                         </motion.div>

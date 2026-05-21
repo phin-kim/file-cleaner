@@ -13,6 +13,8 @@ import useErrorStore from '../../Store/ErrorStore';
 import handleApiError from '../../utils/apiError';
 import createClientLogger from '../../utils/clientLogger';
 import { useNavigate } from 'react-router-dom';
+import { useDebounce } from '../../hooks/useDebounce';
+import ButtonLoader from '../ButtonLoader';
 
 const log = createClientLogger('LoginForm');
 
@@ -22,6 +24,7 @@ interface LoginFormProps {
 
 const LoginForm = ({ onToggle }: LoginFormProps) => {
     const [showPassword, setShowPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const { setError } = useErrorStore();
     const navigate = useNavigate();
     const loginUser = useAuthStore((state) => state.login);
@@ -34,16 +37,24 @@ const LoginForm = ({ onToggle }: LoginFormProps) => {
         resolver: zodResolver(registerSchema),
     });
 
-    const onSubmit = async (data: RegisterInput) => {
+    const performLogin = async (data: RegisterInput) => {
+        setIsLoading(true);
         try {
             const res = await loginUser(data.email, data.password);
             log.info('Login successful', { data: res });
             navigate('/home');
         } catch (error) {
             log.error('Login error', { data: { error } });
-
-            //handleApiError(error, setError);
+            handleApiError(error, setError);
+        } finally {
+            setIsLoading(false);
         }
+    };
+
+    const debouncedLogin = useDebounce(performLogin, 2000);
+
+    const onSubmit = async (data: RegisterInput) => {
+        debouncedLogin(data);
     };
 
     return (
@@ -119,10 +130,14 @@ const LoginForm = ({ onToggle }: LoginFormProps) => {
 
                 <button
                     type="submit"
-                    disabled={isSubmitting}
-                    className="w-full rounded-2xl bg-purple-600 px-6 py-5 text-lg font-bold text-white shadow-xl shadow-purple-500/30 transition-all hover:scale-[1.01] hover:bg-purple-700 active:scale-[0.99] disabled:opacity-70"
+                    disabled={isSubmitting || isLoading}
+                    className="w-full rounded-2xl bg-purple-600 px-6 py-5 text-lg font-bold text-white shadow-xl shadow-purple-500/30 transition-all hover:scale-[1.01] hover:bg-purple-700 active:scale-[0.99] disabled:opacity-70 disabled:cursor-not-allowed"
                 >
-                    <span>{isSubmitting ? 'Signing in...' : 'Sign In'}</span>
+                    {isLoading || isSubmitting ? (
+                        <ButtonLoader size="md" color="#fff" />
+                    ) : (
+                        <span>Sign In</span>
+                    )}
                 </button>
             </form>
 

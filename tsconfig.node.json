@@ -6,7 +6,9 @@
         "lib": ["ES2023"],
         "module": "ESNext",
         "skipLibCheck": true,
+        /*"noImplicitAny": true
 
+"strict": true*/
         /* Bundler mode */
         "moduleResolution": "bundler",
         "verbatimModuleSyntax": true,
@@ -25,8 +27,12 @@
         "emitDeclarationOnly": false,
         "outDir": "./backend/dist", //output to backend/dist
         "rootDir": "./backend/src", //only compile files in backend/src
-        "types": ["node"],
-        "typeRoots": ["./backend/src/Types", "./node_modules/@types"]
+        //"types": ["node"],
+        "typeRoots": [
+            "./backend/src/Types",
+            "./backend/node_modules/@types",
+            "./node_modules/@types"
+        ]
     },
     "include": ["backend/src/**/*"],
     "exclude": [

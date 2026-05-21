@@ -23,6 +23,7 @@ import { useProfileStore } from '../Store/profileStore';
 import authApi from '../library/authApi';
 import { welcomePageApi } from '../library/client';
 import useSuccessStore from '../Store/SuccessStore';
+import useErrorStore from '../Store/ErrorStore';
 const Profile: React.FC = () => {
     const [deleteConfirm, setDeleteConfirm] = useState('');
     const [isDeleting, setIsDeleting] = useState(false);
@@ -120,6 +121,9 @@ const Profile: React.FC = () => {
                 log.error('Failed to upload profile photo', {
                     data: { error },
                 });
+                useErrorStore
+                    .getState()
+                    .setError('Failed to save profile photo. Please try again.');
             } finally {
                 setIsUploading(false);
                 URL.revokeObjectURL(objectUrl);
@@ -162,6 +166,9 @@ const Profile: React.FC = () => {
         } catch (error) {
             setProfilePic(previousPic);
             log.error('Failed to remove profile photo', { data: { error } });
+            useErrorStore
+                .getState()
+                .setError('Failed to remove profile photo. Please try again.');
         } finally {
             setIsUploading(false);
         }

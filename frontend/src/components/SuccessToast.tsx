@@ -26,18 +26,18 @@ const SuccessToast = () => {
                             damping: 15,
                             stiffness: 300,
                         }}
-                        // Offset from top to avoid overlapping with ErrorToast if both are present
-                        // Or we could use a container, but for now let's use a different top position
-                        className="fixed top-6 right-6 z-9999 flex max-w-md min-w-75 items-center gap-3 rounded-2xl border border-emerald-500/50 bg-emerald-700/50 px-6 py-4 text-white shadow-[0_8px_32px_rgba(16,185,129,0.3)] backdrop-blur-xl"
+                        className="fixed top-28 right-6 z-9999 flex max-w-md min-w-[340px] items-center gap-4 overflow-hidden rounded-2xl border-2 border-white/20 bg-green-600 px-6 py-5 text-white shadow-[0_20px_50px_rgba(22,163,74,0.4)] backdrop-blur-md"
                     >
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/40">
-                            <CheckCircle2 className="h-6 w-6 text-white" />
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/20">
+                            <CheckCircle2 className="h-7 w-7 text-white" />
                         </div>
-                        <div>
-                            <p className="text-sm font-bold tracking-wider uppercase opacity-70">
+                        <div className="flex-1">
+                            <h4 className="mb-0.5 text-xs font-black tracking-widest text-white/70 uppercase">
                                 Success
+                            </h4>
+                            <p className="text-[15px] font-bold leading-snug text-white">
+                                {success}
                             </p>
-                            <p className="text-base font-medium">{success}</p>
                         </div>
                     </motion.div>
                 )}
