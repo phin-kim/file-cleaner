@@ -33,7 +33,7 @@ export class GeminiNativePdfProcessor {
         this.retryDelayMs = retryDelayMs;
     }
     async processPdfs(pdfPaths: string[]): Promise<QuestionExtractionResponse> {
-        log.highlight('Using native pdf vison approach');
+        log.highlight('Using native pdf vision approach');
         log.info('Uploading PDFs to gemini api...');
         //upload pdfs using files api
         const uploadedFiles = await this.uploadPdfs(pdfPaths);
