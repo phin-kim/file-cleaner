@@ -37,20 +37,19 @@ export class GeminiNativePdfProcessor {
             `Initializing Gemini processor with Model: ${model}, Project: ${projectId}, Location: ${location}`
         );
 
-        if (appConfig.useVertexAi) {
-            if (!projectId) {
-                log.error('GOOGLE_CLOUD_PROJECT is missing from environment');
-                throw new AppError(
-                    'GOOGLE_CLOUD_PROJECT is required for Vertex AI',
-                    500
-                );
-            }
-            this.client = new GoogleGenAI({
-                vertexai: true,
-                location: location,
-                project: projectId,
-            });
-        } else {
+        if (!projectId) {
+            log.error('GOOGLE_CLOUD_PROJECT is missing from environment');
+            throw new AppError(
+                'Configuration error.Please try again later',
+                500
+            );
+        }
+        this.client = new GoogleGenAI({
+            vertexai: true,
+            location: location,
+            project: projectId,
+        });
+        /*else {
             if (!appConfig.geminiApiKey) {
                 log.error('GEMINI_API_KEY is missing from environment');
                 throw new AppError(
@@ -61,7 +60,7 @@ export class GeminiNativePdfProcessor {
             this.client = new GoogleGenAI({
                 apiKey: appConfig.geminiApiKey,
             });
-        }
+        }*/
 
         this.model = model;
         this.maxRetries = maxRetries;
