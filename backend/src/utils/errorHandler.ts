@@ -41,7 +41,7 @@ const errorHandler = (
     //const message = isProd ? 'Something went wrong' : appError.message;
     const message = appError.message;
     const type = appError.type || 'Server Error';
-    return res.status(appError.statusCode).json({
+    return res.status(statusCode).json({
         success: false,
         requestId,
         error: {

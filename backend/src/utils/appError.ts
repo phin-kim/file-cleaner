@@ -3,7 +3,7 @@
 class AppError extends Error {
     statusCode: number;
     type: string;
-    constructor(message: string, statusCode = 500, type = 'Server Error') {
+    constructor(message: string, statusCode = 500, type = 'ServerError') {
         super(message);
         this.statusCode = statusCode;
         this.type = type;
