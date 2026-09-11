@@ -8,7 +8,11 @@ import createLogger from '../utils/logger.js';
 import validateAndNormalizeEmail from '../middleware/emailValidator.js';
 import axios from 'axios';
 import { DeletedAccountModel } from '../schema/DeletedAccountSchema.js';
-import type { AuthenticatedRequest, JWTUserPayload, Subscription } from '../Types/authenticate.js';
+import type {
+    AuthenticatedRequest,
+    JWTUserPayload,
+    Subscription,
+} from '../Types/authenticate.js';
 import { isUserDocument } from '../helpers/miniHelpers.js';
 import cloudinary from '../utils/cloudinary.js';
 const BREVO_API_KEY = process.env.BREVO_API_KEY;
@@ -179,7 +183,11 @@ export async function login(req: Request, res: Response, next: NextFunction) {
 }
 const TEMPLATE_ID = 6;
 const ADMIN_TEMPLATE_ID = 5;
-export async function forgotPassword(req: Request, res: Response) {
+export async function forgotPassword(
+    req: Request,
+    res: Response,
+    next: NextFunction
+) {
     const { email } = req.body;
     const user = await UserModel.findOne({ email });
     if (!user) {
@@ -222,27 +230,50 @@ export async function forgotPassword(req: Request, res: Response) {
             }
         );
         res.status(200).json({ success: true });
-    } catch (error) {
-        // send alert to me as the admin
-        await axios.post(
-            'https://api.brevo.com/v3/smtp/email',
+    } catch (error: unknown) {
+        log.error(
+            error instanceof Error ? error : 'Password reset email failed',
             {
-                to: [{ email: 'phinjugushdev@gmail.com' }],
-                templateId: ADMIN_TEMPLATE_ID,
-                params: {
-                    subject: `Failure for  ${email} in resetting password`,
-                    timestamp: new Date().toLocaleDateString(),
-                    priority: 'High',
-                    content: `${email} has had an error when we try reset the email `,
-                    year: new Date().getFullYear(),
-                },
-            },
-            {
-                headers: {
-                    'api-key': BREVO_API_KEY,
-                    'Content-Type': 'application/json',
-                },
+                context: 'forgot-password',
+                data: { email },
             }
+        );
+
+        try {
+            // Alert the administrator without hiding the original failure.
+            await axios.post(
+                'https://api.brevo.com/v3/smtp/email',
+                {
+                    to: [{ email: 'phinjugushdev@gmail.com' }],
+                    templateId: ADMIN_TEMPLATE_ID,
+                    params: {
+                        subject: `Failure for  ${email} in resetting password`,
+                        timestamp: new Date().toLocaleDateString(),
+                        priority: 'High',
+                        content: `${email} has had an error when we try reset the email `,
+                        year: new Date().getFullYear(),
+                    },
+                },
+                {
+                    headers: {
+                        'api-key': BREVO_API_KEY,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            );
+        } catch (alertError: unknown) {
+            log.error(
+                alertError instanceof Error
+                    ? alertError
+                    : 'Failed to send password reset failure alert',
+                { context: 'forgot-password-alert', data: { email } }
+            );
+        }
+
+        next(
+            error instanceof Error
+                ? error
+                : new Error('Password reset email failed')
         );
     }
 }

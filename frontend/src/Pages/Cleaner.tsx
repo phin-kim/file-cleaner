@@ -553,7 +553,6 @@ export default function FolderCleanerUI() {
                                             (status === 'uploading'
                                                 ? 'Uploading...'
                                                 : 'Processing...')}{' '}
-                                        {Math.round(progress)}%
                                     </p>
                                     <div className="mt-4 h-3 overflow-hidden rounded-full bg-purple-900/50">
                                         <motion.div

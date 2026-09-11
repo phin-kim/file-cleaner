@@ -134,8 +134,12 @@ export async function paystackWebhook(
                 provider: 'mpesa',
                 createdAt: new Date(),
             });
-        } catch (dbError: any) {
-            if (dbError.code === 11000) {
+        } catch (dbError: unknown) {
+            const code =
+                dbError && typeof dbError === 'object' && 'code' in dbError
+                    ? (dbError as { code?: number }).code
+                    : undefined;
+            if (code === 11000) {
                 return res
                     .status(200)
                     .json({ success: true, message: 'Duplicate blocked' });

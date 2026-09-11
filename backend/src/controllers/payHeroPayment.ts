@@ -393,11 +393,45 @@ function mapPayHeroToPollStatus(
         s.includes('error') ||
         s.includes('declin') ||
         s.includes('timeout') ||
-        s.includes('rejected')
+        s.includes('expired') ||
+        s.includes('rejected') ||
+        s.includes('insufficient')
     ) {
         return 'failed';
     }
     return 'pending';
+}
+
+function describePayHeroFailure(statusRaw: string | undefined): string {
+    if (!statusRaw) return 'Payment failed';
+    const s = statusRaw.toLowerCase();
+
+    if (
+        s.includes('cancel') ||
+        s.includes('declin') ||
+        s.includes('reject') ||
+        s.includes('abort')
+    ) {
+        return 'Payment was cancelled or declined before completion.';
+    }
+
+    if (s.includes('insufficient') || s.includes('fund')) {
+        return 'Your account or phone balance is insufficient to complete this M-Pesa payment.';
+    }
+
+    if (
+        s.includes('timeout') ||
+        s.includes('expired') ||
+        s.includes('timed out')
+    ) {
+        return 'The M-Pesa request timed out before payment was completed.';
+    }
+
+    if (s.includes('fail') || s.includes('error')) {
+        return 'M-Pesa payment failed. Please try again.';
+    }
+
+    return `Payment was not completed (${statusRaw}).`;
 }
 
 export async function initiateFolderCleanStk(
@@ -722,10 +756,11 @@ export async function pollFolderCleanPaymentStatus(
         }
 
         if (mapped === 'failed') {
-            await markFolderCleanFailed(tx, statusRaw || 'failed');
+            const failureReason = describePayHeroFailure(statusRaw);
+            await markFolderCleanFailed(tx, failureReason);
             return res.json({
                 status: 'failed' as const,
-                reason: statusRaw || 'Payment failed',
+                reason: failureReason,
             });
         }
 
@@ -1058,10 +1093,11 @@ export async function pollWalletTopupPaymentStatus(
         }
 
         if (mapped === 'failed') {
-            await markWalletTopupFailed(tx, statusRaw || 'failed');
+            const failureReason = describePayHeroFailure(statusRaw);
+            await markWalletTopupFailed(tx, failureReason);
             return res.json({
                 status: 'failed' as const,
-                reason: statusRaw || 'Payment failed',
+                reason: failureReason,
             });
         }
 
@@ -1325,10 +1361,11 @@ export async function pollFileMergerPaymentStatus(
             }
         }
         if (mapped === 'failed') {
-            await markFileMergerFailed(tx, statusRaw || 'failed');
+            const failureReason = describePayHeroFailure(statusRaw);
+            await markFileMergerFailed(tx, failureReason);
             return res.json({
                 status: 'failed' as const,
-                reason: statusRaw || 'Payment failed',
+                reason: failureReason,
             });
         }
         return res.json({ status: 'pending' as const });

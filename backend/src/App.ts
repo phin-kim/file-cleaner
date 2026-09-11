@@ -22,7 +22,8 @@ import { webhook } from './routes/webhookRoute.js';
 import {
     generalRateLimiter,
     uploadRateLimiter,
-    paymentRateLimiter,
+    paymentInitiationRateLimiter,
+    paymentStatusRateLimiter,
 } from './middleware/rateLimiters.js';
 
 const log = createLogger('APP.TS');
@@ -57,8 +58,8 @@ app.use('/api', cleanerRoute);
 app.use('/api', subRouter);
 app.use('/api', uploadRateLimiter, mergerRoute);
 app.use('/api/auth', authRoute);
-app.use('/api/payment', paymentRateLimiter, webhook);
-app.use('/api/payment', paymentRateLimiter, paymentRoute);
+app.use('/api/payment', paymentInitiationRateLimiter, webhook);
+app.use('/api/payment', paymentStatusRateLimiter, paymentRoute);
 app.use('/downloads', express.static(path.join(process.cwd(), 'backend/temp')));
 
 const PROJECT_ROOT = path.resolve(__dirname, '../');

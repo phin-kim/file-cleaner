@@ -45,7 +45,15 @@ export const deleteAccount = async (
             success: true,
             message: 'Account deleted successfully',
         });
-    } catch (error) {
-        return next(AppError.badRequest('Failed to delete account'));
+    } catch (error: unknown) {
+        log.error(error instanceof Error ? error : 'Failed to delete account', {
+            context: 'delete-account',
+            data: { userId },
+        });
+        return next(
+            error instanceof Error
+                ? error
+                : AppError.badRequest('Failed to delete account')
+        );
     }
 };

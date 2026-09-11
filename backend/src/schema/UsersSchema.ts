@@ -101,7 +101,7 @@ const UserSchema = new Schema<User_Type>(
         },
         walletBalance: {
             type: Number,
-            default: 50,
+            default: 30,
             min: 0,
         },
         profileImageUrl: {

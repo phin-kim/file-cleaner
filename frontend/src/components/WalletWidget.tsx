@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     ArrowUp,
@@ -9,40 +9,45 @@ import {
     //ChevronRight,
     Loader2,
 } from 'lucide-react';
-import authApi from '../library/authApi';
 import { welcomePageApi } from '../library/client';
-import { pollWalletTopupPayment } from '../utils/pollPayHeroPayment';
 import { useWalletStore } from '../Store/walletStore';
-
+import useErrorStore from '../Store/ErrorStore';
+import handleApiError from '../utils/apiError';
+import { useWalletBalanceTopUp } from '../hooks/walletSynch';
 const WalletWidget = () => {
     const { balance, currency, setBalanceFromServer } = useWalletStore();
+    const setError = useErrorStore((state) => state.setError);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [amount, setAmount] = useState('');
     const [mpesaPhone, setMpesaPhone] = useState('');
-    const [loading, setLoading] = useState(false);
     const [inlineError, setInlineError] = useState<string | null>(null);
 
     const mpesaDigitsOk = mpesaPhone.replace(/\D/g, '').length >= 10;
+    const {
+        mutateAsync: topUp,
 
-    useEffect(() => {
-        let mounted = true;
-        const syncBalance = async () => {
-            try {
-                const prof = await welcomePageApi.get<{
-                    walletBalance?: number;
-                }>('/fetch-profile');
-                if (mounted && typeof prof.data?.walletBalance === 'number') {
-                    setBalanceFromServer(prof.data.walletBalance);
-                }
-            } catch {
-                // Non-blocking: keep last known value in store.
+        isPending: topUpLoading,
+    } = useWalletBalanceTopUp();
+    const { data, isLoading, error, isError } = useQuery({
+        queryKey: ['wallet-balance'],
+        queryFn: async () => {
+            const response = await welcomePageApi.get<{
+                walletBalance?: number;
+            }>('/fetch-profile');
+            if (typeof response.data.walletBalance !== 'number') {
+                throw new Error('Invalid wallet balance response');
             }
-        };
-        void syncBalance();
-        return () => {
-            mounted = false;
-        };
-    }, [setBalanceFromServer]);
+
+            return response.data.walletBalance;
+        },
+        refetchInterval: 1000 * 60 * 30, // Automatically refetches every 30 minutes
+        staleTime: 1000 * 60 * 5,
+    });
+    useEffect(() => {
+        if (data !== undefined) {
+            setBalanceFromServer(data);
+        }
+    }, [data, setBalanceFromServer]);
 
     const handleTopUp = async () => {
         setInlineError(null);
@@ -56,52 +61,29 @@ const WalletWidget = () => {
             return;
         }
 
-        setLoading(true);
-        try {
-            const initRes = await authApi.post<{
-                status?: boolean;
-                data?: { reference: string; amount: number };
-                message?: string;
-            }>('/payment/wallet-topup/initiate', {
-                phoneNumber: mpesaPhone.trim(),
-                amount: val,
-            });
-
-            const reference = initRes.data?.data?.reference;
-            if (!reference) {
-                throw new Error(
-                    initRes.data?.message ||
-                        'Could not start M-Pesa payment. Try again.'
-                );
+        await topUp(
+            { mpesaPhone, val },
+            {
+                onSuccess: (walletBalance) => {
+                    setBalanceFromServer(walletBalance);
+                    setIsModalOpen(false);
+                },
+                onError: (error: Error) => {
+                    setInlineError(error.message);
+                },
             }
-
-            const { walletBalance } = await pollWalletTopupPayment(reference);
-            setBalanceFromServer(walletBalance);
-            setIsModalOpen(false);
-            setMpesaPhone('');
-            setInlineError(null);
-        } catch (err: unknown) {
-            let msg = 'Top-up failed. Try again.';
-            if (axios.isAxiosError(err)) {
-                const d = err.response?.data as
-                    | { message?: string; error?: { message?: string } }
-                    | undefined;
-                msg =
-                    d?.error?.message ||
-                    (typeof d?.message === 'string' ? d.message : null) ||
-                    err.message ||
-                    msg;
-            } else if (err instanceof Error) {
-                msg = err.message;
-            }
-            setInlineError(msg);
-        } finally {
-            setLoading(false);
-        }
+        );
     };
+    useEffect(() => {
+        if (isError && error) {
+            handleApiError(error, setError);
+        }
+    }, [isError, error, setError]);
+
+    if (isLoading) return <div>Loading balance...</div>;
 
     return (
-        <div className="w-full max-w-2xl rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
+        <div className="w-full max-w-2xl rounded-4xl border border-slate-200 bg-white p-8 shadow-sm">
             <div className="mb-8 space-y-1">
                 <p className="ml-1 text-[10px] font-bold tracking-[0.2em] text-slate-400 uppercase">
                     Available Balance
@@ -143,7 +125,7 @@ const WalletWidget = () => {
                         >
                             <button
                                 type="button"
-                                disabled={loading}
+                                disabled={topUpLoading}
                                 onClick={() => setIsModalOpen(false)}
                                 className="absolute top-6 right-6 p-2 text-slate-400 hover:text-slate-600 disabled:opacity-40"
                             >
@@ -167,7 +149,7 @@ const WalletWidget = () => {
                                     </label>
                                     <input
                                         type="number"
-                                        disabled={loading}
+                                        disabled={topUpLoading}
                                         value={amount}
                                         onChange={(e) =>
                                             setAmount(e.target.value)
@@ -183,7 +165,7 @@ const WalletWidget = () => {
                                     </label>
                                     <input
                                         type="tel"
-                                        disabled={loading}
+                                        disabled={topUpLoading}
                                         value={mpesaPhone}
                                         onChange={(e) =>
                                             setMpesaPhone(e.target.value)
@@ -202,7 +184,7 @@ const WalletWidget = () => {
                                             <button
                                                 key={val}
                                                 type="button"
-                                                disabled={loading}
+                                                disabled={topUpLoading}
                                                 onClick={() => setAmount(val)}
                                                 className={`rounded-xl border py-3 text-sm font-bold transition-all disabled:opacity-50 ${
                                                     amount === val
@@ -260,7 +242,7 @@ const WalletWidget = () => {
                                 <button
                                     type="button"
                                     disabled={
-                                        loading ||
+                                        topUpLoading ||
                                         !mpesaDigitsOk ||
                                         !Number.isFinite(parseFloat(amount)) ||
                                         parseFloat(amount) <= 0
@@ -268,13 +250,13 @@ const WalletWidget = () => {
                                     onClick={handleTopUp}
                                     className="flex w-full items-center justify-center gap-2 rounded-2xl bg-purple-600 py-4 font-bold text-white shadow-lg shadow-purple-500/20 transition-all hover:bg-purple-700 enabled:active:scale-[0.98] disabled:opacity-50"
                                 >
-                                    {loading && (
+                                    {topUpLoading && (
                                         <Loader2
                                             className="animate-spin"
                                             size={20}
                                         />
                                     )}
-                                    {loading
+                                    {topUpLoading
                                         ? 'Waiting for M-Pesa…'
                                         : 'Confirm top up'}
                                 </button>

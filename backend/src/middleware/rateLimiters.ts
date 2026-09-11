@@ -1,4 +1,4 @@
-import rateLimit from 'express-rate-limit';
+import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
 import type { Request } from 'express';
 
 /**
@@ -15,7 +15,7 @@ const generalRateLimiter = rateLimit({
     legacyHeaders: false,
     keyGenerator: (req: Request) => {
         // Use IP address as key
-        return req.ip || '';
+        return ipKeyGenerator(req.ip || '');
     },
     skip: (req: Request) => {
         // Skip rate limiting for certain paths
@@ -31,7 +31,7 @@ const uploadRateLimiter = rateLimit({
     windowMs: 60 * 60 * 1000, // 1 hour window
     max: 10, // 10 uploads per hour
     message: {
-        error: 'Too many file uploads. Please try again later.',
+        error: 'Too many requests. Please try again later.',
     },
     standardHeaders: false,
     legacyHeaders: false,
@@ -39,15 +39,17 @@ const uploadRateLimiter = rateLimit({
         // Use authenticated user ID if available, fallback to IP
         const userId = (req as unknown as { user?: { uid: string } })?.user
             ?.uid;
-        return userId || req.ip || '';
+        return userId || ipKeyGenerator(req.ip || '');
     },
 });
 
-/**
- * Payment rate limiter - 5 requests per minute per user
- * Applied to payment routes to prevent accidental duplicate charges
- */
-const paymentRateLimiter = rateLimit({
+const paymentKeyGenerator = (req: Request) => {
+    const userId = (req as unknown as { user?: { uid: string } })?.user?.uid;
+    return userId || ipKeyGenerator(req.ip || '');
+};
+
+/** Payment initiation limiter. Initiation requests can create charges. */
+const paymentInitiationRateLimiter = rateLimit({
     windowMs: 60 * 1000, // 1 minute window
     max: 5, // 5 requests per minute
     message: {
@@ -55,12 +57,24 @@ const paymentRateLimiter = rateLimit({
     },
     standardHeaders: false,
     legacyHeaders: false,
-    keyGenerator: (req: Request) => {
-        // Use authenticated user ID if available
-        const userId = (req as unknown as { user?: { uid: string } })?.user
-            ?.uid;
-        return userId || req.ip || '';
-    },
+    keyGenerator: paymentKeyGenerator,
 });
 
-export { generalRateLimiter, uploadRateLimiter, paymentRateLimiter };
+/** Status polling limiter. Normal payment polling must not be mistaken for new charges. */
+const paymentStatusRateLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    max: 30,
+    message: {
+        error: 'Too many payment status checks. Please try again shortly.',
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+    keyGenerator: paymentKeyGenerator,
+});
+
+export {
+    generalRateLimiter,
+    uploadRateLimiter,
+    paymentInitiationRateLimiter,
+    paymentStatusRateLimiter,
+};

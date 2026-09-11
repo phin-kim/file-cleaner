@@ -2,11 +2,11 @@ import axios from 'axios';
 /**importing this access token like this wont be ideal coz it will be stale in the case of an update so we use a getter function defined in the auth api.ts */
 import { accessToken } from './authApi';
 import type { AxiosInstance } from 'axios';
-/*const baseURL =
+const baseURL =
     import.meta.env.MODE === 'development'
         ? 'http://localhost:5000/api'
-        : 'https://tidy-up.onrender.com/api';*/
-const baseURL = import.meta.env.VITE_API_URL;
+        : 'https://tidy-up.onrender.com/api';
+//const baseURL = import.meta.env.VITE_API_URL;
 
 export const fileCleanerApi = axios.create({
     baseURL,

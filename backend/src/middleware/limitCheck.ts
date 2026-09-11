@@ -21,7 +21,7 @@ const checkDailyLimit = (fileLimitThreshold: number = 30, dailyMax = 4) => {
             return next();
         }
 
-        if (fileCount > 300) {
+        if (fileCount > 500) {
             return next(
                 AppError.badRequest('Maximum upload limit is 300 files at once')
             );

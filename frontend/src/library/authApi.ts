@@ -7,12 +7,12 @@ import axios from 'axios';
 import createClientLogger from '../utils/clientLogger';
 //import { useAuthStore } from '../Store/authStore';
 const log = createClientLogger('Auth api');
-/*const baseURL =
+const baseURL =
     import.meta.env.MODE === 'development'
         ? 'http://localhost:5000/api'
-        : 'https://tidy-up.onrender.com/api';*/
-// authAPI.ts or wherever you define baseURL
-const baseURL = import.meta.env.VITE_API_URL;
+        : 'https://tidy-up.onrender.com/api';
+
+//const baseURL = import.meta.env.VITE_API_URL;
 interface QueuedRequest {
     resolve: (value: string | null) => void;
     reject: (reason?: AxiosError) => void;

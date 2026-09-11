@@ -30,7 +30,7 @@ subRouter.get('/fetch-profile', authenticate, async (req, res, next) => {
             log.warn('user not found in the db');
             return next(AppError.notFound('User not found'));
         }
-
+        log.debug('User data', { data: { user } });
         res.status(200).json({
             status: 'success',
             tierId: user.tierId,
@@ -44,7 +44,7 @@ subRouter.get('/fetch-profile', authenticate, async (req, res, next) => {
         //res.status(200).json({ tierId: tierId, dailyUsageCount });
     } catch (error) {
         log.error('Failed to fetch user', { data: { error } });
-        next(error);
+        return next(error);
     }
 });
 subRouter.patch('/increment-usage', authenticate, async (req, res, next) => {

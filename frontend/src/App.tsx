@@ -1,3 +1,5 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
 import ErrorToast from './components/ErrorToast';
 import SuccessToast from './components/SuccessToast';
 import Pricing from './Pages/Pricing';
@@ -86,7 +88,7 @@ function App() {
                     log.info('Session restored');
                     const response = await welcomePageApi.get('/fetch-profile');
                     log.debug('The fetch profile response ', {
-                        data: response,
+                        data: response.data,
                     });
                     setTierId(response.data.tierId);
                     log.info(`Tier synchronized: ${response.data.tierId}`);
@@ -133,15 +135,21 @@ function App() {
         };
         restoreSession();
     }, [setTierId]);
-
+    const queryClient = new QueryClient({
+        defaultOptions: {
+            queries: {
+                retry: 1, // Limit API fallback attempts on failure loops
+            },
+        },
+    });
     return (
         <>
             <ErrorToast />
             <SuccessToast />
             <Analytics />
-
-            <BrowserRouter>
-                {/**
+            <QueryClientProvider client={queryClient}>
+                <BrowserRouter>
+                    {/**
                         <Route
                             path="/file-merge"
                             element={<FolderQuestionAnalyzer />}
@@ -150,56 +158,67 @@ function App() {
                             path="/upgrade-modal"
                             element={<UpgradeModal />}
                         /> */}
-                <Routes>
-                    <Route path="/" element={<WelcomeModal />} />
-                    <Route
-                        path="/pricing"
-                        element={
-                            isAuthenticated ? <Pricing /> : <PublicPricing />
-                        }
-                    />
-                    <Route path="/how-it-works" element={<HowItWorks />} />
-                    <Route path="/about" element={<About />} />
-                    <Route path="/contact" element={<Contact />} />
-                    <Route path="/auth" element={<AuthForm />} />
-                    <Route
-                        path="/auth/forgot-password"
-                        element={<ForgotPassword />}
-                    />
-                    <Route
-                        path="/auth/reset-success"
-                        element={<ResetSuccess />}
-                    />
-                    <Route
-                        path="/auth/reset-password"
-                        element={<ResetPassword />}
-                    />
-                    <Route path="/privacy" element={<PrivacyPolicy />} />
-                    <Route path="/terms" element={<TermsOfService />} />
-                    <Route element={<ProtectedRoutes />} />
-                    <Route element={<AppLayout />}>
-                        <Route path="/home" element={<WelcomeModal />} />
+                    <Routes>
+                        <Route path="/" element={<WelcomeModal />} />
+                        <Route
+                            path="/pricing"
+                            element={
+                                isAuthenticated ? (
+                                    <Pricing />
+                                ) : (
+                                    <PublicPricing />
+                                )
+                            }
+                        />
+                        <Route path="/how-it-works" element={<HowItWorks />} />
+                        <Route path="/about" element={<About />} />
+                        <Route path="/contact" element={<Contact />} />
+                        <Route path="/auth" element={<AuthForm />} />
+                        <Route
+                            path="/auth/forgot-password"
+                            element={<ForgotPassword />}
+                        />
+                        <Route
+                            path="/auth/reset-success"
+                            element={<ResetSuccess />}
+                        />
+                        <Route
+                            path="/auth/reset-password"
+                            element={<ResetPassword />}
+                        />
+                        <Route path="/privacy" element={<PrivacyPolicy />} />
+                        <Route path="/terms" element={<TermsOfService />} />
+                        <Route element={<ProtectedRoutes />} />
+                        <Route element={<AppLayout />}>
+                            <Route path="/home" element={<WelcomeModal />} />
 
-                        <Route element={<ProtectedRoutes />}>
-                            <Route
-                                path="/folder-cleaner"
-                                element={<FolderCleanerUI />}
-                            />
-                            <Route
-                                path="/file-merger"
-                                element={<FolderQuestionAnalyzer />}
-                            />
-                            <Route path="/profile" element={<Profile />} />
-                            <Route path="/history" element={<HistoryPage />} />
-                            <Route path="/wallet" element={<WalletPage />} />
-                            <Route
-                                path="/pricing/billing"
-                                element={<BillingPage />}
-                            />
+                            <Route element={<ProtectedRoutes />}>
+                                <Route
+                                    path="/folder-cleaner"
+                                    element={<FolderCleanerUI />}
+                                />
+                                <Route
+                                    path="/file-merger"
+                                    element={<FolderQuestionAnalyzer />}
+                                />
+                                <Route path="/profile" element={<Profile />} />
+                                <Route
+                                    path="/history"
+                                    element={<HistoryPage />}
+                                />
+                                <Route
+                                    path="/wallet"
+                                    element={<WalletPage />}
+                                />
+                                <Route
+                                    path="/pricing/billing"
+                                    element={<BillingPage />}
+                                />
+                            </Route>
                         </Route>
-                    </Route>
-                </Routes>
-            </BrowserRouter>
+                    </Routes>
+                </BrowserRouter>
+            </QueryClientProvider>
         </>
     );
 }

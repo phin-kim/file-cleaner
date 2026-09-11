@@ -34,7 +34,7 @@ export const useAuthStore = create<AuthState>()(
                 log.highlight('SENDING DATA TO THE BACKEND');
                 try {
                     log.info('Data sent to the backend', {
-                        data: { email, password },
+                        data: { email },
                     });
                     const res = await authApi.post<AuthResponse>(
                         '/auth/register',
@@ -50,7 +50,9 @@ export const useAuthStore = create<AuthState>()(
                         createdAt: res.data.createdAt,
                         isAuthenticated: true,
                     });
-                    useProfileStore.getState().setProfilePic(res.data.user?.profileImageUrl || null);
+                    useProfileStore
+                        .getState()
+                        .setProfilePic(res.data.user?.profileImageUrl || null);
                     setApiToken(res.data.accessToken);
                     localStorage.setItem('hasSession', 'true');
                     const currentState = get();
@@ -79,6 +81,13 @@ export const useAuthStore = create<AuthState>()(
             },
             login: async (email, password) => {
                 set({ isLoading: true });
+                log.debug('Auth API endpoint', {
+                    data: {
+                        baseURL: authApi.defaults.baseURL,
+                        loginURL: `${authApi.defaults.baseURL}/auth/login`,
+                    },
+                });
+
                 try {
                     const res = await authApi.post<LoginResponse>(
                         '/auth/login',
@@ -91,7 +100,9 @@ export const useAuthStore = create<AuthState>()(
                         isAuthenticated: true,
                         createdAt: res.data.createdAt,
                     });
-                    useProfileStore.getState().setProfilePic(res.data.user?.profileImageUrl || null);
+                    useProfileStore
+                        .getState()
+                        .setProfilePic(res.data.user?.profileImageUrl || null);
                     setApiToken(res.data.accessToken);
                     localStorage.setItem('hasSession', 'true');
                     const currentState = get();
@@ -173,7 +184,9 @@ export const useAuthStore = create<AuthState>()(
                         isAuthenticated: true,
                         createdAt: res.data.createdAt,
                     });
-                    useProfileStore.getState().setProfilePic(res.data.user?.profileImageUrl || null);
+                    useProfileStore
+                        .getState()
+                        .setProfilePic(res.data.user?.profileImageUrl || null);
                     const currentState = get();
                     log.debug('Access  token from authstore', {
                         data: currentState.accessToken,

@@ -1,10 +1,15 @@
-import rateLimit from 'express-rate-limit';
+import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
 import type { Request, Response } from 'express';
 
 /**
  * Authentication rate limiter - 2 requests per 2 seconds per email/IP
  * Prevents brute force attacks on login and registration
  */
+interface RateLimitedRequest extends Request {
+    rateLimit?: {
+        resetTime?: number;
+    };
+}
 const authRateLimiter = rateLimit({
     windowMs: 2 * 1000, // 2 second window
     max: 2, // 2 requests per window
@@ -17,19 +22,23 @@ const authRateLimiter = rateLimit({
         // Use email from body as key if available (for login/register), fallback to IP
         const email =
             (req.body?.email as string)?.toLowerCase() || req.ip || '';
-        return email || req.ip || '';
+        if (email) {
+            return email;
+        }
+        return ipKeyGenerator(req.ip ?? '');
     },
     skip: (req: Request) => {
         // Skip rate limiting for health check endpoints
         return req.path === '/health' || req.path === '/status';
     },
     handler: (req: Request, res: Response) => {
+        const typedReq = req as RateLimitedRequest;
         res.status(429).json({
             error: 'Too many authentication attempts',
             message: 'Please try again after 2 seconds.',
             retryAfter: Math.ceil(
-                req.rateLimit?.resetTime
-                    ? (req.rateLimit.resetTime - Date.now()) / 1000
+                typedReq.rateLimit?.resetTime
+                    ? (typedReq.rateLimit.resetTime - Date.now()) / 1000
                     : 2
             ),
         });
