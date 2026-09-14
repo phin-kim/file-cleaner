@@ -246,7 +246,7 @@ export const useAuthStore = create<AuthState>()(
             },
             deleteAccount: async () => {
                 try {
-                    await authApi.post('/auth/delete-account');
+                    await authApi.post('/user/delete-account');
                     setAccessToken(null);
                     setApiToken(null);
                     set({

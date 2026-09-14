@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import asyncHandler from '../middleware/asyncHandler.js';
-import { mpesaPayment } from '../controllers/paymentContoller.js';
 import {
     chargeWalletForFileMerger,
     chargeWalletForFolderCleaner,
@@ -19,12 +18,7 @@ import {
 } from '../middleware/rateLimiters.js';
 
 export const paymentRoute: Router = Router();
-paymentRoute.post(
-    '/initialize-payment',
-    authenticate,
-    paymentInitiationRateLimiter,
-    asyncHandler(mpesaPayment)
-);
+
 paymentRoute.post(
     '/folder-clean/initiate',
     authenticate,

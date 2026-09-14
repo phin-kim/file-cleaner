@@ -13,13 +13,12 @@ import {
     MousePointerClick,
 } from 'lucide-react';
 import useCleaner from '../hooks/useCleaner';
-import { UpgradeModal, SuccessPopup } from '../components/Popup';
+import { SuccessPopup } from '../components/Popup';
 import BreakdownPie from '../components/FilePie';
 import { useGeneralStore } from '../Store/generalStore';
 //import { TIER_CONFIG } from '../library/tier';
 import { CLEANER_COST_PER_FILE_KES } from '../constants/cleanerPricing';
 import { cleanerChargeAmountKes } from '../constants/cleanerPricing';
-import { SubscriptionExpiredModal } from '../components/Popup';
 import { useTransactions } from '../Store/TransactionStore';
 import { useWalletStore } from '../Store/walletStore';
 import { useState } from 'react';
@@ -31,11 +30,9 @@ export default function FolderCleanerUI() {
         progress,
         statusMessage,
         downloadURL,
-        isExpired,
-        setIsExpired,
+
         openPopup,
-        upgradeModal,
-        setUpgradeModal,
+
         setOpenPopUp,
         handleDragEnter,
         handleDragLeave,
@@ -440,16 +437,7 @@ export default function FolderCleanerUI() {
                                 </AnimatePresence>
                             )}
                     </AnimatePresence>
-                    {upgradeModal && (
-                        <UpgradeModal onClose={() => setUpgradeModal(false)} />
-                    )}
-                    {isExpired && (
-                        <SubscriptionExpiredModal
-                            key={'subscription-expired-modal'}
-                            isExpired={isExpired}
-                            onClose={() => setIsExpired(false)}
-                        />
-                    )}
+
                     {status === 'awaiting_payment' && fileCount > 0 && (
                         <div className="mt-8 space-y-4">
                             <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm text-slate-700 shadow-sm">

@@ -1,7 +1,15 @@
 import { Schema } from 'mongoose';
 import { TidyUpConnection } from '../config/DB.js';
 import type { Document } from 'mongoose';
+/**
+ * Imagine a big notebook where everyone in the world has to write down their favorite secret password.
 
+unique: true means every single password has to be completely different—no two people are allowed to pick the exact same one, or the teacher gets mad.
+
+required: true means you must write something down. You aren't allowed to leave the line blank.
+
+sparse: true is like a special rule that says, "Hey, it's totally okay if a few people leave this line completely blank." Normally, if the computer sees a blank line, it gets confused and thinks nobody else is allowed to leave a line blank either. sparse tells it to calm down and ignore the blank ones.
+ */
 export type PaymentKind =
     | 'subscription'
     | 'folder_clean'
@@ -14,11 +22,11 @@ export interface Transaction_Type extends Document {
     reference: string;
     amount: number;
     email: string;
+    idempotencyKey?: string;
     phoneNumberHash?: string;
-    tierId?: string;
-    tierName?: string;
-    metadata?: Metadata;
-    status: 'pending' | 'success' | 'failed' | 'processing';
+
+    webhookReceived: boolean;
+    status: 'QUEUED' | 'PROCESSING' | 'FAILED' | 'SUCCESS';
     mpesaReceipt?: string;
     createdAt: Date;
     project: string;
@@ -37,7 +45,7 @@ export interface Metadata {
     tierName: string;
 }
 
-const MetadataSchema = new Schema<Metadata>(
+export const MetadataSchema = new Schema<Metadata>(
     {
         period: {
             type: String,
@@ -77,7 +85,6 @@ const TransactionsSchema = new Schema<Transaction_Type>(
             type: String,
             //required: true,
         },
-        metadata: { type: MetadataSchema },
         amount: {
             type: Number,
             required: true,
@@ -86,13 +93,13 @@ const TransactionsSchema = new Schema<Transaction_Type>(
             type: String,
             unique: true,
             required: true,
-            sparse: true,
+            //sparse: true,
         },
         status: {
             type: String,
             required: true,
-            enum: ['pending', 'success', 'failed', 'processing'],
-            default: 'pending',
+            enum: ['QUEUED', 'SUCCESS', 'FAILED', 'PROCESSING'],
+            default: 'QUEUED',
         },
         mpesaReceipt: {
             type: String,

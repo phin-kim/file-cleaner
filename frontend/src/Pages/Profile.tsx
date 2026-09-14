@@ -123,7 +123,9 @@ const Profile: React.FC = () => {
                 });
                 useErrorStore
                     .getState()
-                    .setError('Failed to save profile photo. Please try again.');
+                    .setError(
+                        'Failed to save profile photo. Please try again.'
+                    );
             } finally {
                 setIsUploading(false);
                 URL.revokeObjectURL(objectUrl);
@@ -159,7 +161,7 @@ const Profile: React.FC = () => {
         setIsUploadDropdownOpen(false);
         setIsUploading(true);
         try {
-            await authApi.delete('/auth/profile-image');
+            await authApi.delete('/user/profile-image');
             useSuccessStore
                 .getState()
                 .setSuccess('Profile photo removed successfully!');

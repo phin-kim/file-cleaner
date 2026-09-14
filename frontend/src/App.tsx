@@ -5,7 +5,7 @@ import SuccessToast from './components/SuccessToast';
 import Pricing from './Pages/Pricing';
 import AuthForm from './Pages/Auth';
 import FolderCleanerUI from './Pages/Cleaner';
-import BillingPage from './Pages/Billing';
+//import BillingPage from './Pages/Billing';
 import FolderQuestionAnalyzer from './Pages/Merger';
 import { Analytics } from '@vercel/analytics/react';
 import {
@@ -24,7 +24,7 @@ const log = createClientLogger('App.tsx');
 //import { UpgradeModal } from './components/Popup';
 import WelcomeModal from './Pages/WelcomePage';
 import ProtectedRoutes from './components/ProtectedRoutes';
-import { welcomePageApi } from './library/client';
+import { userApi, welcomePageApi } from './library/client';
 import { useTierStore } from './Store/tierStore';
 import ForgotPassword from './components/Auth/ForgotPassword';
 import ResetSuccess from './components/Auth/ResetSuccess';
@@ -86,7 +86,7 @@ function App() {
                 const currentAuth = useAuthStore.getState().isAuthenticated;
                 if (currentAuth) {
                     log.info('Session restored');
-                    const response = await welcomePageApi.get('/fetch-profile');
+                    const response = await userApi.get('/user/fetch-profile');
                     log.debug('The fetch profile response ', {
                         data: response.data,
                     });
@@ -209,10 +209,6 @@ function App() {
                                 <Route
                                     path="/wallet"
                                     element={<WalletPage />}
-                                />
-                                <Route
-                                    path="/pricing/billing"
-                                    element={<BillingPage />}
                                 />
                             </Route>
                         </Route>

@@ -5,7 +5,6 @@ import { fileURLToPath } from 'url';
 import './config/envLoader.js';
 import cookieParser from 'cookie-parser';
 import { cleanerRoute } from './routes/folderCleanerRoute.js';
-import { subRouter } from './routes/subscription.js';
 import {
     startPeriodicCleanup,
     cleanupOrphanedFiles,
@@ -18,13 +17,13 @@ import { authRoute } from './routes/auth.js';
 import errorHandler from './utils/errorHandler.js';
 import { connectDatabases } from './config/DB.js';
 import { paymentRoute } from './routes/paymentRoute.js';
-import { webhook } from './routes/webhookRoute.js';
 import {
     generalRateLimiter,
     uploadRateLimiter,
     paymentInitiationRateLimiter,
     paymentStatusRateLimiter,
 } from './middleware/rateLimiters.js';
+import { userRouter } from './routes/userRoute.js';
 
 const log = createLogger('APP.TS');
 const PORT = process.env.PORT;
@@ -53,12 +52,12 @@ app.use(
 );
 app.use(express.json());
 app.use(cookieParser(cookieSecret));
+
 app.use('/api', generalRateLimiter);
 app.use('/api', cleanerRoute);
-app.use('/api', subRouter);
 app.use('/api', uploadRateLimiter, mergerRoute);
 app.use('/api/auth', authRoute);
-app.use('/api/payment', paymentInitiationRateLimiter, webhook);
+app.use('/api/user', userRouter);
 app.use('/api/payment', paymentStatusRateLimiter, paymentRoute);
 app.use('/downloads', express.static(path.join(process.cwd(), 'backend/temp')));
 

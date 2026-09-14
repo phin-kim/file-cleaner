@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import axios from 'axios';
-import { fileCleanerApi, welcomePageApi } from '../library/client';
+import { fileCleanerApi, userApi, welcomePageApi } from '../library/client';
 import authApi from '../library/authApi';
 import type { UploadedFolder, Status, UploadLimitResult } from '../types/types';
 import traverseDirectory from '../utils/traverser';
@@ -31,41 +31,83 @@ const FOLDER_CLEANER_PATH = 'processFolder';
 const QUESTION_MERGER_PATH = 'merge-files';
 const PAID_UPLOAD_PATHS = new Set([FOLDER_CLEANER_PATH, QUESTION_MERGER_PATH]);
 
+function getTotalAndSplitForPath(
+    path: string,
+    count: number,
+    walletBalance: number
+): { totalCost: number; walletPortion: number; stkPortion: number } {
+    const totalCost =
+        path === QUESTION_MERGER_PATH
+            ? mergerChargeAmountKes(count)
+            : cleanerChargeAmountKes(count);
+    const walletPortion = Math.min(walletBalance, totalCost);
+    const stkPortion = Math.max(totalCost - walletBalance, 0);
+
+    return {
+        totalCost,
+        walletPortion,
+        stkPortion,
+    };
+}
+
 /** Returns charge payload or null if blocked (error already set). */
 async function chargeWalletForCleanerUpload(
     path: string,
-    count: number
+    count: number,
+    chargeAmountOverride?: number
 ): Promise<{ amount: number; chargeReference: string } | null> {
     const isMerger = path === QUESTION_MERGER_PATH;
-    const amount = isMerger
-        ? mergerChargeAmountKes(count)
-        : cleanerChargeAmountKes(count);
+    const resolvedAmount =
+        typeof chargeAmountOverride === 'number' &&
+        Number.isFinite(chargeAmountOverride)
+            ? chargeAmountOverride
+            : isMerger
+              ? mergerChargeAmountKes(count)
+              : cleanerChargeAmountKes(count);
     const chargeUrl = isMerger
         ? '/payment/wallet/charge-file-merger'
         : '/payment/wallet/charge-folder-clean';
     const { hasSufficientFunds, balance, setBalanceFromServer } =
         useWalletStore.getState();
     const { setError } = useErrorStore.getState();
-    if (!hasSufficientFunds(amount)) {
+    if (!hasSufficientFunds(resolvedAmount)) {
         setError(
-            `Insufficient balance. This process costs KES ${amount.toFixed(2)}, but you only have KES ${balance.toFixed(2)}.`
+            `Insufficient balance. This process costs KES ${resolvedAmount.toFixed(2)}, but you only have KES ${balance.toFixed(2)}.`
         );
         return null;
     }
+    const idempotentKey = crypto.randomUUID();
     try {
         const { data } = await authApi.post<{
             status: string;
             amount: number;
             chargeReference: string;
             walletBalance: number;
-        }>(chargeUrl, isMerger ? { pageCount: count } : { fileCount: count });
+        }>(
+            chargeUrl,
+            isMerger
+                ? {
+                      pageCount: count,
+                      amount: Number(resolvedAmount.toFixed(2)),
+                  }
+                : {
+                      fileCount: count,
+                      amount: Number(resolvedAmount.toFixed(2)),
+                  },
+            {
+                headers: {
+                    'Idempotency-Key': idempotentKey,
+                },
+                timeout: 30000,
+            }
+        );
         setBalanceFromServer(Number(data.walletBalance ?? 0));
         if (!data.chargeReference) {
             setError('Could not confirm wallet charge reference.');
             return null;
         }
         return {
-            amount: Number(data.amount ?? amount),
+            amount: Number(data.amount ?? resolvedAmount),
             chargeReference: data.chargeReference,
         };
     } catch (error) {
@@ -85,6 +127,106 @@ async function chargeWalletForCleanerUpload(
         setError(msg);
         return null;
     }
+}
+
+async function settleWalletAndStkPayment(
+    path: string,
+    count: number,
+    walletBalance: number,
+    mpesaPhone: string
+): Promise<{
+    chargedWallet: { amount: number; chargeReference: string } | null;
+    walletBalanceAfter: number;
+}> {
+    const { totalCost, walletPortion, stkPortion } = getTotalAndSplitForPath(
+        path,
+        count,
+        walletBalance
+    );
+
+    let chargedWallet: { amount: number; chargeReference: string } | null =
+        null;
+
+    if (walletPortion > 0) {
+        chargedWallet = await chargeWalletForCleanerUpload(
+            path,
+            count,
+            walletPortion
+        );
+        if (chargedWallet === null) {
+            return {
+                chargedWallet: null,
+                walletBalanceAfter: useWalletStore.getState().balance,
+            };
+        }
+    }
+
+    if (stkPortion > 0) {
+        const phone = mpesaPhone.trim();
+        const digits = phone.replace(/\D/g, '');
+        if (digits.length < 9) {
+            useErrorStore
+                .getState()
+                .setError(
+                    'Your wallet balance is too low for this job. Enter a valid M-Pesa phone number to complete the remaining KES ' +
+                        stkPortion.toFixed(2) +
+                        ' via STK.'
+                );
+            return {
+                chargedWallet: null,
+                walletBalanceAfter: useWalletStore.getState().balance,
+            };
+        }
+
+        const idempotentKey = crypto.randomUUID();
+        const initRes = await authApi.post<{
+            status?: boolean;
+            data?: {
+                reference: string;
+                amount: number;
+                fileCount?: number;
+                pageCount?: number;
+            };
+            message?: string;
+        }>(
+            path === QUESTION_MERGER_PATH
+                ? '/payment/file-merger/initiate'
+                : '/payment/folder-clean/initiate',
+            path === QUESTION_MERGER_PATH
+                ? {
+                      phoneNumber: phone,
+                      pageCount: count,
+                      amount: Number(stkPortion.toFixed(2)),
+                  }
+                : {
+                      phoneNumber: phone,
+                      fileCount: count,
+                      amount: Number(stkPortion.toFixed(2)),
+                  },
+            {
+                headers: { 'Idempotency-Key': idempotentKey },
+            }
+        );
+
+        const reference = initRes.data?.data?.reference;
+        if (!reference) {
+            throw new Error(
+                initRes.data?.message ||
+                    'Could not start M-Pesa payment. Try again.'
+            );
+        }
+
+        const { walletBalance: updatedWalletBalance } =
+            path === QUESTION_MERGER_PATH
+                ? await pollFileMergerPayment(reference)
+                : await pollFolderCleanPayment(reference);
+        useWalletStore.getState().setBalanceFromServer(updatedWalletBalance);
+    }
+
+    return {
+        chargedWallet,
+        walletBalanceAfter: useWalletStore.getState().balance,
+    };
 }
 
 export default function useCleaner() {
@@ -138,9 +280,11 @@ export default function useCleaner() {
     };
 
     const stopProgressInterval = (
-        progressInterval: ReturnType<typeof setInterval>
+        progressInterval?: ReturnType<typeof setInterval>
     ) => {
-        clearInterval(progressInterval);
+        if (progressInterval) {
+            clearInterval(progressInterval);
+        }
         setProgress(0);
     };
 
@@ -202,9 +346,6 @@ export default function useCleaner() {
         }
         handleApiError(error, setError);
         setStatus('error');
-        setTimeout(() => {
-            goIdleOrAwaiting();
-        }, 1500);
     };
 
     /** Multipart upload + usage sync (wallet charge handled by caller if needed). */
@@ -254,7 +395,9 @@ export default function useCleaner() {
                 `/${path}?tierId=${tierId}&isWorkSheet=${isWorkSheet}&userId=${userId}`,
                 formData,
                 {
-                    headers: { 'Content-Type': 'multipart/form-data' },
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
                     onUploadProgress: (progressEvent) => {
                         const total =
                             progressEvent.total || files.length * 500000; // fallback 500KB per file
@@ -433,134 +576,65 @@ export default function useCleaner() {
             setStatus('uploading');
             setProgress(0);
             setStatusMessage('Initializing...');
-            const progressInterval = null as unknown as number;
+
             try {
-                try {
-                    const prof = await welcomePageApi.get<{
-                        walletBalance?: number;
-                    }>('/fetch-profile');
-                    if (typeof prof.data?.walletBalance === 'number') {
-                        useWalletStore
-                            .getState()
-                            .setBalanceFromServer(prof.data.walletBalance);
-                    }
-                } catch (syncErr) {
-                    log.warn('Wallet sync skipped', { data: { syncErr } });
+                const prof = await userApi.get<{
+                    walletBalance?: number;
+                }>('/user/fetch-profile');
+                if (typeof prof.data?.walletBalance === 'number') {
+                    useWalletStore
+                        .getState()
+                        .setBalanceFromServer(prof.data.walletBalance);
                 }
-
-                const { hasSufficientFunds } = useWalletStore.getState();
-
-                if (hasSufficientFunds(totalCost)) {
-                    const chargedWallet = await chargeWalletForCleanerUpload(
-                        pending.path,
-                        units
-                    );
-                    if (chargedWallet === null) {
-                        stopProgressInterval(progressInterval);
-                        setStatus('awaiting_payment');
-                        return;
-                    }
-                    await executeFolderUploadToBackend(
-                        pending.files,
-                        pending.folderName,
-                        pending.path,
-                        pending.uploadLimit,
-                        progressInterval,
-                        chargedWallet,
-                        true,
-                        true
-                    );
-                    return;
-                }
-
-                const phone = mpesaPhone.trim();
-                const digits = phone.replace(/\D/g, '');
-                if (digits.length < 9) {
-                    stopProgressInterval(progressInterval);
-                    setStatus('awaiting_payment');
-                    setError(
-                        'Your wallet balance is too low for this job. Enter a valid M-Pesa phone number to top up via STK, or add funds from the Wallet page first.'
-                    );
-                    return;
-                }
-
-                const initRes = await authApi.post<{
-                    status?: boolean;
-                    data?: {
-                        reference: string;
-                        amount: number;
-                        fileCount?: number;
-                        pageCount?: number;
-                    };
-                    message?: string;
-                }>(
-                    pending.path === QUESTION_MERGER_PATH
-                        ? '/payment/file-merger/initiate'
-                        : '/payment/folder-clean/initiate',
-                    pending.path === QUESTION_MERGER_PATH
-                        ? {
-                              phoneNumber: phone,
-                              pageCount: pending.pageCount,
-                          }
-                        : {
-                              phoneNumber: phone,
-                              fileCount: pending.files.length,
-                          }
-                );
-
-                const reference = initRes.data?.data?.reference;
-                if (!reference) {
-                    throw new Error(
-                        initRes.data?.message ||
-                            'Could not start M-Pesa payment. Try again.'
-                    );
-                }
-
-                const { walletBalance } =
-                    pending.path === QUESTION_MERGER_PATH
-                        ? await pollFileMergerPayment(reference)
-                        : await pollFolderCleanPayment(reference);
-                useWalletStore.getState().setBalanceFromServer(walletBalance);
-
-                const chargedWallet = await chargeWalletForCleanerUpload(
-                    pending.path,
-                    units
-                );
-                if (chargedWallet === null) {
-                    stopProgressInterval(progressInterval);
-                    setStatus('awaiting_payment');
-                    return;
-                }
-
-                await executeFolderUploadToBackend(
-                    pending.files,
-                    pending.folderName,
-                    pending.path,
-                    pending.uploadLimit,
-                    progressInterval,
-                    chargedWallet,
-                    true,
-                    true
-                );
-            } catch (err: unknown) {
-                stopProgressInterval(progressInterval);
-                let msg = 'Payment or upload failed. Please try again.';
-                if (axios.isAxiosError(err)) {
-                    const d = err.response?.data as
-                        | { message?: string; error?: { message?: string } }
-                        | undefined;
-                    msg =
-                        d?.error?.message ||
-                        (typeof d?.message === 'string' ? d.message : null) ||
-                        err.message ||
-                        msg;
-                } else if (err instanceof Error) {
-                    msg = err.message;
-                }
-                setError(msg);
-                log.error('Pay & Process failed', { data: { err } });
-                setStatus('awaiting_payment');
+            } catch (syncErr) {
+                log.warn('Wallet sync skipped', { data: { syncErr } });
             }
+
+            const walletBalance = useWalletStore.getState().balance;
+            const settledPayment = await settleWalletAndStkPayment(
+                pending.path,
+                units,
+                walletBalance,
+                mpesaPhone
+            );
+
+            if (
+                settledPayment.chargedWallet === null &&
+                totalCost > walletBalance
+            ) {
+                setStatus('error');
+                return;
+            }
+
+            await executeFolderUploadToBackend(
+                pending.files,
+                pending.folderName,
+                pending.path,
+                pending.uploadLimit,
+                undefined,
+                settledPayment.chargedWallet,
+                true,
+                true
+            );
+            return;
+        } catch (err: unknown) {
+            let msg = 'Payment or upload failed. Please try again.';
+            if (axios.isAxiosError(err)) {
+                const d = err.response?.data as
+                    | { message?: string; error?: { message?: string } }
+                    | undefined;
+                msg =
+                    d?.error?.message ||
+                    (typeof d?.message === 'string' ? d.message : null) ||
+                    err.message ||
+                    msg;
+            } else if (err instanceof Error) {
+                msg = err.message;
+            }
+            setError(msg);
+            log.error('Pay & Process failed', { data: { err } });
+            setStatus('error');
+            return;
         } finally {
             payProcessInFlight.current = false;
         }

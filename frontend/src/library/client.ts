@@ -14,7 +14,9 @@ export const fileCleanerApi = axios.create({
     maxContentLength: Infinity,
     maxBodyLength: Infinity,
 });
-export const subscriptionApi = axios.create({ baseURL });
+export const userApi = axios.create({
+    baseURL,
+});
 export const welcomePageApi = axios.create({ baseURL });
 export const paystackApi = axios.create({
     baseURL,
@@ -37,11 +39,10 @@ const attachAuth = (instance: AxiosInstance) => {
         return config;
     });
 };
-attachAuth(paystackApi);
-attachAuth(subscriptionApi);
+attachAuth(userApi);
 attachAuth(welcomePageApi);
 attachAuth(fileCleanerApi);
-subscriptionApi.interceptors.response.use(
+userApi.interceptors.response.use(
     (response) => response,
     (error) => {
         if (
@@ -70,34 +71,7 @@ subscriptionApi.interceptors.response.use(
         });
     }
 );
-paystackApi.interceptors.response.use(
-    (response) => response,
-    (error) => {
-        if (
-            error.code === 'ERR_NETWORK' ||
-            error.code === 'ERR_CONNECTION_REFUSED' ||
-            error.message === 'Network Error'
-        ) {
-            return Promise.reject({
-                message:
-                    'Unable to connect to the server please try again later',
-                status: 503,
-                type: 'NetworkError',
-            });
-        }
-        const message =
-            error.response?.data?.error?.message ||
-            error.response?.data.error ||
-            error.response?.data.message ||
-            'Something went wrong.Please try again';
-        error.customMessage = message;
-        return Promise.reject({
-            message,
-            status: error.response?.status || 500,
-            type: error.response?.data?.type || 'Server Error',
-        });
-    }
-);
+
 fileCleanerApi.interceptors.response.use(
     (response) => response,
     (error) => {
