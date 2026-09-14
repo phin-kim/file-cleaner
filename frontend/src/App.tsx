@@ -15,7 +15,7 @@ import {
     Outlet,
     //Navigate,
 } from 'react-router-dom';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import createClientLogger from './utils/clientLogger';
 import handleApiError from './utils/apiError';
 import useErrorStore from './Store/ErrorStore';
@@ -24,8 +24,7 @@ const log = createClientLogger('App.tsx');
 //import { UpgradeModal } from './components/Popup';
 import WelcomeModal from './Pages/WelcomePage';
 import ProtectedRoutes from './components/ProtectedRoutes';
-import { userApi, welcomePageApi } from './library/client';
-import { useTierStore } from './Store/tierStore';
+import { userApi } from './library/client';
 import ForgotPassword from './components/Auth/ForgotPassword';
 import ResetSuccess from './components/Auth/ResetSuccess';
 import ResetPassword from './components/Auth/ResetPassword';
@@ -51,47 +50,20 @@ useAuthStore.getState()	Store getters	❌ No	Non-React code (interceptors, helpe
 */
 function App() {
     //const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const refreshExecuted = useRef(false);
-    const setTierId = useTierStore((state) => state.setTierId);
     const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
     log.debug(
         `State of is authenticated after the fetch in app.tsx isAuthenticated: ${isAuthenticated}`
     );
     useEffect(() => {
-        if (refreshExecuted.current) {
-            log.warn('refresh already executed skipping duplicate');
-            return;
-        }
-        const restoreSession = async () => {
-            refreshExecuted.current = true;
-            /**
-             *  Only restore session if there was a previous session
-             * this return caused the refresh endpoint to being hit hence i had to log in every time
-             * if (!hasStoredSession) {
-                return; }
-            */
-
+        const fetchProfile = async () => {
             try {
-                /*const hasSession = localStorage.getItem('hasSession');
-                if (!hasSession) {
-                    log.info('No stored session skipping refresh');
-                    return;
-                } else {
-                    log.info('Session present');
-                }*/
-                const refresh = useAuthStore.getState().refresh;
-
-                await refresh();
-                const currentUser = useAuthStore.getState().user;
-                const currentAuth = useAuthStore.getState().isAuthenticated;
-                if (currentAuth) {
-                    log.info('Session restored');
+                if (isAuthenticated) {
+                    log.info('user is authenticated');
                     const response = await userApi.get('/user/fetch-profile');
                     log.debug('The fetch profile response ', {
                         data: response.data,
                     });
-                    setTierId(response.data.tierId);
-                    log.info(`Tier synchronized: ${response.data.tierId}`);
+
                     const wb = response.data.walletBalance;
                     if (typeof wb === 'number') {
                         useWalletStore.getState().setBalanceFromServer(wb);
@@ -122,19 +94,15 @@ function App() {
                 } else {
                     log.warn('Session restoration failed no valid session');
                     log.error('Failed to sync tier');
-                    setTierId('free');
                 }
-                log.debug(`is authenticated ${currentAuth}`);
-                log.highlight(`Logged in as ${currentUser?.email}`);
             } catch (error) {
                 log.error('Initialization failed', { data: { error } });
                 const { setError } = useErrorStore.getState();
                 handleApiError(error, setError);
-                setTierId('free');
             }
         };
-        restoreSession();
-    }, [setTierId]);
+        fetchProfile();
+    }, []);
     const queryClient = new QueryClient({
         defaultOptions: {
             queries: {

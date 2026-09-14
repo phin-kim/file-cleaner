@@ -1,14 +1,18 @@
+import { authClient } from '../lib/auth-client';
+
 export interface RegisterData {
     email: string;
     password: string;
 }
+export type LoginResponse = Awaited<ReturnType<typeof authClient.signIn.email>>;
+
 export interface User {
     id: string;
-    phone: string;
+    phone?: string;
     email: string;
     name?: string;
     profileImageUrl?: string;
-    role: 'user' | 'admin';
+    role?: string;
     createdAt?: Date;
 }
 export type AuthResponse = {
@@ -17,12 +21,12 @@ export type AuthResponse = {
     message: string;
     createdAt: Date;
 };
-export type LoginResponse = {
+/*export type LoginResponse = {
     accessToken: string;
     user: User;
     message: string;
     createdAt: Date;
-};
+};*/
 
 export type AuthState = {
     user: User | null;
@@ -35,8 +39,8 @@ export type AuthState = {
     requestPasswordReset: (email: string) => Promise<void>;
     resetPassword: (token: string, password: string) => Promise<void>;
     setNotFound: (state: boolean) => void;
-    register: (email: string, password: string) => Promise<void>;
-    login: (email: string, password: string) => Promise<void>;
+    register: (name: string, email: string, password: string) => Promise<void>;
+    login: (email: string, password: string) => Promise<LoginResponse>;
     setHasHydrated: (state: boolean) => void;
     setAccessToken: (token: string | null) => void;
     refresh: () => Promise<void>;

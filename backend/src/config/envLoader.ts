@@ -40,6 +40,10 @@ log.debug(
     `GEMINI_API_KEY:,
     ${process.env.GEMINI_API_KEY ? '✅ Set' : '❌ Missing'}`
 );
+log.debug(
+    `TIDY_UP_DB:,
+    ${process.env.TIDY_UP_DB ? '✅ Set' : '❌ Missing'}`
+);
 log.debug(`HF_API_KEY: ${process.env.HF_API_KEY ? '✅ Set' : '❌ Missing'}`);
 log.debug(
     `PAYHERO_AUTH_TOKEN:,
@@ -93,6 +97,7 @@ export const GOOGLE_CLOUD_PROJECT = process.env.GOOGLE_CLOUD_PROJECT;
 export const GOOGLE_CLOUD_LOCATION = process.env.GOOGLE_CLOUD_LOCATION;
 export const GOOGLE_GENAI_USE_VERTEXAI = process.env.GOOGLE_GENAI_USE_VERTEXAI;
 export const GEMINI_MODEL = process.env.GEMINI_MODEL;
+export const DATABASE_URL = process.env.TIDY_UP_DB;
 
 // Validate required keys
 /*if (!GEMINI_API_KEY) {
@@ -101,6 +106,10 @@ export const GEMINI_MODEL = process.env.GEMINI_MODEL;
 }*/
 if (!GOOGLE_CLOUD_PROJECT) {
     log.error('❌ GOOGLE_CLOUD_PROJECT is required in .env file');
+    process.exit(1);
+}
+if (!DATABASE_URL) {
+    log.error('❌ DATABASE_URL is required in .env file');
     process.exit(1);
 }
 if (!GOOGLE_CLOUD_LOCATION) {

@@ -38,7 +38,11 @@ const RegistrationForm = ({ onToggle }: RegisterFormProps) => {
     const performRegister = async (data: RegisterInput) => {
         setIsLoading(true);
         try {
-            const res = await registerUser(data.email, data.password);
+            const res = await registerUser(
+                data.name,
+                data.email,
+                data.password
+            );
             log.info('User details sent to backend from the form', {
                 data: data,
             });
@@ -77,13 +81,31 @@ const RegistrationForm = ({ onToggle }: RegisterFormProps) => {
             <form onSubmit={handleSubmit(handleRegister)} className="space-y-8">
                 <div className="relative">
                     <label className="mb-1 ml-1 block text-xs font-bold tracking-wider text-gray-400 uppercase">
+                        Full Name
+                    </label>
+                    <input
+                        type="text"
+                        required
+                        {...register('name')}
+                        className="w-full border-b-2 border-purple-200 bg-transparent px-1 py-3 text-lg text-purple-900 transition-all outline-none placeholder:text-purple-200 focus:border-purple-600"
+                        placeholder="Jane Doe"
+                    />
+                    {errors.name && (
+                        <p className="font-bold text-red-600">
+                            {errors.name.message}
+                        </p>
+                    )}
+                </div>
+
+                <div className="relative">
+                    <label className="mb-1 ml-1 block text-xs font-bold tracking-wider text-gray-400 uppercase">
                         Email Address
                     </label>
                     <input
                         type="email"
                         required
                         {...register('email')}
-                        className="w-full border-b-2 border-purple-200 bg-transparent px-1 py-3 text-lg text-purple-900 transition-all outline-none placeholder:text-purple-200 focus:border-purple-600"
+                        className="w-full border-b-2 border-purple-200 bg-transparent px-1 py-3 text-lg text-purple-900 transition-all outline-none placeholder:text-purple-200 focus:border-purple-200 focus:border-purple-600"
                         placeholder="name@example.com"
                     />
                     {errors.email && (
@@ -127,7 +149,7 @@ const RegistrationForm = ({ onToggle }: RegisterFormProps) => {
                 <button
                     type="submit"
                     disabled={isSubmitting || isLoading}
-                    className="w-full rounded-2xl bg-purple-600 px-6 py-5 text-lg font-bold text-white shadow-xl shadow-purple-500/30 transition-all hover:scale-[1.01] hover:bg-purple-700 active:scale-[0.99] disabled:opacity-70 disabled:cursor-not-allowed"
+                    className="w-full rounded-2xl bg-purple-600 px-6 py-5 text-lg font-bold text-white shadow-xl shadow-purple-500/30 transition-all hover:scale-[1.01] hover:bg-purple-700 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70"
                 >
                     {isLoading || isSubmitting ? (
                         <ButtonLoader size="md" color="#fff" />

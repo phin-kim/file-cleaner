@@ -3,13 +3,13 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import { setAccessToken as setApiToken } from '../library/authApi';
 import createClientLogger from '../utils/clientLogger';
 //remember to change is authenticated in the db and also in the routes
-import type { AuthResponse, AuthState, LoginResponse } from '../types/auth';
+import type { AuthState, LoginResponse } from '../types/auth';
 import authApi, { setAccessToken } from '../library/authApi';
 import useSuccessStore from './SuccessStore';
 import useErrorStore from './ErrorStore';
 import handleApiError from '../utils/apiError';
-import type { BackendError, UnknownApiError } from '../types/types';
 import { useProfileStore } from './profileStore';
+import { authClient } from '../lib/auth-client';
 //import NotFound from '../components/NotFound';
 const log = createClientLogger('AUTH STORE');
 
@@ -29,39 +29,56 @@ export const useAuthStore = create<AuthState>()(
             setAccessToken: (token: string | null) => {
                 (set({ accessToken: token }), setApiToken(token));
             },
-            register: async (email, password) => {
+            register: async (name, email, password) => {
                 set({ isLoading: true });
                 log.highlight('SENDING DATA TO THE BACKEND');
                 try {
                     log.info('Data sent to the backend', {
                         data: { email },
                     });
-                    const res = await authApi.post<AuthResponse>(
-                        '/auth/register',
-                        {
-                            email,
-                            password,
+                    const { error } = await authClient.signUp.email({
+                        name,
+                        email,
+                        password,
+                        callbackURL: 'http://localhost:5173/',
+                    } as Parameters<typeof authClient.signUp.email>[0]);
+                    if (error) {
+                        const { setError } = useErrorStore.getState();
+                        const errorMessage =
+                            error.message || 'Error in signup.Please try again';
+                        switch (error.code) {
+                            case 'USER_ALREADY_EXISTS':
+                                setError(
+                                    'An account with this email already exists'
+                                );
+                                break;
+                            case 'PASSWORD_TOO_SHORT':
+                                setError(
+                                    'Password must be at least 8 characters'
+                                );
+                                break;
+                            default:
+                                log.error('error in sign up', {
+                                    data: { error },
+                                });
+
+                                setError(errorMessage);
                         }
-                    );
-                    get().setAccessToken(res.data.accessToken);
+                        log.error('Error in registering new user', {
+                            data: { error },
+                        });
+                        handleApiError(error, setError);
+                        set({ isAuthenticated: false });
+                        return;
+                    }
+
                     set({
-                        user: res.data.user,
-                        accessToken: res.data.accessToken,
-                        createdAt: res.data.createdAt,
                         isAuthenticated: true,
                     });
-                    useProfileStore
+                    /*useProfileStore
                         .getState()
-                        .setProfilePic(res.data.user?.profileImageUrl || null);
-                    setApiToken(res.data.accessToken);
-                    localStorage.setItem('hasSession', 'true');
-                    const currentState = get();
-                    log.debug(`Current user `, {
-                        data: currentState.user,
-                    });
-                    log.debug(
-                        `Is authenticated ${currentState.isAuthenticated}`
-                    );
+                        .setProfilePic(res.data.user?.profileImageUrl || null);*/
+
                     useSuccessStore.setState({
                         success: 'Registration successful',
                     });
@@ -81,91 +98,67 @@ export const useAuthStore = create<AuthState>()(
             },
             login: async (email, password) => {
                 set({ isLoading: true });
-                log.debug('Auth API endpoint', {
-                    data: {
-                        baseURL: authApi.defaults.baseURL,
-                        loginURL: `${authApi.defaults.baseURL}/auth/login`,
-                    },
-                });
 
                 try {
-                    const res = await authApi.post<LoginResponse>(
-                        '/auth/login',
-                        { email, password }
-                    );
-                    get().setAccessToken(res.data.accessToken);
+                    const response = await authClient.signIn.email({
+                        email,
+                        password,
+                        rememberMe: true,
+                        callbackURL: 'http://localhost:5173/',
+                    });
+                    const { data, error } = response;
+                    if (error) {
+                        const { setError } = useErrorStore.getState();
+                        const errorMessage =
+                            error.message || 'Error in login. Please try again';
+                        switch (error.code) {
+                            case 'USER_ALREADY_EXISTS':
+                                setError(
+                                    'An account with this email already exists'
+                                );
+                                break;
+                            case 'PASSWORD_TOO_SHORT':
+                                setError(
+                                    'Password must be at least 8 characters'
+                                );
+                                break;
+                            default:
+                                log.error('Error in login in user', {
+                                    data: { error },
+                                });
+
+                                setError(errorMessage);
+                        }
+                        log.error('Error in Login in  user', {
+                            data: { error },
+                        });
+                        handleApiError(error, setError);
+                        set({ isAuthenticated: false });
+                        return response; // Stop execution - don't set success state
+                    }
                     set({
-                        user: res.data.user,
-                        accessToken: res.data.accessToken,
+                        user: data?.user,
+                        accessToken: data?.token,
+                        createdAt: data?.user?.createdAt,
+
                         isAuthenticated: true,
-                        createdAt: res.data.createdAt,
                     });
-                    useProfileStore
-                        .getState()
-                        .setProfilePic(res.data.user?.profileImageUrl || null);
-                    setApiToken(res.data.accessToken);
-                    localStorage.setItem('hasSession', 'true');
-                    const currentState = get();
-                    log.debug(`Current user `, {
-                        data: currentState.user,
-                    });
-                    log.debug(
-                        `Is authenticated ${currentState.isAuthenticated}`
-                    );
                     useSuccessStore.setState({
-                        success: 'Login  successful',
+                        success: 'Login successful',
                     });
+                    return response;
                 } catch (error) {
-                    //const statusCode = error.code;
-
-                    log.warn(`Get the general error ${error}`);
-                    log.error('Error in registering', {
-                        data: { error },
-                    });
-
-                    let serverStatus: number | undefined;
-                    let serverData: BackendError | undefined;
-
-                    const potentialError = error as UnknownApiError;
-
-                    // Check if it has the typical Axios response structure
-                    if (potentialError?.response) {
-                        serverStatus = potentialError.response.status;
-                        serverData = potentialError.response.data;
-                        const rawData = potentialError.response?.data;
-                        serverData =
-                            typeof rawData === 'string'
-                                ? JSON.parse(rawData)
-                                : rawData;
-                    }
-                    // Check if the error itself has a status (some middlewares do this)
-                    else if (potentialError?.status) {
-                        serverStatus = potentialError.status;
-                        const rawData = potentialError?.data;
-                        serverData =
-                            typeof rawData === 'string'
-                                ? JSON.parse(rawData)
-                                : rawData;
-                    }
-
-                    log.error('Error in processing files', {
-                        data: { serverStatus, serverData },
-                    });
-                    /*const expiredFlag = log.debug(
-                `Is the 403 error being triggered: ${serverStatus === 403 ? 'YES' : 'NO'}`
-            );*/
-                    log.debug(
-                        `What is the server status code: ${serverStatus}`
-                    );
-                    // set({ notFound: true });
-                    log.debug(
-                        `Does it contain an expired flag: ${potentialError.type}`
-                    );
-
+                    log.error('Error in login in  user', { data: { error } });
                     const { setError } = useErrorStore.getState();
                     handleApiError(error, setError);
-
                     set({ isAuthenticated: false });
+                    return {
+                        data: null,
+                        error:
+                            error instanceof Error
+                                ? error
+                                : new Error('Unknown authentication error'),
+                    } as unknown as LoginResponse;
                 } finally {
                     set({ isLoading: false });
                 }
@@ -229,20 +222,9 @@ export const useAuthStore = create<AuthState>()(
                 }
             },
             logout: async () => {
-                try {
-                    await authApi.post('/auth/logout');
-                } catch (error) {
-                    log.error('Error in logout ', { data: { error } });
-                }
-                setAccessToken(null);
-                setApiToken(null);
-                set({
-                    user: null,
-                    accessToken: null,
-                    isAuthenticated: false,
-                    createdAt: null,
-                });
-                useProfileStore.getState().clearProfilePic();
+                await authClient.signOut();
+                log.warn('User is logged out ');
+                set({ isAuthenticated: false });
             },
             deleteAccount: async () => {
                 try {

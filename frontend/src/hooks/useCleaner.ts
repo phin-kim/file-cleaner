@@ -8,7 +8,6 @@ import type { AnalysisResult } from '../types/types';
 import useErrorStore from '../Store/ErrorStore';
 import createClientLogger from '../utils/clientLogger';
 import handleApiError from '../utils/apiError';
-import { useTierStore } from '../Store/tierStore';
 //import { TIER_CONFIG } from '../library/tier';
 //import { AxiosError } from 'axios';
 import { useGeneralStore } from '../Store/generalStore';
@@ -257,7 +256,6 @@ export default function useCleaner() {
         pageCount: number;
     } | null>(null);
     const payProcessInFlight = useRef(false);
-    const tierId = useTierStore((state) => state.tierId);
     const fileNoCheck = useTransactions((state) => state.fileNoCheck);
     /*const CURRENT_LIMIT =
         TIER_CONFIG[tierId as keyof typeof TIER_CONFIG]?.maxUploads;*/
@@ -394,7 +392,7 @@ export default function useCleaner() {
             const parsed = JSON.parse(storage);
             const userId = parsed.state.user.id;
             const response = await fileCleanerApi.post(
-                `/${path}?tierId=${tierId}&isWorkSheet=${isWorkSheet}&userId=${userId}`,
+                `/${path}?isWorkSheet=${isWorkSheet}&userId=${userId}`,
                 formData,
                 {
                     headers: {
@@ -651,7 +649,6 @@ export default function useCleaner() {
         event: React.ChangeEvent<HTMLInputElement>,
         path: string
     ) => {
-        log.debug(`Current tierId ${tierId}`);
         const files = event.target.files;
         if (!files || files.length === 0) {
             setError('No folder input');

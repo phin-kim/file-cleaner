@@ -39,14 +39,6 @@ export interface Subscription_Status {
     enum: ['active', 'suspended', 'banned'];
 }
 
-const refreshTokenSchema = new Schema(
-    {
-        tokenHash: { type: String, required: true },
-        createdAt: { type: Date, default: Date.now },
-        expiresAt: { type: Date, required: true },
-    },
-    { _id: false }
-);
 const UserSchema = new Schema<User_Type>(
     {
         email: {
@@ -57,34 +49,7 @@ const UserSchema = new Schema<User_Type>(
             trim: true,
             index: true,
         },
-        passwordHash: {
-            type: String,
-        },
-        refreshTokens: {
-            type: [refreshTokenSchema],
-            default: [],
-        },
-        resetPasswordToken: String,
-        resetPasswordExpires: Date,
-        tierId: {
-            type: String,
-            required: true,
-            default: 'free',
-            enum: ['free', 'tier-1', 'tier-2', 'tier-3'],
-        },
-        'subscription-period': {
-            type: String,
-            enum: ['monthly', '3 months'],
-        },
-        'subscription-status': {
-            type: String,
-            enum: ['active', 'suspended', 'banned', 'pending'],
-        },
-        'last-payment-date': {
-            type: Date,
-            required: true,
-            default: Date.now,
-        },
+
         dailyUsageCount: {
             type: Number,
             default: 0,
@@ -105,10 +70,6 @@ const UserSchema = new Schema<User_Type>(
             min: 0,
         },
         profileImageUrl: {
-            type: String,
-            default: '',
-        },
-        profileImagePublicId: {
             type: String,
             default: '',
         },
