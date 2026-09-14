@@ -50,7 +50,7 @@ export async function register(req: Request, res: Response) {
     if (deletedUser) {
         user.walletBalance = 0;
     } else {
-        user.walletBalance = 50;
+        user.walletBalance = 30;
     }
     //nb this if statement is there not necessarily for logic but coz the hash token brings an error so its either this or the non null assertion
 

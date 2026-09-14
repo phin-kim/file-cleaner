@@ -38,7 +38,7 @@ const HistoryPage = () => {
                         mpesaReference?: string | null;
                         source?: 'wallet-topup' | 'in-app-payment' | 'local';
                     }>;
-                }>('/wallet-history');
+                }>('/user/wallet-history');
                 if (!mounted) return;
                 setBalanceFromServer(Number(data.walletBalance ?? 0));
                 setTransactionsFromServer(

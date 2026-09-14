@@ -27,7 +27,7 @@ const parseRetryAfterMs = (value: unknown, fallbackMs = 2000): number => {
 };
 
 type PollStatusResponse = {
-    status: 'pending' | 'success' | 'failed';
+    status: 'QUEUED' | 'SUCCESS' | 'FAILED';
     walletBalance?: number;
     amount?: number;
     reason?: string;
@@ -47,14 +47,14 @@ async function pollUntilResolved(
                 statusPathBuilder(reference)
             );
 
-            if (data.status === 'success') {
+            if (data.status === 'SUCCESS') {
                 return {
                     walletBalance: Number(data.walletBalance ?? 0),
                     amount: Number(data.amount ?? 0),
                 };
             }
 
-            if (data.status === 'failed') {
+            if (data.status === 'FAILED') {
                 throw new Error(
                     data.reason || 'M-Pesa payment was not completed.'
                 );

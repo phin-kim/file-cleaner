@@ -182,7 +182,7 @@ async function settleWalletAndStkPayment(
         const initRes = await authApi.post<{
             status?: boolean;
             data?: {
-                reference: string;
+                payheroReference: string;
                 amount: number;
                 fileCount?: number;
                 pageCount?: number;
@@ -208,7 +208,9 @@ async function settleWalletAndStkPayment(
             }
         );
 
-        const reference = initRes.data?.data?.reference;
+        const reference = initRes.data?.data?.payheroReference;
+        log.debug('The payhero response', { data: initRes?.data?.data });
+        log.debug(`the reference sent to the payhero ${reference}`);
         if (!reference) {
             throw new Error(
                 initRes.data?.message ||

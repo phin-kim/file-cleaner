@@ -4,6 +4,7 @@ import authenticate from '../middleware/authenticate';
 import {
     deleteAccount,
     fetchProfile,
+    getWalletHistory,
     removeProfileImage,
     uploadProfileImage,
 } from '../controllers/userController';
@@ -26,4 +27,5 @@ userRouter.delete(
     authenticate,
     asyncHandler(removeProfileImage)
 );
+userRouter.get('/wallet-history', authenticate, asyncHandler(getWalletHistory));
 userRouter.post('/delete-account', authenticate, asyncHandler(deleteAccount));

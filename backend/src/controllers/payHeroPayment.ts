@@ -252,7 +252,8 @@ export async function initiateFolderCleanStk(
                 amount: roundedExpectedAmount,
                 email: user.email,
                 status: 'QUEUED',
-                reference,
+                reference: payheroInternalRef,
+                //reference
                 project: 'tidy-up',
                 provider: 'mpesa',
                 paymentKind: 'folder_clean',
