@@ -73,6 +73,10 @@ const UserSchema = new Schema<User_Type>(
             type: String,
             default: '',
         },
+        profileImagePublicId: {
+            type: String,
+            default: '',
+        },
     },
     { timestamps: true }
 );

@@ -8,7 +8,6 @@ import authApi, { setAccessToken } from '../library/authApi';
 import useSuccessStore from './SuccessStore';
 import useErrorStore from './ErrorStore';
 import handleApiError from '../utils/apiError';
-import { useProfileStore } from './profileStore';
 import { authClient } from '../lib/auth-client';
 //import NotFound from '../components/NotFound';
 const log = createClientLogger('AUTH STORE');
@@ -24,11 +23,7 @@ export const useAuthStore = create<AuthState>()(
             notFound: false,
 
             setNotFound: (state) => set({ notFound: state }),
-            _hasHydrated: false,
-            setHasHydrated: (state) => set({ _hasHydrated: state }),
-            setAccessToken: (token: string | null) => {
-                (set({ accessToken: token }), setApiToken(token));
-            },
+
             register: async (name, email, password) => {
                 set({ isLoading: true });
                 log.highlight('SENDING DATA TO THE BACKEND');
@@ -163,46 +158,7 @@ export const useAuthStore = create<AuthState>()(
                     set({ isLoading: false });
                 }
             },
-            refresh: async () => {
-                set({ isLoading: true });
-                localStorage.setItem('hasSession', 'true');
 
-                log.highlight('REFRESH IS TRIGGERED');
-                try {
-                    const res = await authApi.post('/auth/refresh');
-                    get().setAccessToken(res.data.accessToken);
-                    set({
-                        user: res.data.user,
-                        accessToken: res.data.accessToken,
-                        isAuthenticated: true,
-                        createdAt: res.data.createdAt,
-                    });
-                    useProfileStore
-                        .getState()
-                        .setProfilePic(res.data.user?.profileImageUrl || null);
-                    const currentState = get();
-                    log.debug('Access  token from authstore', {
-                        data: currentState.accessToken,
-                    });
-                    log.debug('Current user', { data: currentState.user });
-                    log.debug(
-                        `Is authenticated ${currentState.isAuthenticated}`
-                    );
-                    log.info('refresh from backend', { data: { res } });
-                } catch (error) {
-                    // refresh failed; user stays logged out
-                    localStorage.removeItem('hasSession');
-                    setAccessToken(null);
-                    set({
-                        user: null,
-                        accessToken: null,
-                        isAuthenticated: false,
-                    });
-                    log.error('Error in refreshing', { data: error });
-                } finally {
-                    set({ isLoading: false });
-                }
-            },
             requestPasswordReset: async (email: string) => {
                 try {
                     await authApi.post('/auth/forgot-password', { email });
@@ -257,14 +213,6 @@ export const useAuthStore = create<AuthState>()(
                 isAuthenticated: state.isAuthenticated,
             }),
             //triggered when local storage is finished loading
-            onRehydrateStorage: () => (state) => {
-                // When the page loads, immediately try to get a fresh token using the cookie
-                /**this approach caused a race condition between the ap.tsx and this store as both want the .refresh()   if (state?.isAuthenticated) {
-                    state.refresh();
-                }*/
-
-                state?.setHasHydrated(true);
-            },
         }
     )
 );

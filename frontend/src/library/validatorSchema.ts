@@ -11,6 +11,13 @@ export const registerSchema = z.object({
         .pipe(z.email({ error: 'Invalid email address' })),
     password: z.string().min(1, 'Password is required'),
 });
+export const loginSchema = z.object({
+    email: z
+        .string()
+        .trim()
+        .pipe(z.email({ error: 'Invalid email address' })),
+    password: z.string().min(1, 'Password is required'),
+});
 export const forgotPasswordSchema = z.object({
     email: z
         .string()
@@ -30,5 +37,6 @@ export const resetPasswordSchema = z
         path: ['confirmPassword'],
     });
 export type RegisterInput = z.infer<typeof registerSchema>;
+export type LoginInput = z.infer<typeof loginSchema>;
 export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;

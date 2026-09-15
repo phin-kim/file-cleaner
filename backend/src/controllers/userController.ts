@@ -1,13 +1,13 @@
 import type { Response, Request, NextFunction } from 'express';
 import { UserModel } from '../schema/UsersSchema';
 import { DeletedAccountModel } from '../schema/DeletedAccountSchema.js';
+import { auth, updateManagedUser } from '../lib/auth.js';
+import { fromNodeHeaders } from 'better-auth/node';
 
-import type { JWTUserPayload } from '../Types/authenticate';
 import type { AuthenticatedRequest } from '../Types/authenticate';
 import createLogger from '../utils/logger';
 const log = createLogger('userController.ts');
 import AppError from '../utils/appError';
-import { isUserDocument } from '../helpers/miniHelpers.js';
 import cloudinary from '../utils/cloudinary.js';
 import { TransactionsModel } from '../schema/TransactionSchema';
 export async function fetchProfile(
@@ -17,16 +17,14 @@ export async function fetchProfile(
 ) {
     try {
         const authReq = req as AuthenticatedRequest;
-        const userPayload = authReq.user;
 
-        if (!userPayload) {
+        const userId = authReq.user?.id;
+        log.debug(`the user id ${userId}`);
+        log.debug('The authenticated user', { data: authReq?.user });
+        if (!userId) {
             return next(AppError.unauthorized('Not authenticated'));
         }
-
-        // Otherwise, it's the JWT payload, use the uid to find the record
-        // We cast to 'any' or the specific payload type to access 'uid'
-        const userId = (userPayload as JWTUserPayload).uid;
-        const user = await UserModel.findById(userId);
+        const user = authReq?.user;
 
         if (!user) {
             log.warn('user not found in the db');
@@ -35,7 +33,6 @@ export async function fetchProfile(
         log.debug('User data', { data: { user } });
         res.status(200).json({
             status: 'SUCCESS',
-            tierId: user.tierId,
             lastUsageDate: user.lastUsageDate,
             dailyUsageCount: user.dailyUsageCount,
             walletBalance: user.walletBalance ?? 0,
@@ -49,15 +46,18 @@ export async function fetchProfile(
         return next(error);
     }
 }
-export async function uploadProfileImage(req: Request, res: Response) {
+export async function uploadProfileImage(
+    req: Request,
+    res: Response,
+    next: NextFunction
+) {
     const authReq = req as AuthenticatedRequest;
-    if (!authReq.user) {
-        throw AppError.unauthorized('Not authenticated');
+
+    const userId = authReq?.user?.id;
+    if (!userId) {
+        return next(AppError.unauthorized('Not authenticated'));
     }
-    const userId = isUserDocument(authReq.user)
-        ? authReq.user._id.toString()
-        : authReq.user.uid;
-    const user = await UserModel.findById(userId);
+    const user = authReq?.user;
     if (!user) {
         throw AppError.notFound('User not found');
     }
@@ -95,9 +95,13 @@ export async function uploadProfileImage(req: Request, res: Response) {
         });
     }
 
-    user.profileImageUrl = uploaded.secure_url;
-    user.profileImagePublicId = uploaded.public_id;
-    await user.save();
+    await auth.api.updateUser({
+        body: {
+            profileImageUrl: uploaded.secure_url,
+            profileImagePublicId: uploaded.public_id,
+        },
+        headers: fromNodeHeaders(req.headers),
+    });
 
     return res.status(200).json({
         success: true,
@@ -105,15 +109,18 @@ export async function uploadProfileImage(req: Request, res: Response) {
     });
 }
 
-export async function removeProfileImage(req: Request, res: Response) {
+export async function removeProfileImage(
+    req: Request,
+    res: Response,
+    next: NextFunction
+) {
     const authReq = req as AuthenticatedRequest;
-    if (!authReq.user) {
-        throw AppError.unauthorized('Not authenticated');
+
+    const userId = authReq?.user?.id;
+    if (!userId) {
+        return next(AppError.unauthorized('Not authenticated'));
     }
-    const userId = isUserDocument(authReq.user)
-        ? authReq.user._id.toString()
-        : authReq.user.uid;
-    const user = await UserModel.findById(userId);
+    const user = authReq?.user;
     if (!user) {
         throw AppError.notFound('User not found');
     }
@@ -122,9 +129,13 @@ export async function removeProfileImage(req: Request, res: Response) {
             resource_type: 'image',
         });
     }
-    user.profileImageUrl = '';
-    user.profileImagePublicId = '';
-    await user.save();
+    await auth.api.updateUser({
+        body: {
+            profileImageUrl: '',
+            profileImagePublicId: '',
+        },
+        headers: fromNodeHeaders(req.headers),
+    });
     return res.status(200).json({ success: true, profileImageUrl: '' });
 }
 export async function incrementUsage(
@@ -134,31 +145,33 @@ export async function incrementUsage(
 ) {
     try {
         const authReq = req as AuthenticatedRequest;
-
         // Replace findOne({ email: ... }) with findById
-        if (!authReq.user) {
-            return next(AppError.unauthorized('Not authenticated'));
-        }
 
         // TYPE SAFE EXTRACTION:
         // If it's a Document, use ._id. If it's a Payload, use .uid.
-        const userId = isUserDocument(authReq.user)
-            ? authReq.user._id.toString()
-            : authReq.user.uid;
-
+        const userId = authReq?.user?.id;
+        if (!userId) {
+            return next(AppError.unauthorized('Not authenticated'));
+        }
         // Now you can proceed safely
-        const user = isUserDocument(authReq.user)
-            ? authReq.user
-            : await UserModel.findById(userId);
+        const user = authReq?.user;
 
         if (!user) return next(AppError.notFound('User not found'));
-        user.dailyUsageCount += 1;
-        user.lastUsageDate = new Date();
-        await user.save();
+        const nextCount = Number(user.dailyUsageCount ?? 0) + 1;
 
+        await updateManagedUser(
+            {
+                userId,
+                data: {
+                    dailyUsageCount: nextCount,
+                    lastUsageDate: new Date(),
+                },
+            },
+            fromNodeHeaders(req.headers)
+        );
         res.status(200).json({
             success: true,
-            currentCount: user.dailyUsageCount,
+            currentCount: nextCount,
         });
     } catch (error) {
         log.error('Error in incrementing the usage ', { data: { error } });
@@ -172,20 +185,20 @@ export async function getWalletHistory(
 ) {
     try {
         const authReq = req as AuthenticatedRequest;
-        const userPayload = authReq.user as JWTUserPayload | undefined;
-        if (!userPayload?.uid) {
+        const user = authReq?.user;
+        const userId = authReq?.user?.id;
+        if (!userId) {
             return next(AppError.unauthorized('Not authenticated'));
         }
-
-        const user = await UserModel.findById(userPayload.uid).select(
-            'walletBalance'
-        );
+        // const user = await UserModel.findOne({ userId }).select(
+        //     'walletBalance'
+        // );
         if (!user) {
             return next(AppError.notFound('User not found'));
         }
 
         const txs = await TransactionsModel.find({
-            userId: userPayload.uid,
+            userId,
             status: 'SUCCESS',
         })
             .sort({ createdAt: -1 })
@@ -251,16 +264,16 @@ export const deleteAccount = async (
     next: NextFunction
 ) => {
     const authReq = req as AuthenticatedRequest;
-    const userPayload = authReq.user;
+    const userId = authReq?.user?.id;
     log.debug('Inside Controller', { data: { user: authReq.user } });
-    if (!userPayload) {
+    if (!userId) {
         return next(AppError.unauthorized('Not authenticated'));
     }
 
     // Otherwise, it's the JWT payload, use the uid to find the record
     // We cast to 'any' or the specific payload type to access 'uid'
-    const userId = (userPayload as JWTUserPayload).uid;
-    const user = await UserModel.findById(userId);
+
+    const user = authReq?.user;
 
     if (!user) {
         log.warn('user not found in the db');
@@ -277,7 +290,7 @@ export const deleteAccount = async (
     }
     try {
         await DeletedAccountModel.create({ email: user.email });
-        await UserModel.findByIdAndDelete(userId);
+        await UserModel.findOneAndDelete({ userId });
         res.status(200).json({
             success: true,
             message: 'Account deleted successfully',

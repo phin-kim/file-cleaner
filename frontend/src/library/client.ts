@@ -10,17 +10,17 @@ const baseURL =
 
 export const fileCleanerApi = axios.create({
     baseURL,
+    withCredentials: true,
     timeout: 600000, // 10 minutes for large file uploads
     maxContentLength: Infinity,
     maxBodyLength: Infinity,
 });
 export const userApi = axios.create({
     baseURL,
+    withCredentials: true,
 });
-export const welcomePageApi = axios.create({ baseURL });
-export const paystackApi = axios.create({
-    baseURL,
-});
+export const welcomePageApi = axios.create({ baseURL, withCredentials: true });
+
 const attachAuth = (instance: AxiosInstance) => {
     instance.interceptors.request.use((config) => {
         // We use the live 'accessToken' exported from authApi.ts

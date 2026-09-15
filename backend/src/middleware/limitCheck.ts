@@ -1,23 +1,20 @@
 import type { Request, Response, NextFunction } from 'express';
-import { UserModel } from '../schema/UsersSchema.js';
 import AppError from '../utils/appError.js';
-import type {
-    JWTUserPayload,
-    AuthenticatedRequest,
-} from '../Types/authenticate.js';
+import { updateManagedUser } from '../lib/auth.js';
+import { fromNodeHeaders } from 'better-auth/node';
+import type { AuthenticatedRequest } from '../Types/authenticate.js';
 import createLogger from '../utils/logger.js';
 const log = createLogger('Limitcheck.ts');
 const checkDailyLimit = (fileLimitThreshold: number = 30, dailyMax = 4) => {
     return async (req: Request, _res: Response, next: NextFunction) => {
         const authReq = req as AuthenticatedRequest;
-        const payload = authReq.user;
-        const userId = (payload as JWTUserPayload)?.uid;
+        const user = authReq.user;
+        const userId = user?.id;
         //Get the number of files from the request
         const fileCount = Array.isArray(req.files) ? req.files?.length : 0;
         //attach this flag into the request object
-        (req as AuthenticatedRequest).isHeavyUpload =
-            fileCount > fileLimitThreshold;
-        if (!(req as AuthenticatedRequest).isHeavyUpload) {
+        authReq.isHeavyUpload = fileCount > fileLimitThreshold;
+        if (!authReq.isHeavyUpload) {
             return next();
         }
 
@@ -33,9 +30,10 @@ const checkDailyLimit = (fileLimitThreshold: number = 30, dailyMax = 4) => {
         if (fileCount <= fileLimitThreshold) {
             return next();
         }
-        const user = await UserModel.findById(userId);
 
-        if (!user) return next(AppError.notFound('User not found'));
+        if (!userId || !user) {
+            return next(AppError.unauthorized('Not authenticated'));
+        }
 
         // 1. Get User's Timezone Offset from headers (sent by frontend)
         // Frontend should send: headers: { 'x-timezone-offset': new Date().getTimezoneOffset() }
@@ -51,16 +49,29 @@ const checkDailyLimit = (fileLimitThreshold: number = 30, dailyMax = 4) => {
             userLocalTime.getTime() - 24 * 60 * 60 * 1000
         );
         //last usage date converted into the users local time
+        const lastUsageDate = user.lastUsageDate
+            ? new Date(user.lastUsageDate)
+            : now;
         const lastUsageLocal = new Date(
-            new Date(user.lastUsageDate).getTime() - clientOffset * 60000
+            lastUsageDate.getTime() - clientOffset * 60000
         );
         //sliding window logic
+        let dailyUsageCount = Number(user.dailyUsageCount ?? 0);
         if (lastUsageLocal < twentyFourHoursAgo) {
-            user.dailyUsageCount = 0;
-            //save only in the processing logic
+            dailyUsageCount = 0;
+            await updateManagedUser(
+                {
+                    userId,
+                    data: {
+                        dailyUsageCount,
+                        lastUsageDate: now,
+                    },
+                },
+                fromNodeHeaders(req.headers)
+            );
         }
         //check heavy usage limit
-        if (user.dailyUsageCount >= dailyMax) {
+        if (dailyUsageCount >= dailyMax) {
             const expiryTimeLocal =
                 lastUsageLocal.getTime() + 24 * 60 * 60 * 1000;
             const timeLeftMs = expiryTimeLocal - userLocalTime.getTime();

@@ -15,7 +15,7 @@ import {
     Outlet,
     //Navigate,
 } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import createClientLogger from './utils/clientLogger';
 import handleApiError from './utils/apiError';
 import useErrorStore from './Store/ErrorStore';
@@ -54,7 +54,12 @@ function App() {
     log.debug(
         `State of is authenticated after the fetch in app.tsx isAuthenticated: ${isAuthenticated}`
     );
+    const hasFetchedProfile = useRef(false);
+
     useEffect(() => {
+        if (!isAuthenticated || hasFetchedProfile.current) return;
+
+        hasFetchedProfile.current = true;
         const fetchProfile = async () => {
             try {
                 if (isAuthenticated) {
@@ -96,13 +101,14 @@ function App() {
                     log.error('Failed to sync tier');
                 }
             } catch (error) {
+                hasFetchedProfile.current = false;
                 log.error('Initialization failed', { data: { error } });
                 const { setError } = useErrorStore.getState();
                 handleApiError(error, setError);
             }
         };
         fetchProfile();
-    }, []);
+    }, [isAuthenticated]);
     const queryClient = new QueryClient({
         defaultOptions: {
             queries: {

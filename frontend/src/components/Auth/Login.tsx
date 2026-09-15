@@ -5,6 +5,8 @@ import { Eye, EyeOff, ShieldCheck } from 'lucide-react';
 //import { type LoginInput, loginSchema } from '../library/validatorSchema';
 
 import {
+    type LoginInput,
+    loginSchema,
     type RegisterInput,
     registerSchema,
 } from '../../library/validatorSchema';
@@ -33,12 +35,13 @@ const LoginForm = ({ onToggle }: LoginFormProps) => {
         register,
         handleSubmit,
         formState: { errors, isSubmitting },
-    } = useForm<RegisterInput>({
-        resolver: zodResolver(registerSchema),
+    } = useForm<LoginInput>({
+        resolver: zodResolver(loginSchema),
     });
 
-    const performLogin = async (data: RegisterInput) => {
+    const performLogin = async (data: LoginInput) => {
         setIsLoading(true);
+        log.debug('Triggering login ...');
         try {
             const res = await loginUser(data.email, data.password);
             log.info('Login successful', { data: res });
@@ -51,10 +54,9 @@ const LoginForm = ({ onToggle }: LoginFormProps) => {
         }
     };
 
-    const debouncedLogin = useDebounce(performLogin, 2000);
-
-    const onSubmit = async (data: RegisterInput) => {
-        debouncedLogin(data);
+    const onSubmit = async (data: LoginInput) => {
+        log.debug('Triggering login ...');
+        await performLogin(data);
     };
 
     return (
@@ -131,7 +133,7 @@ const LoginForm = ({ onToggle }: LoginFormProps) => {
                 <button
                     type="submit"
                     disabled={isSubmitting || isLoading}
-                    className="w-full rounded-2xl bg-purple-600 px-6 py-5 text-lg font-bold text-white shadow-xl shadow-purple-500/30 transition-all hover:scale-[1.01] hover:bg-purple-700 active:scale-[0.99] disabled:opacity-70 disabled:cursor-not-allowed"
+                    className="w-full rounded-2xl bg-purple-600 px-6 py-5 text-lg font-bold text-white shadow-xl shadow-purple-500/30 transition-all hover:scale-[1.01] hover:bg-purple-700 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70"
                 >
                     {isLoading || isSubmitting ? (
                         <ButtonLoader size="md" color="#fff" />

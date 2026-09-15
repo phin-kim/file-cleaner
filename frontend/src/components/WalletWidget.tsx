@@ -33,7 +33,7 @@ const WalletWidget = () => {
         queryFn: async () => {
             const response = await welcomePageApi.get<{
                 walletBalance?: number;
-            }>('/fetch-profile');
+            }>('/user/fetch-profile');
             if (typeof response.data.walletBalance !== 'number') {
                 throw new Error('Invalid wallet balance response');
             }

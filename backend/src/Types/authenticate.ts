@@ -27,7 +27,7 @@ export interface AuthenticatedRequest extends Request {
     isHeavyUpload?: boolean;
 }*/
 
-import type { Request } from 'express';
+/*import type { Request } from 'express';
 import { Document } from 'mongoose';
 import type { User_Type } from '../schema/UsersSchema';
 
@@ -51,4 +51,37 @@ export interface AuthenticatedRequest extends Request {
     // We keep the union, but we will handle the "extraction" in a type-safe way
     user?: JWTUserPayload | UserDocument;
     isHeavyUpload?: boolean;
+}*/
+import type { Request } from 'express';
+
+export interface BetterAuthUser {
+    id: string;
+    email: string;
+    emailVerified: boolean;
+    name: string;
+    image?: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+    [key: string]: unknown;
+    dailyUsageCount?: number;
+    lastUsageDate?: Date | null;
+    role?: string;
+    walletBalance?: number;
+    profileImageUrl?: string;
+    profileImagePublicId?: string;
 }
+export interface BetterAuthSession {
+    id: string;
+    userId: string;
+    expiresAt: Date;
+    token: string;
+    createdAt: Date;
+    updatedAt: Date;
+    ipAddress?: string | null;
+    userAgent?: string | null;
+}
+export type AuthenticatedRequest = Request & {
+    user?: BetterAuthUser;
+    session?: BetterAuthSession;
+    isHeavyUpload?: boolean;
+};

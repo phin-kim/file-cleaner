@@ -31,7 +31,6 @@ export type AuthResponse = {
 export type AuthState = {
     user: User | null;
     accessToken: string | null;
-    _hasHydrated: boolean; //<-- used  as a flag to tell the pages to wait until the is authenticated is read from the local storage
     isAuthenticated: boolean;
     createdAt: Date | null;
     isLoading: boolean;
@@ -41,9 +40,6 @@ export type AuthState = {
     setNotFound: (state: boolean) => void;
     register: (name: string, email: string, password: string) => Promise<void>;
     login: (email: string, password: string) => Promise<LoginResponse>;
-    setHasHydrated: (state: boolean) => void;
-    setAccessToken: (token: string | null) => void;
-    refresh: () => Promise<void>;
     logout: () => Promise<void>;
     deleteAccount: () => Promise<void>;
 };
