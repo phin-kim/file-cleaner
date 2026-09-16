@@ -12,10 +12,7 @@ import axios from 'axios';
 import type { Response, Request, NextFunction } from 'express';
 import createLogger from '../utils/logger.js';
 import AppError from '../utils/appError.js';
-import type {
-    AuthenticatedRequest,
-    JWTUserPayload,
-} from '../Types/authenticate.js';
+import type { AuthenticatedRequest } from '../Types/authenticate.js';
 import {
     TransactionsModel,
     type Transaction_Type,
@@ -27,6 +24,12 @@ import { mergerChargeAmountKes } from '../constants/mergerPricing.js';
 import PayheroService, {
     type TransactionStatusResponse,
 } from '../services/payheroService.js';
+import {
+    debitManagedWallet,
+    getManagedUser,
+    incrementManagedWallet,
+} from '../lib/auth.js';
+
 const log = createLogger('payHeroPayment.ts');
 
 const PAYHERO_AUTH_TOKEN = process.env.PAYHERO_AUTH_TOKEN;
@@ -134,8 +137,8 @@ export async function initiateFolderCleanStk(
     next: NextFunction
 ) {
     const authReq = req as AuthenticatedRequest;
-    const userPayload = authReq?.user as JWTUserPayload | undefined;
-    const userId = userPayload?.uid;
+    const user = authReq?.user;
+    const userId = user?.id;
     if (!userId) {
         return next(AppError.unauthorized('Authentication required'));
     }
@@ -170,7 +173,6 @@ export async function initiateFolderCleanStk(
         );
     }
 
-    const user = await UserModel.findById(userId).select('email');
     if (!user?.email) {
         return next(AppError.notFound('User not found'));
     }
@@ -320,8 +322,8 @@ export async function initiateFileMergerStk(
     next: NextFunction
 ) {
     const authReq = req as AuthenticatedRequest;
-    const userPayload = authReq?.user as JWTUserPayload | undefined;
-    const userId = userPayload?.uid;
+    const user = authReq?.user;
+    const userId = user?.id;
     if (!userId) return next(AppError.unauthorized('Authentication required'));
     if (!PAYHERO_AUTH_TOKEN) {
         return next(
@@ -353,7 +355,7 @@ export async function initiateFileMergerStk(
         req.header('Idempotent-Key') ||
         (idempotentKey as string | undefined);
     log.debug(`the idempotency key ${idempotencyKey}`);
-    const user = await UserModel.findById(userId).select('email');
+
     if (!user?.email) return next(AppError.notFound('User not found'));
 
     const computedAmount = mergerChargeAmountKes(count);
@@ -470,8 +472,8 @@ export async function initiateWalletTopupStk(
     next: NextFunction
 ) {
     const authReq = req as AuthenticatedRequest;
-    const userPayload = authReq?.user as JWTUserPayload | undefined;
-    const userId = userPayload?.uid;
+    const user = authReq?.user;
+    const userId = user?.id;
     const {
         phoneNumber,
         amount: rawAmount,
@@ -487,7 +489,7 @@ export async function initiateWalletTopupStk(
     if (!userId) {
         return next(AppError.unauthorized('Authentication required'));
     }
-    const user = await UserModel.findById(userId).select('email');
+
     if (!user?.email) {
         return next(AppError.notFound('User not found'));
     }
@@ -638,12 +640,11 @@ export async function pollFolderCleanPaymentStatus(
 ) {
     const { reference } = req.params;
     const authReq = req as AuthenticatedRequest;
-    const userPayload = authReq?.user as JWTUserPayload | undefined;
-    const userId = userPayload?.uid;
+    const user = authReq?.user;
+    const userId = user?.id;
     if (!userId) {
         return next(AppError.unauthorized('Authentication required'));
     }
-    const user = await UserModel.findById(userId).select('walletBalance');
 
     if (!reference || typeof reference !== 'string') {
         return next(AppError.badRequest('reference is required'));
@@ -765,8 +766,8 @@ export async function pollWalletTopupPaymentStatus(
     next: NextFunction
 ) {
     const authReq = req as AuthenticatedRequest;
-    const userPayload = authReq?.user as JWTUserPayload | undefined;
-    const userId = userPayload?.uid;
+    const user = authReq?.user;
+    const userId = user?.id;
     if (!userId) {
         return next(AppError.unauthorized('Authentication required'));
     }
@@ -784,7 +785,7 @@ export async function pollWalletTopupPaymentStatus(
     if (!reference || typeof reference !== 'string') {
         return next(AppError.badRequest('reference is required'));
     }
-    const user = await UserModel.findById(userId).select('walletBalance');
+
     const tx = await TransactionsModel.findOne({
         reference,
         userId,
@@ -895,15 +896,15 @@ export async function pollFileMergerPaymentStatus(
     next: NextFunction
 ) {
     const authReq = req as AuthenticatedRequest;
-    const userPayload = authReq?.user as JWTUserPayload | undefined;
-    const userId = userPayload?.uid;
+    const user = authReq?.user;
+    const userId = user?.id;
     if (!userId) return next(AppError.unauthorized('Authentication required'));
 
     const { reference } = req.params;
     if (!reference || typeof reference !== 'string') {
         return next(AppError.badRequest('reference is required'));
     }
-    const user = await UserModel.findById(userId).select('walletBalance');
+
     const tx = await TransactionsModel.findOne({
         reference,
         userId,
@@ -1001,9 +1002,7 @@ export async function finalizeFolderCleanIfPendingByReference(
         return { outcome: 'not_found' };
     }
     if (tx.status === 'SUCCESS') {
-        const user = await UserModel.findById(tx.userId).select(
-            'walletBalance'
-        );
+        const user = await getManagedUser(tx.userId);
         return {
             outcome: 'SUCCESS',
             walletBalance: user?.walletBalance ?? 0,
@@ -1040,12 +1039,11 @@ export async function finalizeFolderCleanIfPendingByReference(
         return { outcome: 'PROCESSING' };
     }
 
-    const userAfter = await UserModel.findByIdAndUpdate(
-        tx.userId,
-        { $inc: { walletBalance: tx.amount } },
-        { returnDocument: 'after', select: 'walletBalance' }
-    );
+    const userAfter = await incrementManagedWallet(tx.userId, tx.amount);
 
+    if (!userAfter) {
+        throw new Error('Authenticated user was not found');
+    }
     log.info('Folder clean payment finalized; wallet credited', {
         data: { reference, amount: tx.amount },
     });
@@ -1303,8 +1301,8 @@ export async function chargeWalletForFolderCleaner(
     next: NextFunction
 ) {
     const authReq = req as AuthenticatedRequest;
-    const userPayload = authReq?.user as JWTUserPayload | undefined;
-    const userId = userPayload?.uid;
+    const user = authReq?.user;
+    const userId = user?.id;
     if (!userId) {
         return next(AppError.unauthorized('Authentication required'));
     }
@@ -1330,11 +1328,8 @@ export async function chargeWalletForFolderCleaner(
         return next(AppError.badRequest('Invalid charge amount'));
     }
     log.debug(`This is the charging amount ${chargingAmount}`);
-    const userAfterDebit = await UserModel.findOneAndUpdate(
-        { _id: userId, walletBalance: { $gte: chargeAmount } },
-        { $inc: { walletBalance: -chargeAmount } },
-        { returnDocument: 'after', select: 'walletBalance email' }
-    );
+    const userAfterDebit = await debitManagedWallet(userId, chargeAmount);
+
     if (!userAfterDebit) {
         return next(
             AppError.badRequest(
@@ -1384,8 +1379,8 @@ export async function chargeWalletForFileMerger(
     next: NextFunction
 ) {
     const authReq = req as AuthenticatedRequest;
-    const userPayload = authReq?.user as JWTUserPayload | undefined;
-    const userId = userPayload?.uid;
+    const user = authReq?.user;
+    const userId = user?.id;
     if (!userId) {
         return next(AppError.unauthorized('Authentication required'));
     }
@@ -1459,8 +1454,8 @@ export async function refundWalletCharge(
     next: NextFunction
 ) {
     const authReq = req as AuthenticatedRequest;
-    const userPayload = authReq?.user as JWTUserPayload | undefined;
-    const userId = userPayload?.uid;
+    const user = authReq?.user;
+    const userId = user?.id;
     if (!userId) {
         return next(AppError.unauthorized('Authentication required'));
     }
@@ -1497,11 +1492,14 @@ export async function refundWalletCharge(
         });
     }
 
-    const user = await UserModel.findByIdAndUpdate(
-        userId,
-        { $inc: { walletBalance: chargeTx.amount } },
-        { returnDocument: 'after', select: 'walletBalance email' }
+    const userAfter = await incrementManagedWallet(
+        chargeTx.userId,
+        chargeTx.amount
     );
+
+    if (!userAfter) {
+        throw new Error('Authenticated user was not found');
+    }
     const amountNum = Number(chargeTx.amount);
     if (!Number.isFinite(amountNum)) {
         return next(AppError.badRequest('amount must be a number'));

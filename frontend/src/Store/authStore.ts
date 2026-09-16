@@ -1,20 +1,19 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import { setAccessToken as setApiToken } from '../library/authApi';
 import createClientLogger from '../utils/clientLogger';
 //remember to change is authenticated in the db and also in the routes
 import type { AuthState, LoginResponse } from '../types/auth';
-import authApi, { setAccessToken } from '../library/authApi';
 import useSuccessStore from './SuccessStore';
 import useErrorStore from './ErrorStore';
 import handleApiError from '../utils/apiError';
 import { authClient } from '../lib/auth-client';
+import { userApi } from '../library/client';
 //import NotFound from '../components/NotFound';
 const log = createClientLogger('AUTH STORE');
 
 export const useAuthStore = create<AuthState>()(
     persist(
-        (set, get) => ({
+        (set) => ({
             user: null,
             isAuthenticated: false,
             accessToken: null,
@@ -159,15 +158,15 @@ export const useAuthStore = create<AuthState>()(
                 }
             },
 
-            requestPasswordReset: async (email: string) => {
+            /*requestPasswordReset: async (email: string) => {
                 try {
                     await authApi.post('/auth/forgot-password', { email });
                 } catch (error) {
                     const { setError } = useErrorStore.getState();
                     handleApiError(error, setError);
                 }
-            },
-            resetPassword: async (token: string, password: string) => {
+            },*/
+            /*resetPassword: async (token: string, password: string) => {
                 try {
                     // Send token in the URL and password in the body
                     await authApi.patch(`/auth/reset-password/${token}`, {
@@ -176,7 +175,7 @@ export const useAuthStore = create<AuthState>()(
                 } catch (error) {
                     throw error;
                 }
-            },
+            },*/
             logout: async () => {
                 await authClient.signOut();
                 log.warn('User is logged out ');
@@ -184,9 +183,8 @@ export const useAuthStore = create<AuthState>()(
             },
             deleteAccount: async () => {
                 try {
-                    await authApi.post('/user/delete-account');
-                    setAccessToken(null);
-                    setApiToken(null);
+                    await userApi.post('/user/delete-account');
+
                     set({
                         user: null,
                         accessToken: null,

@@ -2,7 +2,7 @@ import { betterAuth } from 'better-auth';
 import type { Auth, BetterAuthOptions } from 'better-auth';
 import { admin } from 'better-auth/plugins';
 import { mongodbAdapter } from 'better-auth/adapters/mongodb';
-import { MongoClient } from 'mongodb';
+import { MongoClient, ObjectId } from 'mongodb';
 import AppError from '../utils/appError';
 const isProd = process.env.NODE_ENV === 'production';
 const TIDY_UP_DATABASE_URL = isProd
@@ -100,6 +100,22 @@ export interface ManagedUserUpdate {
         lastUsageDate?: Date;
     };
 }
+export interface ManagedUser {
+    _id: ObjectId;
+    email: string;
+    walletBalance?: number;
+    profileImageUrl?: string;
+    profileImagePublicId?: string;
+    dailyUsageCount?: number;
+    lastUsageDate?: Date;
+}
+export const getManagedUser = async (
+    userId: string
+): Promise<ManagedUser | null> => {
+    return db.collection<ManagedUser>('user').findOne({
+        _id: toUserObjectId(userId),
+    });
+};
 
 export const updateManagedUser = async (
     body: ManagedUserUpdate,
@@ -113,4 +129,47 @@ export const updateManagedUser = async (
     };
 
     return adminApi.adminUpdateUser({ body, headers });
+};
+
+const toUserObjectId = (userId: string): ObjectId => {
+    if (!ObjectId.isValid(userId)) {
+        throw new Error(`Invalid Better Auth user id: ${userId}`);
+    }
+
+    return new ObjectId(userId);
+};
+
+export const incrementManagedWallet = async (
+    userId: string,
+    amount: number
+): Promise<ManagedUser | null> => {
+    return db.collection<ManagedUser>('user').findOneAndUpdate(
+        {
+            _id: toUserObjectId(userId),
+        },
+        {
+            $inc: { walletBalance: amount },
+        },
+        {
+            returnDocument: 'after',
+        }
+    );
+};
+
+export const debitManagedWallet = async (
+    userId: string,
+    amount: number
+): Promise<ManagedUser | null> => {
+    return db.collection<ManagedUser>('user').findOneAndUpdate(
+        {
+            _id: toUserObjectId(userId),
+            walletBalance: { $gte: amount },
+        },
+        {
+            $inc: { walletBalance: -amount },
+        },
+        {
+            returnDocument: 'after',
+        }
+    );
 };

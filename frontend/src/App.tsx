@@ -25,7 +25,7 @@ const log = createClientLogger('App.tsx');
 import WelcomeModal from './Pages/WelcomePage';
 import ProtectedRoutes from './components/ProtectedRoutes';
 import { userApi } from './library/client';
-import ForgotPassword from './components/Auth/ForgotPassword';
+//import ForgotPassword from './components/Auth/ForgotPassword';
 import ResetSuccess from './components/Auth/ResetSuccess';
 import ResetPassword from './components/Auth/ResetPassword';
 import Sidebar from './components/Sidebar';
@@ -148,10 +148,10 @@ function App() {
                         <Route path="/about" element={<About />} />
                         <Route path="/contact" element={<Contact />} />
                         <Route path="/auth" element={<AuthForm />} />
-                        <Route
+                        {/* <Route
                             path="/auth/forgot-password"
                             element={<ForgotPassword />}
-                        />
+                        /> */}
                         <Route
                             path="/auth/reset-success"
                             element={<ResetSuccess />}

@@ -14,7 +14,6 @@ import asyncHandler from '../middleware/asyncHandler.js';
 import uploadLimiter from '../utils/rateLimiter.js';
 //import { TIER_CONFIG } from '../config/tiers.js';
 import { sendEmailAlert } from '../utils/sendEmail.js';
-import { isUserDocument } from '../helpers/miniHelpers.js';
 import {
     organizeByExtension,
     type ExtensionStats,
@@ -23,6 +22,8 @@ import checkDailyLimit from '../middleware/limitCheck.js';
 import { UserModel } from '../schema/UsersSchema.js';
 import type { AuthenticatedRequest } from '../Types/authenticate.js';
 import authenticate from '../middleware/authenticate.js';
+import { updateManagedUser } from '../lib/auth.js';
+import { fromNodeHeaders } from 'better-auth/node';
 const log = createLogger('FolderCleaner.ts');
 export const cleanerRoute: Router = Router();
 const __filename = fileURLToPath(import.meta.url);
@@ -290,38 +291,14 @@ cleanerRoute.post(
         );
         const isHeavy = (req as AuthenticatedRequest).isHeavyUpload;
         const authReq = req as AuthenticatedRequest;
-
+        const user = authReq?.user;
+        const userId = user?.id;
         // Replace findOne({ email: ... }) with findById
-        if (!authReq.user) {
+        if (!user || !userId) {
             return next(AppError.unauthorized('Not authenticated'));
         }
-
-        // TYPE SAFE EXTRACTION:
-        // If it's a Document, use ._id. If it's a Payload, use .uid.
-        const userId = isUserDocument(authReq.user)
-            ? authReq.user._id.toString()
-            : authReq.user.uid;
-
-        // Now you can proceed safely
-        const user = isUserDocument(authReq.user)
-            ? authReq.user
-            : await UserModel.findById(userId);
-
-        if (!user) return next(AppError.notFound('User not found'));
-
         const uploadedFiles = req.files as Express.Multer.File[];
         const uploadedFolderName = req.body.folderName; //fallback
-        const subscriptionStatus = await sendEmailAlert(req);
-        log.highlight('This is the subscription status', {
-            data: { subscriptionStatus },
-        });
-        if (subscriptionStatus?.expired) {
-            return res.status(403).json({
-                type: 'SUBSCRIPTION_EXPIRED',
-                message: 'Your subscription has expired',
-            });
-        }
-        //const tierId = (req.query.tierId as keyof typeof TIER_CONFIG) || 'free';
 
         //MAX_UPLOADS = TIER_CONFIG[tierId].maxUploads;
 
@@ -414,9 +391,18 @@ cleanerRoute.post(
                 },
             });
             if (isHeavy) {
-                user.dailyUsageCount += 1;
-                user.lastUsageDate = new Date();
-                await user.save();
+                const nextCount = Number(user.dailyUsageCount ?? 0) + 1;
+
+                await updateManagedUser(
+                    {
+                        userId,
+                        data: {
+                            dailyUsageCount: nextCount,
+                            lastUsageDate: new Date(),
+                        },
+                    },
+                    fromNodeHeaders(req.headers)
+                );
                 log.debug('Daily usage count incremented and saved.');
             } else {
                 log.debug(

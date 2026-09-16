@@ -9,7 +9,7 @@ import {
     //ChevronRight,
     Loader2,
 } from 'lucide-react';
-import { welcomePageApi } from '../library/client';
+import { walletApi } from '../library/client';
 import { useWalletStore } from '../Store/walletStore';
 import useErrorStore from '../Store/ErrorStore';
 import handleApiError from '../utils/apiError';
@@ -31,7 +31,7 @@ const WalletWidget = () => {
     const { data, isLoading, error, isError } = useQuery({
         queryKey: ['wallet-balance'],
         queryFn: async () => {
-            const response = await welcomePageApi.get<{
+            const response = await walletApi.get<{
                 walletBalance?: number;
             }>('/user/fetch-profile');
             if (typeof response.data.walletBalance !== 'number') {

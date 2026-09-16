@@ -1,5 +1,5 @@
 import axios from 'axios';
-import authApi from '../library/authApi';
+import { walletApi } from '../library/client';
 
 const POLL_MAX_MS = 180_000;
 /** PayHero often returns 404 until the STK row is indexed — wait before first status call. */
@@ -43,7 +43,7 @@ async function pollUntilResolved(
 
     while (Date.now() - started < POLL_MAX_MS) {
         try {
-            const { data } = await authApi.get<PollStatusResponse>(
+            const { data } = await walletApi.get<PollStatusResponse>(
                 statusPathBuilder(reference)
             );
 

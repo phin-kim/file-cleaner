@@ -20,8 +20,7 @@ import createClientLogger from '../utils/clientLogger';
 const log = createClientLogger('Profile.tsx');
 import { Trash2 } from 'lucide-react';
 import { useProfileStore } from '../Store/profileStore';
-import authApi from '../library/authApi';
-import { welcomePageApi } from '../library/client';
+import { userApi } from '../library/client';
 import useSuccessStore from '../Store/SuccessStore';
 import useErrorStore from '../Store/ErrorStore';
 const Profile: React.FC = () => {
@@ -101,8 +100,8 @@ const Profile: React.FC = () => {
             const formData = new FormData();
             formData.append('image', file);
             try {
-                const { data } = await authApi.post(
-                    '/auth/profile-image',
+                const { data } = await userApi.post(
+                    '/user/profile-image',
                     formData,
                     {
                         headers: { 'Content-Type': 'multipart/form-data' },
@@ -161,7 +160,7 @@ const Profile: React.FC = () => {
         setIsUploadDropdownOpen(false);
         setIsUploading(true);
         try {
-            await authApi.delete('/user/profile-image');
+            await userApi.delete('/user/profile-image');
             useSuccessStore
                 .getState()
                 .setSuccess('Profile photo removed successfully!');

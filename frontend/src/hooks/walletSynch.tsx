@@ -1,8 +1,8 @@
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import authApi from '../library/authApi';
 import { pollWalletTopupPayment } from '../utils/pollPayHeroPayment';
 import useErrorStore from '../Store/ErrorStore';
+import { walletApi } from '../library/client';
 export function useWalletBalanceTopUp() {
     const queryClient = useQueryClient();
     return useMutation({
@@ -13,7 +13,7 @@ export function useWalletBalanceTopUp() {
             mpesaPhone: string;
             val: number;
         }) => {
-            const initRes = await authApi.post<{
+            const initRes = await walletApi.post<{
                 status?: boolean;
                 data?: { reference: string; amount: number };
                 message?: string;

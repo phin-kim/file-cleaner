@@ -3,13 +3,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff, ShieldCheck } from 'lucide-react';
 //import { type LoginInput, loginSchema } from '../library/validatorSchema';
-
-import {
-    type LoginInput,
-    loginSchema,
-    type RegisterInput,
-    registerSchema,
-} from '../../library/validatorSchema';
+import { authClient } from '../../lib/auth-client';
+import { type LoginInput, loginSchema } from '../../library/validatorSchema';
 import { useAuthStore } from '../../Store/authStore';
 import useErrorStore from '../../Store/ErrorStore';
 import handleApiError from '../../utils/apiError';
@@ -17,6 +12,7 @@ import createClientLogger from '../../utils/clientLogger';
 import { useNavigate } from 'react-router-dom';
 import { useDebounce } from '../../hooks/useDebounce';
 import ButtonLoader from '../ButtonLoader';
+import useSuccessStore from '../../Store/SuccessStore';
 
 const log = createClientLogger('LoginForm');
 
@@ -26,6 +22,7 @@ interface LoginFormProps {
 
 const LoginForm = ({ onToggle }: LoginFormProps) => {
     const [showPassword, setShowPassword] = useState(false);
+    const setSuccess = useSuccessStore((state) => state.setSuccess);
     const [isLoading, setIsLoading] = useState(false);
     const { setError } = useErrorStore();
     const navigate = useNavigate();
@@ -34,6 +31,7 @@ const LoginForm = ({ onToggle }: LoginFormProps) => {
     const {
         register,
         handleSubmit,
+        watch,
         formState: { errors, isSubmitting },
     } = useForm<LoginInput>({
         resolver: zodResolver(loginSchema),
@@ -57,6 +55,24 @@ const LoginForm = ({ onToggle }: LoginFormProps) => {
     const onSubmit = async (data: LoginInput) => {
         log.debug('Triggering login ...');
         await performLogin(data);
+    };
+    const email = watch('email');
+    const handleForgotPassword = async (email: string) => {
+        if (!email.trim()) {
+            setError('Enter your email address first');
+            return;
+        }
+
+        const { error } = await authClient.requestPasswordReset({
+            email: email,
+            redirectTo: '/auth/forgot-password',
+        });
+
+        if (error) {
+            console.error('Failed to send reset email', error);
+        } else {
+            setSuccess('Check your email for the password reset link!');
+        }
     };
 
     return (
@@ -117,7 +133,9 @@ const LoginForm = ({ onToggle }: LoginFormProps) => {
                     <div className="mt-2 flex justify-end">
                         <button
                             type="button"
-                            onClick={() => navigate('/auth/forgot-password')}
+                            onClick={() => {
+                                handleForgotPassword(email);
+                            }}
                             className="text-xs font-semibold text-purple-400 transition-colors hover:text-purple-600"
                         >
                             Forgot password?

@@ -5,7 +5,6 @@ import fs from 'fs-extra';
 import multer from 'multer';
 import { fileURLToPath } from 'url';
 
-import { isUserDocument } from '../helpers/miniHelpers.js';
 import uploadLimiter from '../utils/rateLimiter.js';
 import createLogger from '../utils/logger.js';
 //import { TIER_CONFIG } from '../config/tiers.js';
@@ -19,6 +18,8 @@ import { processPdfsNative } from '../utils/GeminiPdfMerger.js';
 import { convertHtmlToPdf } from '../utils/html-pdf.js';
 import { countPdfPagesFromPaths } from '../utils/pdfPageCounter.js';
 import { mergerChargeAmountKes } from '../constants/mergerPricing.js';
+import { updateManagedUser } from '../lib/auth.js';
+import { fromNodeHeaders } from 'better-auth/node';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const log = createLogger('Merge route');
@@ -74,24 +75,20 @@ mergerRoute.post(
             //const userEmail = authReq?.user?.email;
 
             const authReq = req as AuthenticatedRequest;
-
+            const user = authReq?.user;
+            const userId = user?.id;
             // Replace findOne({ email: ... }) with findById
-            if (!authReq.user) {
+            if (!user) {
                 return next(AppError.unauthorized('Not authenticated'));
             }
 
             // TYPE SAFE EXTRACTION:
             // If it's a Document, use ._id. If it's a Payload, use .uid.
-            const userId = isUserDocument(authReq.user)
-                ? authReq.user._id.toString()
-                : authReq.user.uid;
 
             // Now you can proceed safely
-            const user = isUserDocument(authReq.user)
-                ? authReq.user
-                : await UserModel.findById(userId);
 
-            if (!user) return next(AppError.notFound('User not found'));
+            if (!user || !userId)
+                return next(AppError.notFound('User not found'));
 
             const isWorkSheet = req.query.isWorkSheet === 'true';
             //const CAN_MERGE = TIER_CONFIG[tierId].canMerge;
@@ -183,9 +180,18 @@ mergerRoute.post(
             log.highlight(
                 `Done generating the pdf and sent ${downloadURL} to front end`
             );
-            user.dailyUsageCount += 1;
-            user.lastUsageDate = new Date();
-            await user?.save();
+            const nextCount = Number(user.dailyUsageCount ?? 0) + 1;
+
+            await updateManagedUser(
+                {
+                    userId,
+                    data: {
+                        dailyUsageCount: nextCount,
+                        lastUsageDate: new Date(),
+                    },
+                },
+                fromNodeHeaders(req.headers)
+            );
             res.json({
                 success: true,
                 downloadURL,

@@ -1,7 +1,11 @@
 import React, { useRef, useState } from 'react';
 import axios from 'axios';
-import { fileCleanerApi, userApi, welcomePageApi } from '../library/client';
-import authApi from '../library/authApi';
+import {
+    fileCleanerApi,
+    userApi,
+    walletApi,
+    welcomePageApi,
+} from '../library/client';
 import type { UploadedFolder, Status, UploadLimitResult } from '../types/types';
 import traverseDirectory from '../utils/traverser';
 import type { AnalysisResult } from '../types/types';
@@ -77,7 +81,7 @@ async function chargeWalletForCleanerUpload(
     }
     const idempotentKey = crypto.randomUUID();
     try {
-        const { data } = await authApi.post<{
+        const { data } = await walletApi.post<{
             status: string;
             amount: number;
             chargeReference: string;
@@ -178,7 +182,7 @@ async function settleWalletAndStkPayment(
         }
 
         const idempotentKey = crypto.randomUUID();
-        const initRes = await authApi.post<{
+        const initRes = await walletApi.post<{
             status?: boolean;
             data?: {
                 payheroReference: string;
@@ -501,7 +505,7 @@ export default function useCleaner() {
             log.error('Error in processing files', { data: { error } });
             if (chargedWallet !== null) {
                 try {
-                    const refundRes = await authApi.post<{
+                    const refundRes = await fileCleanerApi.post<{
                         walletBalance?: number;
                     }>('/payment/wallet/refund-charge', {
                         chargeReference: chargedWallet.chargeReference,

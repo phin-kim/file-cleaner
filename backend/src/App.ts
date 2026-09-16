@@ -160,7 +160,7 @@ app.post(
 app.use(express.json());
 app.use(cookieParser(cookieSecret));
 
-app.use('/api', generalRateLimiter);
+//app.use('/api', generalRateLimiter);
 app.use('/api', cleanerRoute);
 app.use('/api', uploadRateLimiter, mergerRoute);
 //app.use('/api/auth', authRoute);

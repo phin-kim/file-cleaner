@@ -35,8 +35,8 @@ export type AuthState = {
     createdAt: Date | null;
     isLoading: boolean;
     notFound: boolean;
-    requestPasswordReset: (email: string) => Promise<void>;
-    resetPassword: (token: string, password: string) => Promise<void>;
+    //requestPasswordReset: (email: string) => Promise<void>;
+    //resetPassword: (token: string, password: string) => Promise<void>;
     setNotFound: (state: boolean) => void;
     register: (name: string, email: string, password: string) => Promise<void>;
     login: (email: string, password: string) => Promise<LoginResponse>;
