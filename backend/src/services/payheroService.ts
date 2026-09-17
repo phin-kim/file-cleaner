@@ -28,8 +28,10 @@ export interface TransactionStatusResponse {
     payment_reference: string;
     third_party_reference: string;
     status: 'QUEUED' | 'PROCESSING' | 'FAILED' | 'SUCCESS';
-    CheckoutRequestId: string;
-    provider_reference: string;
+    reference: string;
+    CheckoutRequestID?: string;
+    provider_reference?: string;
+    external_reference?: string;
 }
 class PayheroService {
     private client: AxiosInstance; //https://backend.payhero.co.ke/api/v2/payments
@@ -115,7 +117,12 @@ class PayheroService {
         reference: string
     ): Promise<TransactionStatusResponse> {
         try {
-            log.highlight(`The reference ${reference}`);
+            log.highlight(`The pre-api call data `, {
+                data: {
+                    reference,
+                },
+            });
+
             const response = await this.client.get('/transaction-status', {
                 params: { reference },
             });
@@ -150,7 +157,9 @@ class PayheroService {
             log.error('Failed to fetch transaction status', {
                 data: { statusCode, message, errorData },
             });
-
+            log.error('the post endpoint data', {
+                data: { error },
+            });
             throw AppError.badRequest('Failed to fetch payment status');
         }
     }

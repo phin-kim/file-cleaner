@@ -11,7 +11,6 @@ import createLogger from '../utils/logger.js';
 import AppError from '../utils/appError.js';
 //import { ConnectionCheckedOutEvent } from 'mongodb';
 import checkDailyLimit from '../middleware/limitCheck.js';
-import { UserModel } from '../schema/UsersSchema.js';
 import type { AuthenticatedRequest } from '../Types/authenticate.js';
 import authenticate from '../middleware/authenticate.js';
 import { processPdfsNative } from '../utils/GeminiPdfMerger.js';

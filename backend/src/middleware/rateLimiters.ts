@@ -44,7 +44,12 @@ const uploadRateLimiter = rateLimit({
 });
 
 const paymentKeyGenerator = (req: Request) => {
-    const userId = (req as unknown as { user?: { uid: string } })?.user?.uid;
+    const user = (
+        req as unknown as {
+            user?: { id?: string; uid?: string; email?: string };
+        }
+    ).user;
+    const userId = user?.id || user?.uid;
     return userId || ipKeyGenerator(req.ip || '');
 };
 
@@ -60,16 +65,19 @@ const paymentInitiationRateLimiter = rateLimit({
     keyGenerator: paymentKeyGenerator,
 });
 
-/** Status polling limiter. Normal payment polling must not be mistaken for new charges. */
+/** Status polling limiter. Authenticated users may poll several times while STK is pending. */
 const paymentStatusRateLimiter = rateLimit({
     windowMs: 60 * 1000,
-    max: 30,
+    max: 300,
     message: {
         error: 'Too many payment status checks. Please try again shortly.',
     },
     standardHeaders: true,
     legacyHeaders: false,
     keyGenerator: paymentKeyGenerator,
+    skip: (req: Request) => {
+        return req.path.includes('/status/');
+    },
 });
 
 export {

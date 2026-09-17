@@ -16,16 +16,10 @@ import {
 import fs from 'fs-extra';
 import { mergerRoute } from './routes/fileMergerRoute.js';
 import createLogger from './utils/logger.js';
-import { authRoute } from './routes/auth.js';
 import errorHandler from './utils/errorHandler.js';
 import { connectDatabases } from './config/DB.js';
 import { paymentRoute } from './routes/paymentRoute.js';
-import {
-    generalRateLimiter,
-    uploadRateLimiter,
-    paymentInitiationRateLimiter,
-    paymentStatusRateLimiter,
-} from './middleware/rateLimiters.js';
+import { uploadRateLimiter } from './middleware/rateLimiters.js';
 import { userRouter } from './routes/userRoute.js';
 
 const log = createLogger('APP.TS');
@@ -165,7 +159,7 @@ app.use('/api', cleanerRoute);
 app.use('/api', uploadRateLimiter, mergerRoute);
 //app.use('/api/auth', authRoute);
 app.use('/api/user', userRouter);
-app.use('/api/payment', paymentStatusRateLimiter, paymentRoute);
+app.use('/api/payment', paymentRoute);
 app.use('/downloads', express.static(path.join(process.cwd(), 'backend/temp')));
 
 const PROJECT_ROOT = path.resolve(__dirname, '../');

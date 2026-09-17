@@ -2,7 +2,6 @@
 //import { embeddingCache } from '../utils/fileMerger.js';
 //import { saveEmbeddingsCache } from '../utils/fileMerger.js';
 
-import type { JWTUserPayload, UserDocument } from '../Types/authenticate.js';
 //import type { Request } from 'express';
 
 // const log = createLogger('Mini Helpers');
@@ -26,8 +25,3 @@ export function sleep(ms: number) {
 /**
  * Type Guard to check if the user property is the full Mongoose Document
  */
-export const isUserDocument = (
-    user: JWTUserPayload | UserDocument
-): user is UserDocument => {
-    return (user as UserDocument)._id !== undefined;
-};

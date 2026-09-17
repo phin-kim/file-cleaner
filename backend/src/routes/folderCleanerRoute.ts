@@ -13,13 +13,11 @@ import AppError from '../utils/appError.js';
 import asyncHandler from '../middleware/asyncHandler.js';
 import uploadLimiter from '../utils/rateLimiter.js';
 //import { TIER_CONFIG } from '../config/tiers.js';
-import { sendEmailAlert } from '../utils/sendEmail.js';
 import {
     organizeByExtension,
     type ExtensionStats,
 } from '../utils/organizeFolder.js';
 import checkDailyLimit from '../middleware/limitCheck.js';
-import { UserModel } from '../schema/UsersSchema.js';
 import type { AuthenticatedRequest } from '../Types/authenticate.js';
 import authenticate from '../middleware/authenticate.js';
 import { updateManagedUser } from '../lib/auth.js';

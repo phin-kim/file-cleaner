@@ -1,4 +1,4 @@
-import type { NextFunction, Request, Response } from 'express';
+/*import type { NextFunction, Request, Response } from 'express';
 import { UserModel } from '../schema/UsersSchema.js';
 import AppError from '../utils/appError.js';
 import { comparePasswords, hashPassword } from '../utils/hashes.js';
@@ -8,7 +8,6 @@ import createLogger from '../utils/logger.js';
 import validateAndNormalizeEmail from '../middleware/emailValidator.js';
 import axios from 'axios';
 import { DeletedAccountModel } from '../schema/DeletedAccountSchema.js';
-import type { JWTUserPayload, Subscription } from '../Types/authenticate.js';
 
 const BREVO_API_KEY = process.env.BREVO_API_KEY;
 if (!BREVO_API_KEY) {
@@ -37,10 +36,9 @@ export async function register(req: Request, res: Response) {
         email,
         passwordHash,
     });
-    const payload: JWTUserPayload = {
+    const payload = {
         uid: user._id.toString(),
         email: user.email,
-        subscriptionStatus: user.tierId as Subscription,
         role: user.role,
         displayName: user.email.split('@')[0],
     };
@@ -54,10 +52,10 @@ export async function register(req: Request, res: Response) {
     }
     //nb this if statement is there not necessarily for logic but coz the hash token brings an error so its either this or the non null assertion
 
-    /*if (!refreshToken) {
+    if (!refreshToken) {
         log.warn('Token has expired');
         throw AppError.tokenExpired('Kindly log in again');
-    }*/
+    }
     const refreshTokenHash = hashToken(refreshToken!);
     log.info('Storing refresh token hash in DB', {
         data: {
@@ -128,10 +126,9 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     if (!isMatched) {
         return next(AppError.unauthorized('Wrong password input.'));
     }
-    const payload: JWTUserPayload = {
+    const payload = {
         uid: user._id.toString(),
         email: user.email,
-        subscriptionStatus: user.tierId as Subscription,
         role: user.role,
         displayName: user.email.split('@')[0],
     };
@@ -292,4 +289,4 @@ export async function resetPassword(
     user.resetPasswordToken = undefined;
     await user.save();
     res.status(200).json({ success: true });
-}
+}*/

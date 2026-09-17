@@ -136,7 +136,11 @@ async function settleWalletAndStkPayment(
     path: string,
     count: number,
     walletBalance: number,
-    mpesaPhone: string
+    mpesaPhone: string,
+    onSuccessfulPayment?: (payment: {
+        chargedWallet: { amount: number; chargeReference: string } | null;
+        walletBalanceAfter: number;
+    }) => Promise<void> | void
 ): Promise<{
     chargedWallet: { amount: number; chargeReference: string } | null;
     walletBalanceAfter: number;
@@ -162,6 +166,17 @@ async function settleWalletAndStkPayment(
                 walletBalanceAfter: useWalletStore.getState().balance,
             };
         }
+    }
+
+    if (walletPortion === totalCost) {
+        const resolvedPayment = {
+            chargedWallet,
+            walletBalanceAfter: useWalletStore.getState().balance,
+        };
+        if (onSuccessfulPayment) {
+            await onSuccessfulPayment(resolvedPayment);
+        }
+        return resolvedPayment;
     }
 
     if (stkPortion > 0) {
@@ -226,6 +241,15 @@ async function settleWalletAndStkPayment(
                 ? await pollFileMergerPayment(reference)
                 : await pollFolderCleanPayment(reference);
         useWalletStore.getState().setBalanceFromServer(updatedWalletBalance);
+
+        const resolvedPayment = {
+            chargedWallet,
+            walletBalanceAfter: useWalletStore.getState().balance,
+        };
+        if (onSuccessfulPayment) {
+            await onSuccessfulPayment(resolvedPayment);
+        }
+        return resolvedPayment;
     }
 
     return {
@@ -599,7 +623,19 @@ export default function useCleaner() {
                 pending.path,
                 units,
                 walletBalance,
-                mpesaPhone
+                mpesaPhone,
+                async (payment) => {
+                    await executeFolderUploadToBackend(
+                        pending.files,
+                        pending.folderName,
+                        pending.path,
+                        pending.uploadLimit,
+                        undefined,
+                        payment.chargedWallet,
+                        true,
+                        true
+                    );
+                }
             );
 
             if (
@@ -610,16 +646,6 @@ export default function useCleaner() {
                 return;
             }
 
-            await executeFolderUploadToBackend(
-                pending.files,
-                pending.folderName,
-                pending.path,
-                pending.uploadLimit,
-                undefined,
-                settledPayment.chargedWallet,
-                true,
-                true
-            );
             return;
         } catch (err: unknown) {
             let msg = 'Payment or upload failed. Please try again.';
@@ -637,7 +663,10 @@ export default function useCleaner() {
             }
             setError(msg);
             log.error('Pay & Process failed', { data: { err } });
-            setStatus('error');
+            pendingCleanRef.current = null;
+            setUploadedFolder(null);
+            setProgress(0);
+            setStatus('idle');
             return;
         } finally {
             payProcessInFlight.current = false;

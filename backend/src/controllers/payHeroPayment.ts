@@ -21,9 +21,7 @@ import { UserModel } from '../schema/UsersSchema.js';
 import { cleanerChargeAmountKes } from '../constants/cleanerPricing.js';
 import { mergerChargeAmountKes } from '../constants/mergerPricing.js';
 //import { maxFolderFilesForTier } from '../constants/tierUploadLimits.js';
-import PayheroService, {
-    type TransactionStatusResponse,
-} from '../services/payheroService.js';
+import PayheroService from '../services/payheroService.js';
 import {
     debitManagedWallet,
     getManagedUser,
@@ -38,19 +36,6 @@ const PAYHERO_AUTH_TOKEN = process.env.PAYHERO_AUTH_TOKEN;
 //const PAYHERO_CHANNEL_ID = Number(process.env.PAYHERO_CHANNEL_ID) || 7067;
 const MIN_WALLET_TOPUP_KES = 10;
 const MAX_WALLET_TOPUP_KES = 500_000;
-const PAYHERO_STATUS_INITIAL_DELAY_MS = 3500;
-const PAYHERO_STATUS_RETRY_DELAYS_MS = [2000, 3000, 5000, 8000, 12000];
-
-const delay = (ms: number) =>
-    new Promise<void>((resolve) => setTimeout(resolve, ms));
-
-function normalizePayHeroPollStatus(
-    status: TransactionStatusResponse['status'] | undefined
-): 'SUCCESS' | 'FAILED' | 'PROCESSING' {
-    if (status === 'SUCCESS') return 'SUCCESS';
-    if (status === 'FAILED') return 'FAILED';
-    return 'PROCESSING';
-}
 
 /*export async function pollPayHeroStatusWithRetry(
     reference: string,
@@ -693,18 +678,29 @@ export async function pollFolderCleanPaymentStatus(
         );
 
         //const statusResponse = await pollPayHeroStatusWithRetry(reference);
-        if (!statusResponse || statusResponse.status === 'PROCESSING') {
+        if (statusResponse.status === 'PROCESSING') {
+            log.debug('Data b4 success tx status ', {
+                data: { statusResponse },
+            });
             return res.status(200).json({ status: 'PROCESSING' as const });
         }
 
-        const status = statusResponse.status as
-            | { status?: 'SUCCESS' | 'FAILED' | 'PROCESSING' | 'QUEUED' }
-            | undefined;
-
-        if (status?.status === 'SUCCESS') {
+        const payHeroStatus = statusResponse.status;
+        log.debug(`payhero status ${payHeroStatus}`);
+        if (payHeroStatus === 'SUCCESS') {
             const final =
                 await finalizeFolderCleanIfPendingByReference(reference);
             if (final.outcome === 'SUCCESS') {
+                log.highlight(
+                    'The process is successful and hence sending this message'
+                );
+                log.debug('Data b4 success tx status ', {
+                    data: {
+                        payHeroStatus,
+                        final,
+                    },
+                });
+
                 return res.status(200).json({
                     status: 'SUCCESS' as const,
                     amount: final.amount ?? tx.amount,
@@ -712,19 +708,35 @@ export async function pollFolderCleanPaymentStatus(
                 });
             }
             if (final.outcome === 'PROCESSING') {
+                log.debug('Currently processing data ');
+                log.debug('Data b4 processing tx status ', {
+                    data: {
+                        payHeroStatus,
+                        final,
+                    },
+                });
                 return res.status(200).json({ status: 'PROCESSING' as const });
             }
         }
 
-        if (status?.status === 'FAILED') {
-            const failureReason = describePayHeroFailure(status.status);
+        if (payHeroStatus === 'FAILED') {
+            const failureReason = describePayHeroFailure(payHeroStatus);
             await markFolderCleanFailed(tx, failureReason);
+            log.debug('Data b4 failed tx status ', {
+                data: {
+                    payHeroStatus,
+                },
+            });
             return res.status(400).json({
                 status: 'FAILED' as const,
                 reason: failureReason,
             });
         }
-
+        log.debug('final return data', {
+            data: {
+                payHeroStatus,
+            },
+        });
         return res.status(200).json({ status: 'PROCESSING' as const });
     } catch (error) {
         if (axios.isAxiosError(error)) {
@@ -733,6 +745,32 @@ export async function pollFolderCleanPaymentStatus(
                     data: { reference: tx.reference },
                 });
                 return res.json({ status: 'PROCESSING' as const });
+            }
+            if (error.response?.status === 429) {
+                const txStatusText = String(tx.status);
+                const transactionAlreadySucceeded =
+                    txStatusText === 'SUCCESS' || tx.webhookReceived;
+                log.debug('Error details in the 429', {
+                    data: { Error: error.response },
+                });
+                if (transactionAlreadySucceeded) {
+                    return res.status(200).json({
+                        status: 'SUCCESS',
+                        amount: tx.amount,
+                        walletBalance: user?.walletBalance ?? 0,
+                    });
+                }
+
+                log.warn(
+                    'Stale duplicate poll hit rate limit; using transaction state',
+                    {
+                        data: { reference: tx.reference, txStatus: tx.status },
+                    }
+                );
+                return res.status(200).json({
+                    status: 'PROCESSING' as const,
+                    message: '429 code detected ',
+                });
             }
             if (error.response) {
                 log.error('PayHero status check error', {
@@ -822,15 +860,17 @@ export async function pollWalletTopupPaymentStatus(
     try {
         const statusResponse =
             await PayheroService.getTransactionStatus(reference);
-        if (!statusResponse || statusResponse.status === 'PROCESSING') {
+        if (
+            !statusResponse ||
+            statusResponse.status === 'PROCESSING' ||
+            statusResponse.status === 'QUEUED'
+        ) {
             return res.json({ status: 'PROCESSING' as const });
         }
 
-        const status = statusResponse.status as
-            | { status?: 'SUCCESS' | 'FAILED' | 'PROCESSING' | 'QUEUED' }
-            | undefined;
+        const payHeroStatus = statusResponse.status;
 
-        if (status?.status === 'SUCCESS') {
+        if (payHeroStatus === 'SUCCESS') {
             const final =
                 await finalizeWalletTopupIfPendingByReference(reference);
             if (final.outcome === 'SUCCESS') {
@@ -845,8 +885,8 @@ export async function pollWalletTopupPaymentStatus(
             }
         }
 
-        if (status?.status === 'FAILED') {
-            const failureReason = describePayHeroFailure(status.status);
+        if (payHeroStatus === 'FAILED') {
+            const failureReason = describePayHeroFailure(payHeroStatus);
             await markWalletTopupFailed(tx, failureReason);
             return res.json({
                 status: 'FAILED' as const,
@@ -862,6 +902,30 @@ export async function pollWalletTopupPaymentStatus(
                     data: { reference: tx.reference },
                 });
                 return res.json({ status: 'PROCESSING' as const });
+            }
+            if (error.response?.status === 429) {
+                const txStatusText = String(tx.status);
+                const transactionAlreadySucceeded =
+                    txStatusText === 'SUCCESS' || tx.webhookReceived;
+
+                if (transactionAlreadySucceeded) {
+                    return res.status(200).json({
+                        status: 'SUCCESS',
+                        amount: tx.amount,
+                        walletBalance: user?.walletBalance ?? 0,
+                    });
+                }
+
+                log.warn(
+                    'Stale duplicate poll hit rate limit; using transaction state',
+                    {
+                        data: { reference: tx.reference, txStatus: tx.status },
+                    }
+                );
+                return res.status(200).json({
+                    status: 'PROCESSING' as const,
+                    message: '429 detected',
+                });
             }
             if (error.response) {
                 log.error('PayHero wallet top-up status check error', {
@@ -938,15 +1002,17 @@ export async function pollFileMergerPaymentStatus(
     try {
         const statusResponse =
             await PayheroService.getTransactionStatus(reference);
-        if (!statusResponse || statusResponse.status === 'PROCESSING') {
+        if (
+            !statusResponse ||
+            statusResponse.status === 'PROCESSING' ||
+            statusResponse.status === 'QUEUED'
+        ) {
             return res.json({ status: 'PROCESSING' as const });
         }
 
-        const status = statusResponse.status as
-            | { status?: 'SUCCESS' | 'FAILED' | 'PROCESSING' | 'QUEUED' }
-            | undefined;
+        const payHeroStatus = statusResponse.status;
 
-        if (status?.status === 'SUCCESS') {
+        if (payHeroStatus === 'SUCCESS') {
             const final = await finalizeFileMergerIfPendingByReference(
                 reference
                 //receipt
@@ -962,8 +1028,8 @@ export async function pollFileMergerPaymentStatus(
                 return res.json({ status: 'PROCESSING' as const });
             }
         }
-        if (status?.status === 'FAILED') {
-            const failureReason = describePayHeroFailure(status.status);
+        if (payHeroStatus === 'FAILED') {
+            const failureReason = describePayHeroFailure(payHeroStatus);
             await markFileMergerFailed(tx, failureReason);
             return res.json({
                 status: 'FAILED' as const,
@@ -972,14 +1038,37 @@ export async function pollFileMergerPaymentStatus(
         }
         return res.json({ status: 'PROCESSING' as const });
     } catch (error) {
-        if (axios.isAxiosError(error) && error.request) {
-            return next(
-                new AppError(
-                    'Payment service is currently unavailable.',
-                    503,
-                    'PaymentError'
-                )
-            );
+        if (axios.isAxiosError(error)) {
+            if (error.response?.status === 429) {
+                const txStatusText = String(tx.status);
+                const transactionAlreadySucceeded =
+                    txStatusText === 'SUCCESS' || tx.webhookReceived;
+
+                if (transactionAlreadySucceeded) {
+                    return res.status(200).json({
+                        status: 'SUCCESS',
+                        amount: tx.amount,
+                        walletBalance: user?.walletBalance ?? 0,
+                    });
+                }
+
+                log.warn(
+                    'Stale duplicate poll hit rate limit; using transaction state',
+                    {
+                        data: { reference: tx.reference, txStatus: tx.status },
+                    }
+                );
+                return res.status(200).json({ status: 'PROCESSING' as const });
+            }
+            if (error.request) {
+                return next(
+                    new AppError(
+                        'Payment service is currently unavailable.',
+                        503,
+                        'PaymentError'
+                    )
+                );
+            }
         }
         return next(error);
     }
@@ -998,6 +1087,9 @@ export async function finalizeFolderCleanIfPendingByReference(
         reference,
         paymentKind: 'folder_clean',
     });
+    log.debug(`transaction data after fetching from db for ${reference}`, {
+        data: { tx },
+    });
     if (!tx) {
         return { outcome: 'not_found' };
     }
@@ -1014,7 +1106,11 @@ export async function finalizeFolderCleanIfPendingByReference(
     }
 
     const updated = await TransactionsModel.findOneAndUpdate(
-        { _id: tx._id, status: 'PROCESSING', paymentKind: 'folder_clean' },
+        {
+            userId: tx.userId,
+            status: 'QUEUED',
+            paymentKind: 'folder_clean',
+        },
         {
             $set: {
                 status: 'SUCCESS',
@@ -1023,8 +1119,12 @@ export async function finalizeFolderCleanIfPendingByReference(
         },
         { returnDocument: 'after' }
     );
+    log.debug(`transaction data after updating to db for ${reference}`, {
+        data: { updated },
+    });
 
     if (!updated) {
+        log.warn('Document not updated trying again...');
         const again = await TransactionsModel.findOne({ reference });
         if (again?.status === 'SUCCESS') {
             const user = await UserModel.findById(again.userId).select(
@@ -1036,6 +1136,7 @@ export async function finalizeFolderCleanIfPendingByReference(
                 amount: again.amount,
             };
         }
+        log.warn('failed to update document hence still processing');
         return { outcome: 'PROCESSING' };
     }
 
@@ -1086,7 +1187,7 @@ export async function finalizeWalletTopupIfPendingByReference(
     }
 
     const updated = await TransactionsModel.findOneAndUpdate(
-        { _id: tx._id, status: 'PROCESSING', paymentKind: 'wallet_topup' },
+        { userId: tx.userId, status: 'QUEUED', paymentKind: 'wallet_topup' },
         {
             $set: {
                 status: 'SUCCESS',
@@ -1159,7 +1260,7 @@ export async function finalizeFileMergerIfPendingByReference(
     }
 
     const updated = await TransactionsModel.findOneAndUpdate(
-        { _id: tx._id, status: 'PROCESSING', paymentKind: 'file_merger' },
+        { userId: tx.userId, status: 'QUEUED', paymentKind: 'file_merger' },
         {
             $set: {
                 status: 'SUCCESS',
@@ -1202,7 +1303,7 @@ async function markFolderCleanFailed(
     reason: string
 ): Promise<void> {
     await TransactionsModel.updateOne(
-        { _id: tx._id, status: 'PROCESSING' },
+        { userId: tx.userId, status: 'QUEUED' },
         { $set: { status: 'FAILED' } }
     );
     log.warn('Folder clean transaction failed', {
@@ -1215,7 +1316,7 @@ async function markWalletTopupFailed(
     reason: string
 ): Promise<void> {
     await TransactionsModel.updateOne(
-        { _id: tx._id, status: 'PROCESSING' },
+        { userId: tx.userId, status: 'QUEUED' },
         { $set: { status: 'FAILED' } }
     );
     log.warn('Wallet top-up transaction failed', {
@@ -1227,7 +1328,7 @@ async function markFileMergerFailed(
     reason: string
 ): Promise<void> {
     await TransactionsModel.updateOne(
-        { _id: tx._id, status: 'PROCESSING' },
+        { userId: tx.userId, status: 'QUEUED' },
         { $set: { status: 'FAILED' } }
     );
     log.warn('File merger transaction failed', {

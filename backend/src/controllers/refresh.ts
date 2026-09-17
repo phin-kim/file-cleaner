@@ -3,7 +3,6 @@ import jwt, { type JwtPayload } from 'jsonwebtoken';
 
 import { UserModel } from '../schema/UsersSchema.js';
 import { hashToken, signAccessToken, signRefreshToken } from '../utils/jwt.js';
-import type { JWTUserPayload, Subscription } from '../Types/authenticate.js';
 import createLogger from '../utils/logger.js';
 import AppError from '../utils/appError.js';
 
@@ -93,10 +92,10 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
             return next(AppError.unauthorized('Refresh token has expired'));
         }
         //rotate tokens - keep old token until new one is sent to client
-        const userPayload: JWTUserPayload = {
+        const userPayload = {
             uid: user._id.toString(),
             email: user.email,
-            subscriptionStatus: user.tierId as Subscription,
+            subscriptionStatus: user.tierId,
             role: user.role,
             displayName: user.email.split('@')[0],
         };

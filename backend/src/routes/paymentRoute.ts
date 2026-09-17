@@ -12,10 +12,7 @@ import {
     refundWalletCharge,
 } from '../controllers/payHeroPayment.js';
 import authenticate from '../middleware/authenticate.js';
-import {
-    paymentInitiationRateLimiter,
-    paymentStatusRateLimiter,
-} from '../middleware/rateLimiters.js';
+import { paymentInitiationRateLimiter } from '../middleware/rateLimiters.js';
 
 export const paymentRoute: Router = Router();
 
@@ -28,7 +25,6 @@ paymentRoute.post(
 paymentRoute.get(
     '/folder-clean/status/:reference',
     authenticate,
-    paymentStatusRateLimiter,
     asyncHandler(pollFolderCleanPaymentStatus)
 );
 paymentRoute.post(
@@ -40,7 +36,6 @@ paymentRoute.post(
 paymentRoute.get(
     '/file-merger/status/:reference',
     authenticate,
-    paymentStatusRateLimiter,
     asyncHandler(pollFileMergerPaymentStatus)
 );
 paymentRoute.post(
@@ -52,7 +47,6 @@ paymentRoute.post(
 paymentRoute.get(
     '/wallet-topup/status/:reference',
     authenticate,
-    paymentStatusRateLimiter,
     asyncHandler(pollWalletTopupPaymentStatus)
 );
 paymentRoute.post(
