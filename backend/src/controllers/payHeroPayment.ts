@@ -17,7 +17,7 @@ import {
     TransactionsModel,
     type Transaction_Type,
 } from '../schema/TransactionSchema.js';
-import { UserModel } from '../schema/UsersSchema.js';
+
 import { cleanerChargeAmountKes } from '../constants/cleanerPricing.js';
 import { mergerChargeAmountKes } from '../constants/mergerPricing.js';
 //import { maxFolderFilesForTier } from '../constants/tierUploadLimits.js';
@@ -1127,9 +1127,7 @@ export async function finalizeFolderCleanIfPendingByReference(
         log.warn('Document not updated trying again...');
         const again = await TransactionsModel.findOne({ reference });
         if (again?.status === 'SUCCESS') {
-            const user = await UserModel.findById(again.userId).select(
-                'walletBalance'
-            );
+            const user = await getManagedUser(again.userId);
             return {
                 outcome: 'SUCCESS',
                 walletBalance: user?.walletBalance ?? 0,
@@ -1173,9 +1171,7 @@ export async function finalizeWalletTopupIfPendingByReference(
         return { outcome: 'not_found' };
     }
     if (tx.status === 'SUCCESS') {
-        const user = await UserModel.findById(tx.userId).select(
-            'walletBalance'
-        );
+        const user = await getManagedUser(tx.userId);
         return {
             outcome: 'SUCCESS',
             walletBalance: user?.walletBalance ?? 0,
@@ -1200,9 +1196,7 @@ export async function finalizeWalletTopupIfPendingByReference(
     if (!updated) {
         const again = await TransactionsModel.findOne({ reference });
         if (again?.status === 'SUCCESS') {
-            const user = await UserModel.findById(again.userId).select(
-                'walletBalance'
-            );
+            const user = await getManagedUser(again.userId);
             return {
                 outcome: 'SUCCESS',
                 walletBalance: user?.walletBalance ?? 0,
@@ -1212,11 +1206,7 @@ export async function finalizeWalletTopupIfPendingByReference(
         return { outcome: 'PROCESSING' };
     }
 
-    const userAfter = await UserModel.findByIdAndUpdate(
-        tx.userId,
-        { $inc: { walletBalance: tx.amount } },
-        { returnDocument: 'after', select: 'walletBalance' }
-    );
+    const userAfter = await incrementManagedWallet(tx.userId, tx.amount);
 
     log.info('Wallet top-up finalized; wallet credited', {
         data: { reference, amount: tx.amount },
@@ -1246,9 +1236,7 @@ export async function finalizeFileMergerIfPendingByReference(
         return { outcome: 'not_found' };
     }
     if (tx.status === 'SUCCESS') {
-        const user = await UserModel.findById(tx.userId).select(
-            'walletBalance'
-        );
+        const user = await getManagedUser(tx.userId);
         return {
             outcome: 'SUCCESS',
             walletBalance: user?.walletBalance ?? 0,
@@ -1273,9 +1261,7 @@ export async function finalizeFileMergerIfPendingByReference(
     if (!updated) {
         const again = await TransactionsModel.findOne({ reference });
         if (again?.status === 'SUCCESS') {
-            const user = await UserModel.findById(again.userId).select(
-                'walletBalance'
-            );
+            const user = await getManagedUser(again.userId);
             return {
                 outcome: 'SUCCESS',
                 walletBalance: user?.walletBalance ?? 0,
@@ -1285,11 +1271,7 @@ export async function finalizeFileMergerIfPendingByReference(
         return { outcome: 'PROCESSING' };
     }
 
-    const userAfter = await UserModel.findByIdAndUpdate(
-        tx.userId,
-        { $inc: { walletBalance: tx.amount } },
-        { returnDocument: 'after', select: 'walletBalance' }
-    );
+    const userAfter = await incrementManagedWallet(tx.userId, tx.amount);
 
     return {
         outcome: 'SUCCESS',
@@ -1335,34 +1317,6 @@ async function markFileMergerFailed(
         data: { reference: tx.reference, reason },
     });
 }
-
-// function mapPayHeroToPollStatus(
-//     statusRaw: string | undefined
-// ): FolderCleanPollStatus {
-//     if (!statusRaw) return 'pending';
-//     const s = statusRaw.toLowerCase();
-//     if (
-//         s.includes('success') ||
-//         s.includes('complete') ||
-//         s.includes('paid') ||
-//         s === 'completed'
-//     ) {
-//         return 'success';
-//     }
-//     if (
-//         s.includes('fail') ||
-//         s.includes('cancel') ||
-//         s.includes('error') ||
-//         s.includes('declin') ||
-//         s.includes('timeout') ||
-//         s.includes('expired') ||
-//         s.includes('rejected') ||
-//         s.includes('insufficient')
-//     ) {
-//         return 'failed';
-//     }
-//     return 'pending';
-// }
 
 function describePayHeroFailure(statusRaw: string | undefined): string {
     if (!statusRaw) return 'Payment failed';
@@ -1460,9 +1414,7 @@ export async function chargeWalletForFolderCleaner(
             createdAt: new Date(),
         });
     } catch (error) {
-        await UserModel.findByIdAndUpdate(userId, {
-            $inc: { walletBalance: chargeAmount },
-        });
+        await incrementManagedWallet(userId, chargingAmount);
         throw error;
     }
 
@@ -1506,11 +1458,7 @@ export async function chargeWalletForFileMerger(
         return next(AppError.badRequest('Invalid charge amount'));
     }
 
-    const userAfterDebit = await UserModel.findOneAndUpdate(
-        { _id: userId, walletBalance: { $gte: chargeAmount } },
-        { $inc: { walletBalance: -chargeAmount } },
-        { returnDocument: 'after', select: 'walletBalance email' }
-    );
+    const userAfterDebit = await debitManagedWallet(userId, chargeAmount);
     if (!userAfterDebit) {
         return next(
             AppError.badRequest(
@@ -1535,9 +1483,7 @@ export async function chargeWalletForFileMerger(
             createdAt: new Date(),
         });
     } catch (error) {
-        await UserModel.findByIdAndUpdate(userId, {
-            $inc: { walletBalance: chargeAmount },
-        });
+        await incrementManagedWallet(userId, chargeAmount);
         throw error;
     }
 
@@ -1584,7 +1530,7 @@ export async function refundWalletCharge(
         userId,
     });
     if (existingRefund) {
-        const user = await UserModel.findById(userId).select('walletBalance');
+        const user = await getManagedUser(existingRefund.userId);
         return res.status(200).json({
             status: 'SUCCESS',
             walletBalance: user?.walletBalance ?? 0,

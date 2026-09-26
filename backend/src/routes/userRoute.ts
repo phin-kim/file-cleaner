@@ -5,6 +5,7 @@ import {
     deleteAccount,
     fetchProfile,
     getWalletHistory,
+    incrementUsage,
     removeProfileImage,
     uploadProfileImage,
 } from '../controllers/userController';
@@ -21,6 +22,11 @@ userRouter.post(
     authenticate,
     profileUpload.single('image'),
     asyncHandler(uploadProfileImage)
+);
+userRouter.patch(
+    '/increment-usage',
+    authenticate,
+    asyncHandler(incrementUsage)
 );
 userRouter.delete(
     '/profile-image',

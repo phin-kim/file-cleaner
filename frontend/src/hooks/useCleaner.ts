@@ -495,7 +495,7 @@ export default function useCleaner() {
                 localStorage.setItem('upload-stats', JSON.stringify(newStats));
                 log.info('Local limit updated instantly');
                 try {
-                    await welcomePageApi.patch('/increment-usage');
+                    await walletApi.patch('/user/increment-usage');
                     log.info('Usage count synced to cloud');
                 } catch (err) {
                     log.error('Failed to sync usage count', { data: { err } });

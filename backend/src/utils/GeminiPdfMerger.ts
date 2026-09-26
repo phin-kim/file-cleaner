@@ -1,4 +1,5 @@
 import { GoogleGenAI, type Content } from '@google/genai';
+import { existsSync, readFileSync } from 'fs-extra';
 import createLogger from '../utils/logger.js';
 const log = createLogger('GeminiPdfMerger');
 import type { QuestionExtractionResponse } from '../Types/filer-merger.js';
@@ -38,10 +39,11 @@ export class GeminiNativePdfProcessor {
         );
 
         if (appConfig.useVertexAi) {
+            log.highlight('Using vertex ai');
             if (!projectId) {
                 log.error('GOOGLE_CLOUD_PROJECT is missing from environment');
                 throw new AppError(
-                    'GOOGLE_CLOUD_PROJECT is required for Vertex AI',
+                    'Configuration mismatch.Please try again later',
                     500
                 );
             }
@@ -51,10 +53,11 @@ export class GeminiNativePdfProcessor {
                 project: projectId,
             });
         } else {
+            log.highlight('Using google studio');
             if (!appConfig.geminiApiKey) {
                 log.error('GEMINI_API_KEY is missing from environment');
                 throw new AppError(
-                    'GEMINI_API_KEY is required for Gemini API',
+                    'Configuration mismatch.Please try again later',
                     500
                 );
             }
@@ -68,10 +71,11 @@ export class GeminiNativePdfProcessor {
         this.retryDelayMs = retryDelayMs;
     }
     async processPdfs(pdfPaths: string[]): Promise<QuestionExtractionResponse> {
-        log.highlight('Using native pdf vison approach');
+        log.highlight('Using native pdf vision approach');
         log.info('Uploading PDFs to gemini api...');
-        //upload pdfs using files api
-        const uploadedFiles = await this.getGcsFileReference(pdfPaths);
+        //upload pdf;s using files api
+        // const uploadedFiles = await this.getGcsFileReference(pdfPaths);
+        const uploadedFiles = await this.uploadPdfs(pdfPaths);
         log.info(`Ready to process ${uploadedFiles.length} GCS reference(s)`);
         log.info('Sending to Gemini for visual analysis and deduplication...');
         const BATCH_SIZE = 10;
@@ -117,11 +121,11 @@ export class GeminiNativePdfProcessor {
         const merged = this.mergeBatchItems(batchResponses);
         return this.buildFinalResponse(merged);
     }
-    /* private async uploadPdfs(
+    private async uploadPdfs(
         pdfPaths: string[]
     ): Promise<GeminiFileResponse[]> {
         log.highlight(
-            `Starting parralel upload for ${pdfPaths.length} files ...`
+            `Starting parallel upload for ${pdfPaths.length} files ...`
         );
         const limit = pLimit(3);
         const uploadTasks = pdfPaths.map((path) =>
@@ -162,9 +166,9 @@ export class GeminiNativePdfProcessor {
             `Successfully uploaded ${successfulUploads.length}/${pdfPaths.length} files.`
         );
         return successfulUploads;
-    } */
-    //returns the GCS path this is a replacement for uplod pdfs coz Vertex AI cant process files directly like AIstudio
-    private async getGcsFileReference(
+    }
+    //returns the GCS path this is a replacement for upload pdf's coz Vertex AI cant process files directly like AIstudio
+    /*private async getGcsFileReference(
         pdfPaths: string[]
     ): Promise<GeminiFileResponse[]> {
         log.highlight(
@@ -198,7 +202,7 @@ export class GeminiNativePdfProcessor {
 
         const fileReferences = await Promise.all(uploadTasks);
         return fileReferences as unknown as GeminiFileResponse[];
-    }
+    }*/
     /**
      * build the extraction prompt for native pdf processing
      */
@@ -396,7 +400,7 @@ HTML RULES:
             .toLowerCase();
     }
     /**
-     * Build fallback HTML for unparseable responses
+     * Build fallback HTML for unparsable responses
      */
     /* private buildFallbackHtml(content: string): string {
         return `<!DOCTYPE html>

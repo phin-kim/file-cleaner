@@ -81,27 +81,10 @@ mergerRoute.post(
                 return next(AppError.unauthorized('Not authenticated'));
             }
 
-            // TYPE SAFE EXTRACTION:
-            // If it's a Document, use ._id. If it's a Payload, use .uid.
-
-            // Now you can proceed safely
-
             if (!user || !userId)
                 return next(AppError.notFound('User not found'));
 
             const isWorkSheet = req.query.isWorkSheet === 'true';
-            //const CAN_MERGE = TIER_CONFIG[tierId].canMerge;
-
-            /*const subscriptionStatus = await sendEmailAlert(req);
-            log.highlight('This is the subscription status', {
-                data: { subscriptionStatus },
-            });
-            if (subscriptionStatus?.expired) {
-                return res.status(403).json({
-                    type: 'SUBSCRIPTION_EXPIRED',
-                    message: 'Your subscription has expired',
-                });
-            }*/
 
             const folderName = req.body.folderName;
             if (!folderName) {

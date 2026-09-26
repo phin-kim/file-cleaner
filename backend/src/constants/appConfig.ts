@@ -12,7 +12,8 @@ export const appConfig = {
     geminiApiKey: process.env.GEMINI_API_KEY || '',
     location: process.env.GOOGLE_CLOUD_LOCATION || 'global',
     projectId: process.env.GOOGLE_CLOUD_PROJECT,
-    useVertexAi: process.env.GOOGLE_GENAI_USE_VERTEXAI === 'True' || process.env.GOOGLE_GENAI_USE_VERTEXAI === 'true',
+    //useVertexAi: process.env.GOOGLE_GENAI_USE_VERTEXAI === 'True' || process.env.GOOGLE_GENAI_USE_VERTEXAI === 'true',
+    useVertexAi: false,
     /** Gemini model to use */
     geminiModel: process.env.GEMINI_MODEL || 'gemini-3-flash-preview',
 
